@@ -1,0 +1,432 @@
+{
+ "videos": [
+  {
+   "id": "stewart-demo",
+   "file": "stewart-demo.mp4",
+   "poster": "stewart-demo.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 13.44,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/ShortStewartDemo.mp4 @5.0-18.4s",
+   "description": "Orange ball held steady on the black Stewart platform plate while the servo legs correct below it; edge LEDs switch to green near the end."
+  },
+  {
+   "id": "stewart-setup",
+   "file": "stewart-setup.mp4",
+   "poster": "stewart-setup.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/Full Demo.mp4 @43-55s",
+   "description": "Wide desk shot of the Stewart platform balancing a ball in the dark, with live ball-position and IK plots on the monitors behind it."
+  },
+  {
+   "id": "stewart-trajectory",
+   "file": "stewart-trajectory.mp4",
+   "poster": "stewart-trajectory.jpg",
+   "w": 1280,
+   "h": 706,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/TrajectoryPlanning.mp4 @4-16s",
+   "description": "Matplotlib trajectory planner animating position, velocity and acceleration profiles and the setpoint dot moving on the platform circle (white-background plots)."
+  },
+  {
+   "id": "stewart-sensing",
+   "file": "stewart-sensing.mp4",
+   "poster": "stewart-sensing.jpg",
+   "w": 720,
+   "h": 1280,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/PositionSensing.mp4 @2-14s",
+   "description": "Portrait shot of a finger pressing on the force-torque sensor while the monitor plots the estimated contact position as a yellow dot."
+  },
+  {
+   "id": "stewart-ik",
+   "file": "stewart-ik.mp4",
+   "poster": "stewart-ik.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 11.03,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/Inverse Kinematics.mp4 @3-14s",
+   "description": "Stewart platform prototype on the desk tilting while the monitor shows the live 3D inverse-kinematics leg plot."
+  },
+  {
+   "id": "stewart-assembly",
+   "file": "stewart-assembly.mp4",
+   "poster": "stewart-assembly.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/TimeLapseAssembly.mp4 full 36.8s at 3x",
+   "description": "Sped-up timelapse of hands assembling the acrylic Stewart platform: servo mounts, linkages, then the top plate with LED ring."
+  },
+  {
+   "id": "stewart-skeleton",
+   "file": "stewart-skeleton.mp4",
+   "poster": "stewart-skeleton.jpg",
+   "w": 1094,
+   "h": 1064,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/Stewart Platform/SPM Skeleton.mp4 @4-16s",
+   "description": "SolidWorks blue-line kinematic skeleton of the platform, with the top plate tilting as the legs are dragged (light background)."
+  },
+  {
+   "id": "stewart-sim",
+   "file": "stewart-sim.mp4",
+   "poster": "stewart-sim.jpg",
+   "w": 1280,
+   "h": 838,
+   "seconds": 13.0,
+   "source": "Documents/School/3B/MTE 380/3YDP/sims/ball_on_plate_control.mp4 @0.5-13.5s",
+   "description": "Simscape ball-on-plate simulation in four views with the plate tilting to centre an orange ball (grey background)."
+  },
+  {
+   "id": "beam-balancer",
+   "file": "beam-balancer.mp4",
+   "poster": "beam-balancer.jpg",
+   "w": 720,
+   "h": 1280,
+   "seconds": 12.03,
+   "source": "OneDrive/Pictures/Cool Stuff/Beam Balancer/BeamBalancingDemo.mp4 @2-14s",
+   "description": "Portrait close-up of the white 3D-printed beam balancer holding an orange ping-pong ball in place while it is nudged with a pen."
+  },
+  {
+   "id": "measurement",
+   "file": "measurement.mp4",
+   "poster": "measurement.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 9.8,
+   "source": "OneDrive/Pictures/Cool Stuff/Measurment Device/Final No Watermark.mp4 @0-9.8s",
+   "description": "Rendered turntable of the automated measurement device on black: screen enclosure, gantry tower and hex-grid part tray rotating into view."
+  },
+  {
+   "id": "mujoco",
+   "file": "mujoco.mp4",
+   "poster": "mujoco.jpg",
+   "w": 1222,
+   "h": 1234,
+   "seconds": 12.0,
+   "source": "OneDrive/Pictures/Cool Stuff/URA/MuJuCo Callbacks.mp4 @0-12s",
+   "description": "MuJoCo simulation of a Franka Panda arm reaching toward randomly placed coloured target spheres on a blue checkered floor."
+  },
+  {
+   "id": "radial-engine",
+   "file": "radial-engine.mp4",
+   "poster": "radial-engine.jpg",
+   "w": 960,
+   "h": 640,
+   "seconds": 9.94,
+   "source": "OneDrive/Pictures/Cool Stuff/Radial Engine/Motion Study.mp4 @0-9.9s",
+   "description": "Six-cylinder radial engine CAD motion study with translucent cylinders and the crank spinning, on a wooden base (white background)."
+  },
+  {
+   "id": "ftc-robot",
+   "file": "ftc-robot.mp4",
+   "poster": "ftc-robot.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 11.01,
+   "source": "YouTube yTg-Im7ZjQQ (FTC 16397 Control Award Submission) @268.5-279.5s",
+   "description": "Close-up of the FTC 16397 robot with purple underglow driving and handling orange rings on the field mat."
+  },
+  {
+   "id": "ftc-ring-shooter",
+   "file": "ftc-ring-shooter.mp4",
+   "poster": "ftc-ring-shooter.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 11.0,
+   "source": "OneDrive/Pictures/Cool Stuff/shootingRingSloMo.mp4 @0-11s",
+   "description": "Slow-motion top-down view of the FTC robot's flywheel shooter firing orange rings out of the chassis."
+  },
+  {
+   "id": "trashminator",
+   "file": "trashminator.mp4",
+   "poster": "trashminator.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 12.0,
+   "source": "YouTube ZRnscKaHNMk (The Trashminator) @271-283s",
+   "description": "The Trashminator surface trash-collecting robot floating on an icy river with its conveyor intake in the water."
+  },
+  {
+   "id": "swerve-cad",
+   "file": "swerve-cad.mp4",
+   "poster": "swerve-cad.jpg",
+   "w": 1280,
+   "h": 720,
+   "seconds": 13.0,
+   "source": "YouTube HbKzi6g2pC8 (Highlight Reel of Projects) @150-163s",
+   "description": "CAD animation moving over a blue/red swerve drive module, closing in on the rack-and-pinion gears and stepper motor."
+  }
+ ],
+ "images": [
+  {
+   "id": "armaan_portrait_highres",
+   "file": "img/armaan_portrait_highres.webp",
+   "w": 1600,
+   "h": 1200,
+   "description": "Casual selfie of Armaan smiling in front of a robot/demo setup."
+  },
+  {
+   "id": "automated_tolerance_inspection",
+   "file": "img/automated_tolerance_inspection.webp",
+   "w": 690,
+   "h": 440,
+   "description": "Photo of the measurement device prototype beside its CAD render: screen enclosure, part tray and camera tower."
+  },
+  {
+   "id": "canard_actuator_render",
+   "file": "img/canard_actuator_render.webp",
+   "w": 1143,
+   "h": 603,
+   "description": "Render of a stacked-plate actuator assembly driven by a purple 70 kg brushless servo (appears to be a rocketry canard actuator, not the inspection setup)."
+  },
+  {
+   "id": "beam_simulink_loop",
+   "file": "img/beam_simulink_loop.webp",
+   "w": 975,
+   "h": 411,
+   "description": "Simulink block diagram of a feedback control loop (not linkage CAD)."
+  },
+  {
+   "id": "beam_balancer_mechanism",
+   "file": "img/beam_balancer_mechanism.webp",
+   "w": 680,
+   "h": 460,
+   "description": "Render of the white beam balancer with a ball on the beam and the servo at the pivot."
+  },
+  {
+   "id": "ftc_16397_robot",
+   "file": "img/ftc_16397_robot.webp",
+   "w": 710,
+   "h": 440,
+   "description": "Render of the FTC 16397 robot with green flywheel/intake mechanisms and purple side panels."
+  },
+  {
+   "id": "ftc_robot_award_action",
+   "file": "img/ftc_robot_award_action.webp",
+   "w": 721,
+   "h": 776,
+   "description": "Armaan in a team shirt presenting the FTC robot at a judging table."
+  },
+  {
+   "id": "ftc_sim_banner",
+   "file": "img/ftc_sim_banner.webp",
+   "w": 1140,
+   "h": 416,
+   "description": "FTC SIM Virtual Robotics Adventure banner with a cartoon robot on an orange field (not subsystem CAD)."
+  },
+  {
+   "id": "ftc_robotics_team_championship",
+   "file": "img/ftc_robotics_team_championship.webp",
+   "w": 1600,
+   "h": 501,
+   "description": "Row of team logos: Relatively Quantum 16397, Disco Bots and a robot mascot (logo graphic, not a championship photo)."
+  },
+  {
+   "id": "fyelabs_actuating_case",
+   "file": "img/fyelabs_actuating_case.webp",
+   "w": 700,
+   "h": 760,
+   "description": "Collage of the Fyelabs actuating enclosure: CAD views, internal electronics and the open case."
+  },
+  {
+   "id": "fyelabs_actuating_case_render",
+   "file": "img/fyelabs_actuating_case_render.webp",
+   "w": 1600,
+   "h": 900,
+   "description": "Render of the black actuating case with its outer cover raised."
+  },
+  {
+   "id": "fyelabs_lidar_pcb",
+   "file": "img/fyelabs_lidar_pcb.webp",
+   "w": 784,
+   "h": 318,
+   "description": "Render of a long blue PCB on black (not a flux graph)."
+  },
+  {
+   "id": "fyelabs_enclosure_metal",
+   "file": "img/fyelabs_enclosure_metal.webp",
+   "w": 852,
+   "h": 479,
+   "description": "Render of a brushed-metal sensor enclosure on black (not a control-flow diagram)."
+  },
+  {
+   "id": "fyelabs_hmi_unit",
+   "file": "img/fyelabs_hmi_unit.webp",
+   "w": 590,
+   "h": 600,
+   "description": "HMI unit with a touchscreen showing a red/green zone display, beside its blue PCB."
+  },
+  {
+   "id": "fyelabs_case_closed",
+   "file": "img/fyelabs_case_closed.webp",
+   "w": 960,
+   "h": 540,
+   "description": "Render of the actuating case with its outer cover lowered (not a lidar visualizer)."
+  },
+  {
+   "id": "ixana_pipeline_block_diagram",
+   "file": "img/ixana_pipeline_block_diagram.webp",
+   "w": 1600,
+   "h": 302,
+   "description": "Black IXANA wordmark on a transparent background (not a block diagram; invisible on a dark page)."
+  },
+  {
+   "id": "ixana_wearable_streaming",
+   "file": "img/ixana_wearable_streaming.webp",
+   "w": 740,
+   "h": 640,
+   "description": "Ixana early prototype electronics: battery, flex PCBs and camera module, captioned as last year's CES demo / early prototypes."
+  },
+  {
+   "id": "lidar_point_cloud_3d",
+   "file": "img/lidar_point_cloud_3d.webp",
+   "w": 740,
+   "h": 480,
+   "description": "3D lidar point cloud coloured by height, blue to red."
+  },
+  {
+   "id": "magna_algorithm_flowchart",
+   "file": "img/magna_algorithm_flowchart.webp",
+   "w": 1273,
+   "h": 723,
+   "description": "Crack-detection algorithm flowchart with angle-bucket averaging tables."
+  },
+  {
+   "id": "magna_crack_detection",
+   "file": "img/magna_crack_detection.webp",
+   "w": 720,
+   "h": 530,
+   "description": "Strain curves from multiple sensors all detecting a crack, with algorithm flowchart thumbnails."
+  },
+  {
+   "id": "magna_crack_detection_dashboard",
+   "file": "img/magna_crack_detection_dashboard.webp",
+   "w": 1024,
+   "h": 768,
+   "description": "Dashboard of per-sensor strain waveform plots with the detection flowchart below."
+  },
+  {
+   "id": "magna_strokes_deviation",
+   "file": "img/magna_strokes_deviation.webp",
+   "w": 1600,
+   "h": 739,
+   "description": "Plot of strain waveforms across many strokes with one deviating curve (not a queue diagram)."
+  },
+  {
+   "id": "magna_strain_waveforms_crack",
+   "file": "img/magna_strain_waveforms_crack.webp",
+   "w": 1600,
+   "h": 727,
+   "description": "Plot of strain waveforms across many strokes showing a crack signature."
+  },
+  {
+   "id": "mujoco_franka_panda_ripl",
+   "file": "img/mujoco_franka_panda_ripl.webp",
+   "w": 600,
+   "h": 590,
+   "description": "MuJoCo render of a Franka Panda arm grasping a red object on a blue checkered floor."
+  },
+  {
+   "id": "hub_fea",
+   "file": "img/hub_fea.webp",
+   "w": 1600,
+   "h": 991,
+   "description": "FEA stress plot of a blue clamping hub with yellow/red stress concentrations (not the radial engine)."
+  },
+  {
+   "id": "canardian_pcb_render",
+   "file": "img/canardian_pcb_render.webp",
+   "w": 1600,
+   "h": 863,
+   "description": "Render of The Canard-ian flight-computer PCB on black (not airbrakes CAD)."
+  },
+  {
+   "id": "canardian_pcb_layout",
+   "file": "img/canardian_pcb_layout.webp",
+   "w": 960,
+   "h": 540,
+   "description": "PCB layout view of The Canard-ian board with copper traces (not a cam mechanism)."
+  },
+  {
+   "id": "rocketry_canardian_pcb",
+   "file": "img/rocketry_canardian_pcb.webp",
+   "w": 810,
+   "h": 680,
+   "description": "Collage of The Canard-ian PCB render with its layout, schematic and simulation plots."
+  },
+  {
+   "id": "canardian_pcb_render_tall",
+   "file": "img/canardian_pcb_render_tall.webp",
+   "w": 1162,
+   "h": 1548,
+   "description": "Render of The Canard-ian PCB on black (not a CFD simulation)."
+  },
+  {
+   "id": "segway_dynamics_simulink",
+   "file": "img/segway_dynamics_simulink.webp",
+   "w": 800,
+   "h": 720,
+   "description": "Collage of segway dynamics: free-body diagram, equations, Simulink blocks and surface plots."
+  },
+  {
+   "id": "equations_of_motion",
+   "file": "img/equations_of_motion.webp",
+   "w": 487,
+   "h": 831,
+   "description": "Typeset equations of motion with C1-C7 coefficient terms (not a sensor photo)."
+  },
+  {
+   "id": "stewart_kinematics_diagram",
+   "file": "img/stewart_kinematics_diagram.webp",
+   "w": 632,
+   "h": 948,
+   "description": "Free-body/kinematics line diagram of a pivoting link system with labelled forces."
+  },
+  {
+   "id": "stewart_platform_prototype",
+   "file": "img/stewart_platform_prototype.webp",
+   "w": 1600,
+   "h": 901,
+   "description": "Dark photo of the Stewart platform with a ball on the plate and servo legs below."
+  },
+  {
+   "id": "stewart_platform_sim_sensor",
+   "file": "img/stewart_platform_sim_sensor.webp",
+   "w": 730,
+   "h": 630,
+   "description": "Collage: IK 3D plot, Simulink plant and controller, and the force-moment sensor."
+  },
+  {
+   "id": "link_free_body_diagram",
+   "file": "img/link_free_body_diagram.webp",
+   "w": 565,
+   "h": 773,
+   "description": "Free-body diagram of a link pivoting about O with labelled forces and moments (not a Simscape block)."
+  },
+  {
+   "id": "armaan_portrait_formal",
+   "file": "img/armaan_portrait_formal.webp",
+   "w": 1600,
+   "h": 1600,
+   "description": "Formal portrait of Armaan in a maroon suit on black (not a clamping hub)."
+  },
+  {
+   "id": "tesla_lighting_vehicles",
+   "file": "img/tesla_lighting_vehicles.webp",
+   "w": 720,
+   "h": 500,
+   "description": "Line-callout illustration of a Tesla Semi and Cybercab highlighting their lighting."
+  },
+  {
+   "id": "radial_engine_render",
+   "file": "img/radial_engine_render.webp",
+   "w": 1600,
+   "h": 900,
+   "description": "Render of the six-cylinder radial engine on a wooden base (not the Trashminator)."
+  }
+ ]
+}
