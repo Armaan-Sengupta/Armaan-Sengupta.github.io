@@ -555,12 +555,6 @@ class FyelabsSystem extends HTMLElement {
     txt('10 × 1-D LIDAR · 180° ARC', pad, pad + fs, mid);
     if (v === 'lidar') { txt('NO MOVING PARTS', pad, pad + fs + lh, dim); return; }
     const filt = S.filter;
-    txt('DUST FILTER', pad, pad + fs + lh * 1.2, dim);
-    txt('RAW', pad, pad + fs + lh * 2.2, filt ? dim : hi); txt('FILTERED', pad + fs * 5, pad + fs + lh * 2.2, filt ? hi : dim);
-    c.fillStyle = hi; const ux = filt ? pad + fs * 5 : pad, uw = filt ? fs * 5.4 : fs * 2; c.fillRect(ux, pad + fs + lh * 2.2 + 4, uw, 1);
-    txt(`DUST RETURNS  ${String(Math.round(S.raw)).padStart(2, ' ')}`, pad, pad + fs + lh * 3.6, mid);
-    txt(filt ? `REJECTED      ${String(Math.round(S.rej)).padStart(2, ' ')}` : 'REJECTED       0', pad, pad + fs + lh * 4.6, filt ? hi : dim);
-    const falseAl = !filt && S.raw > .5; txt(falseAl ? 'FALSE DETECTIONS' : 'PERSON TRACKED', pad, pad + fs + lh * 5.6, falseAl ? ac : hi);
     // strip chart beam 5: distance + flux
     const cw = Math.min(260, W * .38), ch = Math.min(70, H * .15), cx = pad, cy = H - pad - ch;
     c.strokeStyle = 'rgba(242,239,233,.12)'; c.lineWidth = 1; c.strokeRect(cx + .5, cy + .5, cw, ch);

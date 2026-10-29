@@ -245,7 +245,7 @@ export const details = {
     ],
     body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across 3,000+ electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
       'Cut registration from 8 min to 15 s per trial, enabling ~40M pulses per electrode in 13 weeks, which made the safety study feasible and met the FDA submission deadline. Brought up impedance and calibration so chips could self-test, unblocking the production line.'],
-    chips: ['Rust', 'C', 'DMA', 'Interrupts', 'ASIC bring-up'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
+    chips: ['Rust', 'C', 'DMA', 'Interrupts', 'ASIC bring-up', 'Protobuf'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
   },
   tesla: { gallery: [
       { type: 'image', src: 'media/img/tesla_lighting_vehicles.webp', caption: 'Semi and Cybercab lighting locations (render)' },
@@ -295,7 +295,7 @@ export const details = {
     ],
     body: ['An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, an IR camera, IMU and GPS across 6 microcontrollers.',
       'Designed a LiDAR dust-filtering algorithm from field data, five parallel filters that reject dust and still catch people (C++). Designed the HMI: a 2-layer PCB with two MCUs, a LoRa link with custom checksums, a graphics library and 12-zone object mapping. Designed the 100+ part actuating stainless enclosure over 15 revisions, cutting cost 56% and halving lead time.'],
-    chips: ['C++', 'LiDAR', 'EasyEDA', 'LoRa · UART', 'SolidWorks · sheet metal']
+    chips: ['C++', 'LiDAR', 'EasyEDA', 'LoRa · UART · I²C', 'SolidWorks · sheet metal']
   },
   'trashminator': { body: ['A macro surface-level aquatic cleaning robot that autonomously navigates a body of water and collects floating debris; a swarm of them could take on aquatic pollution. It began as a technological design course project and became a personal one.'], chips: ['Arduino', 'Fusion 360'] },
   'radial-engine': { body: ['A test of CAD skill: more than 20 intricate parts modelled from orthographic drawings and assembled into a working radial-engine linkage, then animated.'], chips: ['Inventor', 'Fusion 360'] },
@@ -347,7 +347,7 @@ export const skills = {
     'DMA · interrupts': ['neuralink', 'gantry'], 'ASIC bring-up': ['neuralink', 'ixana'], 'FPGA': ['ixana']
   },
   'Protocols': {
-    'I²C': ['airbrakes', 'measurement'], 'UART': ['fyelabs', 'airbrakes', 'gantry'],
+    'I²C': ['airbrakes', 'measurement', 'fyelabs'], 'Protobuf': ['neuralink'], 'UART': ['fyelabs', 'airbrakes', 'gantry'],
     'MIPI DSI': ['ixana'], 'LoRa': ['fyelabs'], 'MQTT': ['magna', 'fyelabs'], 'WebSockets': ['measurement']
   },
   'Hardware & CAD': {
