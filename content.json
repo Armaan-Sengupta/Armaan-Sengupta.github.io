@@ -1,0 +1,1419 @@
+{
+ "projects": [
+  {
+   "id": "platform",
+   "title": "Stewart Platform",
+   "org": "Third year · MTE 380 design project (team)",
+   "dates": "Sep – Dec 2025",
+   "start": "2025-09",
+   "flow": "personal",
+   "kind": "chapter",
+   "summary": "A 3RRS parallel manipulator that balances a ball on a plate, with the ball located by a force/torque sensor under the plate instead of a camera.",
+   "bullets": [
+    "3-DOF 3RRS parallel manipulator: forward and inverse kinematics for the servo legs",
+    "Plant modelled in Simulink/Simscape; physical plant characterized and controller tuned against it",
+    "Trajectory planning for feedforward control of the ball path",
+    "\"Remote\" ball position sensing from a 3-DOF ForceN force/torque sensor",
+    "Code on GitHub (Redstone-ray/3YDP); full MTE 380 report"
+   ],
+   "links": [
+    {
+     "label": "Code (GitHub)",
+     "href": "https://github.com/Redstone-ray/3YDP"
+    },
+    {
+     "label": "Full report (PDF)",
+     "href": "media/gallery/platform/report.pdf"
+    },
+    {
+     "label": "Demo video",
+     "href": "https://youtu.be/CxzUW5jrmIc"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "youtube",
+     "src": "CxzUW5jrmIc",
+     "poster": "https://i.ytimg.com/vi/CxzUW5jrmIc/hqdefault.jpg",
+     "caption": "Ball balancing using the force/torque sensor: informal demo"
+    },
+    {
+     "type": "youtube",
+     "src": "Ilx4d0JpWdY",
+     "poster": "https://i.ytimg.com/vi/Ilx4d0JpWdY/hqdefault.jpg",
+     "caption": "Inverse kinematics demo of the 3RRS manipulator"
+    },
+    {
+     "type": "youtube",
+     "src": "-PhUBZktgj0",
+     "poster": "https://i.ytimg.com/vi/-PhUBZktgj0/hqdefault.jpg",
+     "caption": "Simscape ball-on-plate plant and controller simulation"
+    },
+    {
+     "type": "youtube",
+     "src": "4DZ4b8GL0lY",
+     "poster": "https://i.ytimg.com/vi/4DZ4b8GL0lY/hqdefault.jpg",
+     "caption": "Ball position sensing using the force + torque sensor"
+    },
+    {
+     "type": "youtube",
+     "src": "uATKdre2w3I",
+     "poster": "https://i.ytimg.com/vi/uATKdre2w3I/hqdefault.jpg",
+     "caption": "Trajectory planning"
+    },
+    {
+     "type": "youtube",
+     "src": "MWGfau5B12A",
+     "poster": "https://i.ytimg.com/vi/MWGfau5B12A/hqdefault.jpg",
+     "caption": "Ball position sensing using the 3-DOF ForceN force/torque sensor (long form)"
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/platform/overview.webp",
+     "caption": "Overview: inverse kinematics, the Simulink plant and controller, and the force/torque sensor",
+     "w": 800,
+     "h": 600
+    },
+    {
+     "type": "pdf",
+     "src": "media/gallery/platform/report.pdf",
+     "caption": "MTE 380 final report (PDF)"
+    }
+   ]
+  },
+  {
+   "id": "airbrakes",
+   "title": "Rocket Airbrakes",
+   "org": "Waterloo Rocketry · Borealis",
+   "dates": "Sep 2023 – Dec 2024",
+   "start": "2023-09",
+   "flow": "personal",
+   "kind": "chapter",
+   "summary": "Active in-flight apogee control for a liquid rocket: three panels driven by one servo through a linear cam-and-slot plate, with CFD-derived drag models and STM32 flight firmware.",
+   "bullets": [
+    "One low-power servo drives all 3 panels in sync through a spinning plate with 3 modified spiral slots (linear extension per degree)",
+    "Ansys CFD with a teammate: kept the centre of pressure safely behind the CG and mapped Cd vs extension for the trajectory model",
+    "Co-wrote STM32 FreeRTOS firmware: Kalman-filter state estimation, RK4 trajectory prediction, PID panel control",
+    "2025: designed the 4-layer central avionics PCB in KiCad (power efficiency 66% to 95%, onboard IMU over I2C, external AHRS over UART) for the roll-control canards",
+    "2024 launch: propellant underfill meant the airbrakes correctly stayed retracted the whole flight"
+   ],
+   "links": [
+    {
+     "label": "Rocket launch (YouTube)",
+     "href": "https://youtu.be/Z126ZESX3uA"
+    },
+    {
+     "label": "Airbrakes presentation (YouTube)",
+     "href": "https://youtu.be/SJO39WQ7Uv0"
+    },
+    {
+     "label": "Rocketry page (Wix)",
+     "href": "https://www.armaansengupta.ca/rocketry"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/rocket.webp",
+     "caption": "Borealis, the Waterloo Rocketry liquid rocket",
+     "w": 1800,
+     "h": 1440
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/render-stand.webp",
+     "caption": "Airbrake mechanism render, panels retracted",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/render-extended.webp",
+     "caption": "Airbrake module with the three panels extended",
+     "w": 1143,
+     "h": 603
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/assembly.webp",
+     "caption": "Airbrake module, external view",
+     "w": 1677,
+     "h": 783
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cross-section.webp",
+     "caption": "Airbrake assembly cross-section",
+     "w": 1677,
+     "h": 783
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cross-section-2.webp",
+     "caption": "Cross-section through the cam plate and panels",
+     "w": 1673,
+     "h": 783
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cfd-streamlines.webp",
+     "caption": "Ansys CFD: streamlines past the airbrakes",
+     "w": 1252,
+     "h": 878
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cfd-body.webp",
+     "caption": "Ansys CFD: flow over the rocket body",
+     "w": 597,
+     "h": 418
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cd-points.webp",
+     "caption": "Simulated drag data across extension and velocity",
+     "w": 772,
+     "h": 699
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cd-surface.webp",
+     "caption": "Regression surface fitted to the drag data",
+     "w": 795,
+     "h": 722
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/cam-profile.webp",
+     "caption": "Modified spiral slot profile: linear extension per degree of servo rotation",
+     "w": 1533,
+     "h": 867
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/spinning-plate.webp",
+     "caption": "Spinning cam plate with three spiral slots, one per panel",
+     "w": 1685,
+     "h": 849
+    },
+    {
+     "type": "youtube",
+     "src": "Z126ZESX3uA",
+     "poster": "https://i.ytimg.com/vi/Z126ZESX3uA/hqdefault.jpg",
+     "caption": "Rocket launch"
+    },
+    {
+     "type": "youtube",
+     "src": "SJO39WQ7Uv0",
+     "poster": "https://i.ytimg.com/vi/SJO39WQ7Uv0/hqdefault.jpg",
+     "caption": "My presentation on the airbrakes"
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/canard-pcb-render.webp",
+     "caption": "2025 central avionics PCB (4-layer, KiCad) render",
+     "w": 1724,
+     "h": 930
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/canard-pcb-layout.webp",
+     "caption": "Central avionics PCB layout",
+     "w": 960,
+     "h": 540
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/airbrakes/canard-pcb.webp",
+     "caption": "Central avionics PCB render",
+     "w": 1162,
+     "h": 1548
+    }
+   ]
+  },
+  {
+   "id": "measurement",
+   "title": "Automated Measurement System",
+   "org": "Second year · MTE 201 (team of 4)",
+   "dates": "Sep – Dec 2023",
+   "start": "2023-09",
+   "flow": "personal",
+   "kind": "chapter",
+   "summary": "A hands-off tolerance-inspection station: computer vision orients the part, a force-sensing clamp on a rotary encoder measures it, and out-of-spec parts are logged to a server.",
+   "bullets": [
+    "Lead firmware: C++ on the ESP32 and the VEX V5 brain for both motors, dimension derivation and the on-machine GUI",
+    "Custom uni-directional 2-wire clock + data protocol (I2C-inspired) because the V5 brain exposes only digital I/O",
+    "OpenCV (Python) finds the part rotation and sends the angle to the ESP32 over web sockets",
+    "Clamp stops on firm contact via force sensing; encoder rotation is mapped to linear distance",
+    "Out-of-spec parts: image + failing dimension logged to a remote server and flagged on the display"
+   ],
+   "links": [
+    {
+     "label": "Project report (PDF)",
+     "href": "media/gallery/measurement/report.pdf"
+    },
+    {
+     "label": "Technical report (Google Drive)",
+     "href": "https://drive.google.com/file/d/1Ytp4l94ol0VdSAHArLPGi6ToqCvMx83w/view"
+    },
+    {
+     "label": "Measurement project (YouTube)",
+     "href": "https://youtu.be/MB9A7U8ksmc"
+    }
+   ],
+   "lottie": {
+    "json": "media/lottie/measurement-device.json",
+    "mp4": "media/lottie/measurement-device.mp4",
+    "poster": "media/lottie/measurement-device.jpg"
+   },
+   "loop": {
+    "src": "media/gallery/measurement/demo-loop.mp4",
+    "poster": "media/gallery/measurement/demo-loop.jpg"
+   },
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/measurement/machine.webp",
+     "caption": "The automated measurement machine",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "video",
+     "src": "media/gallery/measurement/demo.mp4",
+     "poster": "media/gallery/measurement/demo.jpg",
+     "caption": "Full demo: vision-guided rotation, clamping and measurement",
+     "w": 1280,
+     "h": 720,
+     "seconds": 92.78,
+     "loop": false
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/measurement/flow.webp",
+     "caption": "Measurement state flow",
+     "w": 1024,
+     "h": 768
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/measurement/ui-flow.webp",
+     "caption": "On-machine UI flow",
+     "w": 1024,
+     "h": 768
+    },
+    {
+     "type": "video",
+     "src": "media/gallery/measurement/protocol-test-1.mp4",
+     "poster": "media/gallery/measurement/protocol-test-1.jpg",
+     "caption": "Custom 2-wire protocol test: ESP32 sending a rotation angle to the brain",
+     "w": 1920,
+     "h": 1080,
+     "seconds": 10.13,
+     "loop": false
+    },
+    {
+     "type": "video",
+     "src": "media/gallery/measurement/protocol-test-2.mp4",
+     "poster": "media/gallery/measurement/protocol-test-2.jpg",
+     "caption": "Second protocol test, decoding angles into turntable motion",
+     "w": 1920,
+     "h": 1080,
+     "seconds": 14.76,
+     "loop": false
+    },
+    {
+     "type": "pdf",
+     "src": "media/gallery/measurement/report.pdf",
+     "caption": "MTE 201 project report (PDF)"
+    }
+   ]
+  },
+  {
+   "id": "segway",
+   "title": "Segway System Modelling & Optimization",
+   "org": "Third year · SYDE 351 (team)",
+   "dates": "Jan – Apr 2025",
+   "start": "2025-01",
+   "flow": "personal",
+   "kind": "chapter",
+   "summary": "Derived, linearized and simulated a human transporter, then tuned thrust force and lean angle for maximum distance without falling, cross-checked against an acausal SimulationX model.",
+   "bullets": [
+    "Hand-derived nonlinear kinematic and kinetic equations; linearized with a small-angle approximation",
+    "Simulink sweep: coarse pass, then 160-180 N in 0.5 N steps and 0.2-0.8 rad in 0.05 rad steps",
+    "Simulink optimum: 12.3 m at 170 N thrust (lean angle reported as -0.2 rad)",
+    "SimulationX acausal model (no hand-derived EOMs) as a sanity check: 9.15 m at 110 N and 11 degrees",
+    "Python to parse, clean and plot the SimulationX sweep data"
+   ],
+   "links": [
+    {
+     "label": "Simulink code",
+     "href": "https://github.com/Armaan-Sengupta/MTE-351-Code/tree/main/Simulink"
+    },
+    {
+     "label": "SimX files & Python",
+     "href": "https://github.com/Armaan-Sengupta/MTE-351-Code/tree/main/SimX"
+    },
+    {
+     "label": "Full report (PDF)",
+     "href": "media/gallery/segway/report.pdf"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/segway/fbd-kinematics.webp",
+     "caption": "Free-body diagram of the rider and wheel",
+     "w": 632,
+     "h": 948
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/fbd-kinetics.webp",
+     "caption": "Kinematic diagram with the rider lean angle",
+     "w": 565,
+     "h": 773
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/eom.webp",
+     "caption": "Nonlinear equations of motion",
+     "w": 487,
+     "h": 831
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/state-space.webp",
+     "caption": "Linearized state-space model (small-angle approximation)",
+     "w": 880,
+     "h": 178
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/constants.webp",
+     "caption": "Lumped model constants",
+     "w": 295,
+     "h": 373
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/simulink.webp",
+     "caption": "Simulink block diagram of the linearized model",
+     "w": 975,
+     "h": 411
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/simx-model.webp",
+     "caption": "SimulationX acausal model of the transporter",
+     "w": 816,
+     "h": 908
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/segway/simx-surface.webp",
+     "caption": "SimulationX sweep: distance travelled vs force and lean angle",
+     "w": 795,
+     "h": 636
+    },
+    {
+     "type": "pdf",
+     "src": "media/gallery/segway/report.pdf",
+     "caption": "SYDE 351 technical report (PDF)"
+    }
+   ]
+  },
+  {
+   "id": "neuralink",
+   "title": "Neuralink",
+   "org": "Implant Firmware & Embedded Systems Intern · California",
+   "dates": "Jan – Aug 2026",
+   "start": "2026-01",
+   "flow": "professional",
+   "kind": "chapter",
+   "summary": "Firmware for a first-generation neural stimulation implant and the app-to-ASIC stack for Blindsight, the visual prosthesis.",
+   "bullets": [
+    "Led firmware for the 1st-gen stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling for 3k+ electrodes (Rust & C)",
+    "Architected the full app-to-ASIC stack for Blindsight",
+    "Cut registration time from 8 min to 15 s per trial, enabling ~40M pulses per electrode in 13 weeks: made the safety study feasible and hit the FDA submission deadline (Rust)",
+    "Brought up impedance and calibration, enabling chip self-test and unblocking the production line"
+   ],
+   "links": [
+    {
+     "label": "Blindsight",
+     "href": "https://neuralink.com/trials/visual-prosthesis/"
+    }
+   ],
+   "gallery": []
+  },
+  {
+   "id": "tesla",
+   "title": "Tesla",
+   "org": "Vehicle Firmware Body Controls Intern · California",
+   "dates": "May – Aug 2025",
+   "start": "2025-05",
+   "flow": "professional",
+   "kind": "chapter",
+   "summary": "Led exterior-lighting bring-up on the Tesla Semi (~20 channels, hardware to production) and lighting diagnostics across Cybercab, Cybertruck and Model 3/Y.",
+   "bullets": [
+    "Brought up ~20 exterior lights and their ADCs on the Semi from bare hardware to the app layer (Altium schematics, C drivers, homologated behaviours)",
+    "Found an RC time-constant / short ADC sample-time issue that let the sample-and-hold retain charge and false-pass faulty lights",
+    "Current-sense self-tests for Cybercab lights so faulty units cannot pass production",
+    "Fixed Cybertruck left/right headlamp stepper calibration falling out of sync; auto high-beam latching only at night",
+    "Fixed fault logging used on Model 3/Y and Cybertruck; Python (Pytest) SIL tests to prevent regressions"
+   ],
+   "links": [],
+   "lottie": {
+    "json": "media/lottie/tesla-semi.json"
+   },
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/tesla/semi-illustration-2.webp",
+     "caption": "Tesla Semi marker lights (illustration)",
+     "w": 1024,
+     "h": 1024
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/tesla/vehicle-illustration.webp",
+     "caption": "Headlamp light bar (illustration)",
+     "w": 1024,
+     "h": 1024
+    }
+   ]
+  },
+  {
+   "id": "ixana",
+   "title": "Ixana",
+   "org": "Embedded Systems & Firmware Engineering Intern · Indiana",
+   "dates": "Aug – Dec 2024",
+   "start": "2024-08",
+   "flow": "professional",
+   "kind": "chapter",
+   "summary": "Wireless video from smart glasses to a smartwatch over Ixana's YR22 Wi-R silicon, which uses electro-quasistatic body communication as a low-power data bus.",
+   "bullets": [
+    "Full data path: camera, encoding FPGA, TX MCU, Wi-R (EQS) silicon, RX MCU, decoding FPGA, AMOLED display",
+    "Wrote the watch AMOLED display driver over MIPI DSI (C++)",
+    "Bare-metal core OS in C++ for Ambiq and NXP ARM MCUs; frame rate 4 to 13 fps, power down 8%",
+    "Automatic gain control for the custom RF chip: +45% packet reception",
+    "Rigol arbitrary-waveform-generator library for HIL testing of custom silicon (Python); SPI/I2C timing debug between FPGA and MCU"
+   ],
+   "links": [
+    {
+     "label": "Ixana page (Wix)",
+     "href": "https://www.armaansengupta.ca/ixana"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "vimeo",
+     "src": "1049786530",
+     "caption": "Video streaming from smart glasses to the watch through the body",
+     "w": 403,
+     "h": 707
+    },
+    {
+     "type": "image",
+     "src": "media/img/ixana_wearable_streaming.webp",
+     "caption": "Wearable streaming demo"
+    }
+   ]
+  },
+  {
+   "id": "magna",
+   "title": "Magna",
+   "org": "Data Science & Controls R&D Engineering Intern · Ontario",
+   "dates": "Jan – Apr 2024",
+   "start": "2024-01",
+   "flow": "professional",
+   "kind": "chapter",
+   "summary": "In-die crack detection (IDCD) for a hydraulic press: strain-gauge streaming, a real-time anomaly detector and an operator dashboard.",
+   "bullets": [
+    "End-to-end pipeline: strain gauges streamed over MQTT, re-synchronized and stored in PostgreSQL",
+    "Anomaly detector over four strain sensors spots the discontinuity of a cracking part; 100% detection with zero false positives in validation",
+    "Adapts to new part profiles and uses a moving-window average so sensor drift is not flagged",
+    "Patent-pending PLC buffering on a Beckhoff controller: semaphore-driven threads + staged queues lifted collection from ~140 Hz to 500+ Hz",
+    "Web dashboard for operators to compare strain profiles across batches and review anomalies"
+   ],
+   "links": [
+    {
+     "label": "Magna page (Wix)",
+     "href": "https://www.armaansengupta.ca/magna"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/magna/dashboard.webp",
+     "caption": "Crack-detection dashboard flagging a cracked part",
+     "w": 1024,
+     "h": 768
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/magna/algorithm.webp",
+     "caption": "Anomaly detection algorithm flow chart",
+     "w": 1273,
+     "h": 723
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/magna/strokes-normal.webp",
+     "caption": "Control strokes (red) vs current stroke (blue): normal part",
+     "w": 1800,
+     "h": 818
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/magna/strokes-cracked.webp",
+     "caption": "Control strokes (red) vs current stroke (blue): cracked part",
+     "w": 1800,
+     "h": 832
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/magna/plc-buffering.webp",
+     "caption": "PLC data aggregation with semaphore-driven threads and staged queues",
+     "w": 1280,
+     "h": 720
+    }
+   ]
+  },
+  {
+   "id": "fyelabs",
+   "title": "FYELABS",
+   "org": "Robotics & Embedded Systems Intern · Ontario",
+   "dates": "May – Sep 2023",
+   "start": "2023-05",
+   "flow": "professional",
+   "kind": "chapter",
+   "summary": "Back-up safety system for garbage trucks: an actuating weatherproof sensor case, a dashboard HMI with its own PCB and LoRa link, and LiDAR dust filtering with live visualisation tools.",
+   "bullets": [
+    "All-metal actuating case (100+ parts, 15 revisions) housing 10 LiDARs, 3 depth cameras, IR camera, IMU, GPS, 3 MCUs and 4 compute units",
+    "Redesigned for 6 bent/welded sheet-metal parts: manufacturing cost -56%, lead time halved; stayed dry in a water-spray test",
+    "HMI: 2-layer PCB with two MCUs, 4 buttons, speaker and 7\" display; custom LoRa protocol with checksums across 6 MCUs; 12-zone object mapping",
+    "LiDAR dust filtering: 5 parallel algorithms in C++ firmware from clean vs dusty flux/distance data",
+    "Python LiDAR visualiser (serial, then wireless MQTT) with record and real-time playback used by the team for tuning"
+   ],
+   "links": [
+    {
+     "label": "FYELABS page (Wix)",
+     "href": "https://www.armaansengupta.ca/fyelabs"
+    }
+   ],
+   "lottie": {
+    "json": "media/lottie/hmi-pcb.json",
+    "mp4": "media/lottie/hmi-pcb.mp4",
+    "poster": "media/lottie/hmi-pcb.jpg"
+   },
+   "loop": {
+    "src": "media/gallery/fyelabs/lidar-visualiser-loop.mp4",
+    "poster": "media/gallery/fyelabs/lidar-visualiser-loop.jpg"
+   },
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-01.webp",
+     "caption": "Case lowered with the outer case",
+     "w": 960,
+     "h": 540
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-02.webp",
+     "caption": "Case raised with the outer case",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-04.webp",
+     "caption": "Closed enclosure",
+     "w": 1080,
+     "h": 1080
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-05.webp",
+     "caption": "Inner case, shell hidden",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-13.webp",
+     "caption": "Special components: visual and depth cameras, light sensor",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-14.webp",
+     "caption": "HMI render",
+     "w": 1080,
+     "h": 1080
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/case-15.webp",
+     "caption": "HMI render, side",
+     "w": 1080,
+     "h": 1080
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-1.webp",
+     "caption": "Manufactured sheet-metal case (1 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-2.webp",
+     "caption": "Manufactured sheet-metal case (2 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-3.webp",
+     "caption": "Manufactured sheet-metal case (3 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-4.webp",
+     "caption": "Manufactured sheet-metal case (4 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-5.webp",
+     "caption": "Manufactured sheet-metal case (5 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/metal-6.webp",
+     "caption": "Manufactured sheet-metal case (6 of 6)",
+     "w": 1350,
+     "h": 1800
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-render.webp",
+     "caption": "HMI with the LiDAR zone display",
+     "w": 490,
+     "h": 509
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-comms.webp",
+     "caption": "Control flow between the HMI and the main-unit microcontrollers",
+     "w": 1800,
+     "h": 614
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-pcb-3d.webp",
+     "caption": "HMI PCB, 3D view",
+     "w": 784,
+     "h": 318
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-case.webp",
+     "caption": "HMI case assembly",
+     "w": 1800,
+     "h": 903
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-pcb-layout.webp",
+     "caption": "HMI PCB layout",
+     "w": 972,
+     "h": 286
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/hmi-wired.webp",
+     "caption": "HMI with cable",
+     "w": 577,
+     "h": 600
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/fyelabs/lidar-arc.webp",
+     "caption": "10 single-point LiDARs arranged in an arc",
+     "w": 1800,
+     "h": 840
+    },
+    {
+     "type": "video",
+     "src": "media/gallery/fyelabs/lidar-visualiser.mp4",
+     "poster": "media/gallery/fyelabs/lidar-visualiser.jpg",
+     "caption": "LiDAR visualiser: live distances, line thickness = return intensity",
+     "w": 1920,
+     "h": 1080,
+     "seconds": 38.64,
+     "loop": false
+    },
+    {
+     "type": "video",
+     "src": "media/gallery/fyelabs/person-detection.mp4",
+     "poster": "media/gallery/fyelabs/person-detection.jpg",
+     "caption": "Person detection testing",
+     "w": 1920,
+     "h": 1080,
+     "seconds": 31.05,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "id": "trashminator",
+   "title": "The Trashminator",
+   "org": "Grade 12 · Technological Design",
+   "dates": "2021 – 2022",
+   "start": "2021-09",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "A surface-level aquatic trash-cleaning robot that autonomously navigates and cleans water bodies; the idea is a swarm to fight aquatic pollution.",
+   "bullets": [
+    "Autonomous navigation on open water",
+    "Conveyor intake collects floating trash",
+    "Designed to work as part of a swarm",
+    "Built for the tech design course, continued as a personal project"
+   ],
+   "links": [
+    {
+     "label": "Summary video",
+     "href": "https://www.youtube.com/watch?v=ZRnscKaHNMk"
+    },
+    {
+     "label": "Presentation",
+     "href": "https://youtu.be/GyN0_a2XMrs"
+    },
+    {
+     "label": "Slides 1",
+     "href": "https://docs.google.com/presentation/d/e/2PACX-1vSjny414N99gSn6npwOWtSSpdwT4-4dOpMrqrHBdO_qOtpBQv9ENwT2jArK70hi1wr_xNxTqGMhKLrb/pub"
+    },
+    {
+     "label": "Slides 2",
+     "href": "https://docs.google.com/presentation/d/e/2PACX-1vRT8d6qGR2Uh3WWXK4nxRRHkk1b2ayjlSsfvx2dDjOA6O44w7oekPFy0VN76mxNiI9Sv2eq_A_A6s72/pub"
+    },
+    {
+     "label": "CAD (Autodesk 360)",
+     "href": "https://gmail260093.autodesk360.com/shares/public/SH9285eQTcf875d3c5396264844c8a13262e"
+    }
+   ],
+   "lottie": {
+    "json": "media/lottie/trashminator.json",
+    "mp4": "media/lottie/trashminator.mp4",
+    "poster": "media/lottie/trashminator.jpg"
+   },
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/trashminator/real-render.webp",
+     "caption": "The Trashminator render",
+     "w": 1470,
+     "h": 495
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/trashminator/in-water.webp",
+     "caption": "Render of the robot on the water",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "youtube",
+     "src": "ZRnscKaHNMk",
+     "poster": "https://i.ytimg.com/vi/ZRnscKaHNMk/hqdefault.jpg",
+     "caption": "The Trashminator: summary"
+    },
+    {
+     "type": "youtube",
+     "src": "GyN0_a2XMrs",
+     "poster": "https://i.ytimg.com/vi/GyN0_a2XMrs/hqdefault.jpg",
+     "caption": "The Trashminator: presentation"
+    },
+    {
+     "type": "video",
+     "src": "media/trashminator.mp4",
+     "caption": "The robot collecting trash",
+     "poster": "media/trashminator.jpg"
+    }
+   ]
+  },
+  {
+   "id": "radial-engine",
+   "title": "6-Cylinder Radial Engine",
+   "org": "Grade 11 · Tech Design (CAD)",
+   "dates": "2020 – 2021",
+   "start": "2021-01",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "A test of CAD skill: 20+ intricate parts modelled from orthographic drawings and assembled into a working six-cylinder radial engine linkage.",
+   "bullets": [
+    "20+ parts modelled from orthographic drawings",
+    "Assembled into a working linkage with motion study",
+    "Rendered animations of the running engine"
+   ],
+   "links": [
+    {
+     "label": "Animations (YouTube)",
+     "href": "https://www.youtube.com/watch?v=4E9GT82WyEI"
+    },
+    {
+     "label": "CAD (A360)",
+     "href": "https://a360.co/3qWdRs9"
+    }
+   ],
+   "lottie": {
+    "json": "media/lottie/radial-engine.json",
+    "mp4": "media/lottie/radial-engine.mp4",
+    "poster": "media/lottie/radial-engine.jpg"
+   },
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/radial-engine/assembly.webp",
+     "caption": "Full radial engine assembly render",
+     "w": 1800,
+     "h": 1013
+    },
+    {
+     "type": "youtube",
+     "src": "4E9GT82WyEI",
+     "poster": "https://i.ytimg.com/vi/4E9GT82WyEI/hqdefault.jpg",
+     "caption": "6 cylinder radial engine CAD"
+    },
+    {
+     "type": "video",
+     "src": "media/radial-engine.mp4",
+     "caption": "Motion study",
+     "poster": "media/radial-engine.jpg"
+    }
+   ]
+  },
+  {
+   "id": "clamping-hub",
+   "title": "Clamping Hub",
+   "org": "Product · Studica",
+   "dates": "",
+   "start": "",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "An ultra-low-profile clamping shaft hub that grips without marring the shaft; now sold commercially by Studica.",
+   "bullets": [
+    "Set-screw hubs on the market marred shafts and worked loose",
+    "Split clamping design for a stronger, mar-free grip",
+    "FEA to maximize flex of the metal while keeping high torque transmission",
+    "Sold as the Studica 6 mm D-shaft low-profile clamping hub"
+   ],
+   "links": [
+    {
+     "label": "Studica product",
+     "href": "https://www.studica.ca/en/6mm-d-shaft-low-profile-clamping-hub"
+    }
+   ],
+   "lottie": {
+    "json": "media/lottie/clamping-hub.json",
+    "mp4": "media/lottie/clamping-hub.mp4",
+    "poster": "media/lottie/clamping-hub.jpg"
+   },
+   "gallery": []
+  },
+  {
+   "id": "ripl",
+   "title": "Contact Localization (RIPL)",
+   "org": "Research Assistant · Robotic Interaction, Perception and Learning Lab",
+   "dates": "Sep 2025 – Jan 2026",
+   "start": "2025-09",
+   "flow": "professional",
+   "kind": "card",
+   "summary": "A MuJoCo simulation bridge so the lab's motion-planning missions run on the real Franka Panda or in physics simulation, with injected contacts for joint-torque contact localization.",
+   "bullets": [
+    "Packaged the Franka Emika Panda MuJoCo model",
+    "ROS 2 bridge node syncing joint states and trajectory commands",
+    "Replaced the RViz/Gazebo workflow; inject contact events and read joint-torque responses",
+    "Extended joint-limit handling for simulation precision"
+   ],
+   "links": [
+    {
+     "label": "Demo (YouTube short)",
+     "href": "https://youtube.com/shorts/lbKC-9KtVCI"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "youtube",
+     "src": "lbKC-9KtVCI",
+     "poster": "https://i.ytimg.com/vi/lbKC-9KtVCI/hqdefault.jpg",
+     "caption": "MuJoCo mission twist demo"
+    },
+    {
+     "type": "video",
+     "src": "media/mujoco.mp4",
+     "caption": "MuJoCo callbacks",
+     "poster": "media/mujoco.jpg"
+    }
+   ]
+  },
+  {
+   "id": "beam-balancer",
+   "title": "Beam Balancer",
+   "org": "Third year · Personal project",
+   "dates": "2025",
+   "start": "2025-09",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "The 1-D precursor to the Stewart platform: from link lengths to a CAD mechanism to working control code in about two weeks.",
+   "bullets": [
+    "Link lengths chosen for mechanical advantage and a compact footprint",
+    "Four-bar linkage modelled in SolidWorks",
+    "Ball tracking and tuned controller in Python, servo firmware in C"
+   ],
+   "links": [
+    {
+     "label": "Demo (YouTube short)",
+     "href": "https://youtube.com/shorts/xsgP9gpsP7k"
+    },
+    {
+     "label": "Ball & beam control lab",
+     "href": "https://github.com/Armaan-Sengupta/Ball-Beam-Control"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "video",
+     "src": "media/gallery/beam-balancer/mechanism.mp4",
+     "poster": "media/gallery/beam-balancer/mechanism.jpg",
+     "caption": "Animation of the four-bar linkage that tilts the beam",
+     "w": 1136,
+     "h": 640,
+     "seconds": 8.76,
+     "loop": false
+    },
+    {
+     "type": "youtube",
+     "src": "xsgP9gpsP7k",
+     "poster": "https://i.ytimg.com/vi/xsgP9gpsP7k/hqdefault.jpg",
+     "caption": "Beam balancing demo"
+    },
+    {
+     "type": "video",
+     "src": "media/beam-balancer.mp4",
+     "caption": "Ball held at centre",
+     "poster": "media/beam-balancer.jpg"
+    }
+   ]
+  },
+  {
+   "id": "gantry",
+   "title": "Two-Axis Gantry Control",
+   "org": "Third year · STM32",
+   "dates": "2025",
+   "start": "2025-01",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "STM32 control of a two-axis machine over UART and a potentiometer, with interrupt-driven endstops and homing.",
+   "bullets": [
+    "Interrupts stop motion at the endstops",
+    "UART position commands from a PC",
+    "ADC characterized so a potentiometer sets each axis precisely",
+    "Demo: safe stops at the limits and a speed/precision race to a target"
+   ],
+   "links": [
+    {
+     "label": "C code",
+     "href": "https://github.com/Armaan-Sengupta/2-Axis-Gantry/tree/armaan-branch"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/gantry/gantry.webp",
+     "caption": "The two-axis gantry on the bench",
+     "w": 1800,
+     "h": 1278
+    }
+   ]
+  },
+  {
+   "id": "ri3d",
+   "title": "UW REACT: FRC Robot in 3 Days",
+   "org": "UW REACT · Team lead",
+   "dates": "Jan 2024",
+   "start": "2024-01",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "Organized and led a 48-hour robot-in-3-days build: from nothing to a ring-launching FRC robot with five people on 3 hours of sleep.",
+   "bullets": [
+    "Organized the event and pre-planned materials",
+    "Built with 30% of the projected team turnout",
+    "Robot takes rings and launches them into a goal",
+    "Served as a reference for high-school teams"
+   ],
+   "links": [
+    {
+     "label": "UW REACT",
+     "href": "https://www.uwreact.ca/"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "youtube",
+     "src": "qqqrSge0pF4",
+     "poster": "https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg",
+     "caption": "UW REACT Robot in 3 Days build"
+    },
+    {
+     "type": "video",
+     "src": "media/ftc-ring-shooter.mp4",
+     "caption": "Ring shooter in slow motion",
+     "poster": "media/ftc-ring-shooter.jpg"
+    }
+   ]
+  },
+  {
+   "id": "tank-tread",
+   "title": "Custom Tank Tread",
+   "org": "Personal · CAD",
+   "dates": "",
+   "start": "",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "A custom tank-tread drive.",
+   "bullets": [],
+   "links": [
+    {
+     "label": "YouTube short",
+     "href": "https://youtube.com/shorts/oDeQVKhRZAk"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "youtube",
+     "src": "oDeQVKhRZAk",
+     "poster": "https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg",
+     "caption": "Custom tank tread"
+    }
+   ]
+  },
+  {
+   "id": "lidar",
+   "title": "LiDAR Data Processing",
+   "org": "First year · Software",
+   "dates": "2023",
+   "start": "2023-05",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "Cleaning and analysing a massive LiDAR point cloud: anomaly removal, filtering and finding the two furthest points among millions.",
+   "bullets": [
+    "Statistical outlier removal and anomaly cleanup",
+    "Building extraction and segmentation",
+    "Fast furthest-pair search over millions of points",
+    "Viewable online in LidarView"
+   ],
+   "links": [
+    {
+     "label": "Code & details (GitHub)",
+     "href": "https://github.com/Armaan-Sengupta/Fyelabs-Project"
+    },
+    {
+     "label": "3D point cloud online",
+     "href": "http://lidarview.com/?url=armaan-sengupta.github.io/Fyelabs-Project/CaliforniaBuildingsOnly.las"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-01.webp",
+     "caption": "Point cloud coloured by height",
+     "w": 612,
+     "h": 397
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-02.webp",
+     "caption": "Top-down view",
+     "w": 456,
+     "h": 512
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-03.webp",
+     "caption": "Height colour map",
+     "w": 621,
+     "h": 293
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-04.webp",
+     "caption": "Reference point marked for a later task",
+     "w": 912,
+     "h": 406
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-05.webp",
+     "caption": "Statistical outlier removal vs normal",
+     "w": 618,
+     "h": 206
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-06.webp",
+     "caption": "Raw cloud",
+     "w": 938,
+     "h": 484
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-07.webp",
+     "caption": "Raw cloud at ground level",
+     "w": 938,
+     "h": 392
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-08.webp",
+     "caption": "Before and after comparison",
+     "w": 934,
+     "h": 495
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-09.webp",
+     "caption": "Cleaned cloud, coloured by height",
+     "w": 735,
+     "h": 495
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-10.webp",
+     "caption": "Extracted buildings",
+     "w": 960,
+     "h": 720
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-11.webp",
+     "caption": "Segmented cloud",
+     "w": 913,
+     "h": 474
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-12.webp",
+     "caption": "Furthest pair of points found",
+     "w": 920,
+     "h": 744
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-13.webp",
+     "caption": "Clusters",
+     "w": 927,
+     "h": 437
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-14.webp",
+     "caption": "Dense greyscale surface",
+     "w": 904,
+     "h": 727
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/lidar/cloud-15.webp",
+     "caption": "Buildings only",
+     "w": 924,
+     "h": 510
+    }
+   ]
+  },
+  {
+   "id": "gooseminator",
+   "title": "The Gooseminator",
+   "org": "First year · MTE 100 (group)",
+   "dates": "Fall 2022",
+   "start": "2022-09",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "A robot that sweeps an area and sorts bird eggs by whether they are an invasive or protected species.",
+   "bullets": [
+    "Sweeps an area and sorts eggs",
+    "Full engineering design process documented"
+   ],
+   "links": [
+    {
+     "label": "Design document",
+     "href": "https://drive.google.com/file/d/1Ytp4l94ol0VdSAHArLPGi6ToqCvMx83w/view"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "youtube",
+     "src": "Ba5209A3aXg",
+     "poster": "https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg",
+     "caption": "The Gooseminator"
+    }
+   ]
+  },
+  {
+   "id": "robotic-arm",
+   "title": "3-DOF Robotic Arm",
+   "org": "First year · 8-hour build",
+   "dates": "2022 – 2023",
+   "start": "2023-01",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "A 3-degree-of-freedom arm built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and place them in containers.",
+   "bullets": [
+    "Built in under 8 hours",
+    "Tetrix kit for rapid prototyping",
+    "Picks irregular objects and places them at different locations"
+   ],
+   "links": [
+    {
+     "label": "YouTube short",
+     "href": "https://youtube.com/shorts/wWIzTf6D2mE"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "video",
+     "src": "media/gallery/robotic-arm/demo.mp4",
+     "poster": "media/gallery/robotic-arm/demo.jpg",
+     "caption": "The 3-DOF Tetrix arm picking up bones and placing them in containers",
+     "w": 406,
+     "h": 720,
+     "seconds": 34.9,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "id": "ftc",
+   "title": "Competitive Robotics: FTC, FRC, VEX",
+   "org": "FTC 16397 Relatively Quantum · FRC 3560 · DiscoBots",
+   "dates": "High school, 2017 – 2022",
+   "start": "2019-09",
+   "flow": "personal",
+   "kind": "card",
+   "summary": "Ran my own FTC team, captained the school FRC team (100+ members), competed in VEX, and gave back through tutorials, classes and mentoring with FIRST Robotics Canada.",
+   "bullets": [
+    "FTC 16397: managed everything from logistics to design (2019-2021)",
+    "Started and captained the high-school FRC team; taught the mechanical design lessons",
+    "Beta-tested and taught FTC Sim classes for FIRST Canada",
+    "Summer camp: 38 robotics kits given to schools without a club",
+    "Mentored FTC teams 18846 and 17003; FTC video tutorial series"
+   ],
+   "links": [
+    {
+     "label": "Robotics page (Wix)",
+     "href": "https://www.armaansengupta.ca/robotics"
+    },
+    {
+     "label": "FTC 16397",
+     "href": "https://relativelyquantum.wixsite.com/home"
+    },
+    {
+     "label": "FRC 3560",
+     "href": "https://www.3560.ca/"
+    }
+   ],
+   "gallery": [
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/team.webp",
+     "caption": "Teams: FTC 16397 Relatively Quantum, DiscoBots (VEX), FRC",
+     "w": 1800,
+     "h": 563
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/frc-robot.webp",
+     "caption": "FRC robot at competition",
+     "w": 1080,
+     "h": 1350
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/ftc-robot.webp",
+     "caption": "FTC robot drivetrain close-up",
+     "w": 1177,
+     "h": 883
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/award.webp",
+     "caption": "Presenting the robot at an awards event",
+     "w": 721,
+     "h": 776
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/vex-robot.webp",
+     "caption": "VEX EDR robot with the DiscoBots",
+     "w": 1078,
+     "h": 1315
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/ftc-sim.webp",
+     "caption": "FTC Sim virtual robotics classes",
+     "w": 1140,
+     "h": 416
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/intake.webp",
+     "caption": "FTC intake and shooter",
+     "w": 729,
+     "h": 614
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/lesson.webp",
+     "caption": "FRC newcomer lesson slides",
+     "w": 1280,
+     "h": 720
+    },
+    {
+     "type": "image",
+     "src": "media/gallery/ftc/tutorial.webp",
+     "caption": "FTC electrical configuration tutorial",
+     "w": 1280,
+     "h": 720
+    },
+    {
+     "type": "video",
+     "src": "media/ftc-robot.mp4",
+     "caption": "FTC 16397 Control Award submission clip",
+     "poster": "media/ftc-robot.jpg"
+    },
+    {
+     "type": "youtube",
+     "src": "srE_CpOQ7bI",
+     "poster": "https://i.ytimg.com/vi/srE_CpOQ7bI/hqdefault.jpg",
+     "caption": "My robotics journey"
+    },
+    {
+     "type": "youtube",
+     "src": "8dQN9VFddJ4",
+     "poster": "https://i.ytimg.com/vi/8dQN9VFddJ4/hqdefault.jpg",
+     "caption": "Robotics innovations and outreach"
+    }
+   ]
+  }
+ ]
+}

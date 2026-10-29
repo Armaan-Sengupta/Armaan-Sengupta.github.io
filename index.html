@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Armaan Sengupta · Firmware, Controls & Mechatronics</title>
 <meta name="description" content="Armaan Sengupta: mechatronics engineer at the University of Waterloo. Implant firmware at Neuralink, vehicle firmware at Tesla, rocket active controls, robotics and embedded systems.">
-<meta name="theme-color" content="#050505">
+<meta name="theme-color" content="#08080a">
 <meta property="og:title" content="Armaan Sengupta · Firmware, Controls & Mechatronics">
-<meta property="og:description" content="From bare-metal firmware to machines that move. Neuralink · Tesla · Ixana · FYELABS · Waterloo Rocketry.">
+<meta property="og:description" content="From bare-metal firmware to machines that move. Neuralink · Tesla · Ixana · Magna · FYELABS · Waterloo Rocketry.">
 <meta property="og:image" content="https://armaan-sengupta.github.io/media/og.jpg">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Cpath d='M4 20h6l3-9 4 14 3-7h8' fill='none' stroke='%23f2efe9' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2308080a'/%3E%3Cpath d='M4 20h6l3-9 4 14 3-7h8' fill='none' stroke='%23f2efe9' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,330 +19,63 @@
 <body>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#top" aria-label="Armaan Sengupta, home"><span class="dot"></span>Armaan Sengupta</a>
+  <a class="brand" href="#top" aria-label="Armaan Sengupta, back to top"><span class="dot"></span>Armaan Sengupta</a>
   <ul class="mono">
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#teams">Teams</a></li>
+    <li><a href="#work" data-flow-link="personal">Personal</a></li>
+    <li><a href="#work" data-flow-link="professional">Professional</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#skills">Skills</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a class="cta" href="media/Armaan_Sengupta_Resume.pdf" target="_blank" rel="noopener">Résumé</a></li>
   </ul>
-  <button class="menu mono" aria-expanded="false" aria-controls="nav">Menu</button>
 </header>
 
 <main id="top">
 
-<!-- ═════════════ HERO ═════════════ -->
-<section class="hero" aria-label="Introduction">
+<section class="intro" aria-label="Introduction">
   <canvas id="hero-canvas" aria-hidden="true"></canvas>
-  <div class="readout mono" aria-hidden="true">
-    <div>SETPOINT <b id="ro-sp">0.000</b></div>
-    <div>OUTPUT <b id="ro-y">0.000</b></div>
-    <div>ERROR <b id="ro-e">0.000</b></div>
-    <div>LOOP <b>1 kHz</b></div>
-  </div>
   <div class="wrap">
     <div class="eyebrow mono"><span>Mechatronics Engineering · University of Waterloo</span><span>Embedded · Controls · Robotics</span></div>
-    <h1><span>Armaan</span><span class="thin">Sengupta</span></h1>
+    <h1><span>Armaan</span> <span class="thin">Sengupta</span></h1>
     <p class="lede">I write the firmware that makes machines move, and design the machines too. Neural implants at Neuralink, vehicle lighting at Tesla, rocket airbrakes, and robots that balance balls on plates.</p>
-    <div class="hero-foot">
-      <div class="tuner mono" aria-label="Tune the controller behind this page">
-        <span class="lbl"><span class="fine">Move your cursor · </span>Drag to tune →</span>
-        <label class="knob" data-k="kp"><b>Kp</b><output>2.40</output></label>
-        <label class="knob" data-k="ki"><b>Ki</b><output>0.60</output></label>
-        <label class="knob" data-k="kd"><b>Kd</b><output>0.22</output></label>
-      </div>
-      <a class="scroll-hint mono" href="#experience"><i></i>Scroll</a>
-    </div>
   </div>
 </section>
 
-<!-- ═════════════ METRICS ═════════════ -->
-<div class="metrics" aria-label="Selected outcomes">
-  <div class="wrap">
-    <div class="metric"><div class="v" data-count="3000" data-suffix="+">0</div><div class="k mono">Electrodes coordinated<br>per implant · Neuralink</div></div>
-    <div class="metric"><div class="v"><span data-count="8">0</span><small>min</small> → <span data-count="15">0</span><small>s</small></div><div class="k mono">Registration time per trial<br>FDA safety study</div></div>
-    <div class="metric"><div class="v" data-count="20" data-prefix="~">0</div><div class="k mono">Lighting channels brought up<br>Tesla Semi</div></div>
-    <div class="metric"><div class="v"><span data-count="66">0</span>→<span data-count="95">0</span><small>%</small></div><div class="k mono">Power efficiency<br>rocket flight computer</div></div>
-    <div class="metric"><div class="v"><span data-count="4">0</span>→<span data-count="13">0</span><small>fps</small></div><div class="k mono">Body-coupled video link<br>Ixana wearables</div></div>
-    <div class="metric"><div class="v" data-count="100" data-suffix="%">0</div><div class="k mono">Cracked parts caught<br>350-stroke production run</div></div>
-  </div>
+<!-- pinned chapters, one flow visible at a time -->
+<div id="work" class="work">
+  <div class="flow" data-flow="personal" aria-label="Personal projects"></div>
+  <div class="flow" data-flow="professional" aria-label="Professional work" hidden></div>
 </div>
 
-<!-- ═════════════ EXPERIENCE ═════════════ -->
-<section id="experience" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">01 / Experience</span><h2>Industry</h2></div>
-    <p>Five internships across medical devices, automotive, wearables, industrial sensing and manufacturing. Every role sat where software touches hardware.</p>
-  </div>
+<div class="flow-switch" id="flow-switch" role="radiogroup" aria-label="Show personal or professional work">
+  <span class="thumb" aria-hidden="true"></span>
+  <button role="radio" aria-checked="true" data-flow="personal">Personal</button>
+  <button role="radio" aria-checked="false" data-flow="professional">Professional</button>
+</div>
+<div class="flow-veil" id="flow-veil" aria-hidden="true"><span class="mono">Next · Professional work</span></div>
 
-  <article class="chapter rv" id="neuralink">
-    <div class="copy">
-      <div class="meta mono"><span>Neuralink · California</span><span>Jan – Aug 2026</span></div>
-      <h3>Neuralink</h3>
-      <p class="role">Implant Firmware &amp; Embedded Systems Intern</p>
-      <ul class="points">
-        <li>Led firmware for a <strong>1st-gen neural stimulation implant</strong>: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across <strong>3,000+ electrodes</strong> (Rust &amp; C).</li>
-        <li>Architected the full <strong>app-to-ASIC stack</strong> for Blindsight, a human visual prosthesis.</li>
-        <li>Cut registration from <strong>8 min to 15 s</strong> per trial, enabling ~40M pulses per electrode in 13 weeks. This made the safety study feasible and met the FDA submission deadline.</li>
-        <li>Brought up impedance &amp; calibration so chips could self-test, unblocking the production line.</li>
-      </ul>
-      <div class="chips"><span class="chip">Rust</span><span class="chip">C</span><span class="chip">DMA</span><span class="chip">Interrupts</span><span class="chip">ASIC bring-up</span></div>
-      <div class="links"><a href="https://neuralink.com/trials/visual-prosthesis/" target="_blank" rel="noopener">Blindsight</a></div>
-    </div>
-    <div class="stage" data-el="as-neural-journey" data-src="elements/neuralink/neuralink-elements.js" data-attrs='{"loop":""}'></div>
-  </article>
-
-  <article class="chapter flip rv" id="tesla">
-    <div class="copy">
-      <div class="meta mono"><span>Tesla · California</span><span>May – Aug 2025</span></div>
-      <h3>Tesla</h3>
-      <p class="role">Vehicle Firmware · Body Controls Intern</p>
-      <ul class="points">
-        <li>Took <strong>~20 exterior lighting channels</strong> on the Semi from bare hardware to production readiness: C drivers written from Altium schematics, homologated app-layer behaviour, ADC current-sense self-tests.</li>
-        <li>Cut Cybercab lighting ADC sampling from <strong>10 ms to 1 ms</strong>, and traced an <strong>RC time-constant fault</strong> that let the sample-and-hold retain charge and pass faulty lamps.</li>
-        <li>Fixed a Cybertruck bug that calibrated the left/right headlamp <strong>stepper motors</strong> out of sync.</li>
-        <li>Wrote Pytest software-in-the-loop suites guarding lighting behaviour across vehicle programs.</li>
-      </ul>
-      <div class="chips"><span class="chip">C</span><span class="chip">Altium</span><span class="chip">ADC</span><span class="chip">Pytest · SIL</span></div>
-    </div>
-    <div class="stage" data-el="as-cybertruck-lighting" data-src="elements/tesla/cybertruck-lighting.js" data-classic data-attrs='{"controls":"false"}'></div>
-  </article>
-
-  <article class="chapter rv" id="ixana">
-    <div class="copy">
-      <div class="meta mono"><span>Ixana · Indiana</span><span>Aug – Dec 2024</span></div>
-      <h3>Ixana</h3>
-      <p class="role">Embedded Systems &amp; Firmware Engineering Intern</p>
-      <ul class="points">
-        <li>Built video streaming from smart glasses to a smartwatch over Ixana's <strong>Wi-R body-coupled silicon</strong>, using the body as an ultra-low-power data bus.</li>
-        <li>Raised frame rate from <strong>4 to 13 fps</strong> and cut power by <strong>8%</strong> with a bare-metal C++ core OS on Ambiq &amp; NXP MCUs.</li>
-        <li>Debugged the whole path (camera → FPGA encode → MCU → Wi-R → MCU → FPGA decode → AMOLED) and owned the <strong>MIPI-DSI display drivers</strong>.</li>
-        <li>Wrote a Python driver for a Rigol arbitrary waveform generator for HIL testing of custom silicon.</li>
-      </ul>
-      <div class="chips"><span class="chip">C++</span><span class="chip">Bare metal</span><span class="chip">MIPI DSI</span><span class="chip">FPGA · Verilog</span><span class="chip">HIL</span></div>
-      <div class="links"><a href="https://youtube.com/shorts/He_goadObV0" target="_blank" rel="noopener">CES demo</a></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="ix-a">Data path</button>
-        <button role="tab" aria-selected="false" data-panel="ix-b">Prototype</button>
-      </div>
-      <div class="panel" id="ix-a"><div class="stage" data-el="as-ixana-link" data-src="elements/ixana/ixana-link.js" data-classic data-attrs='{"controls":"hidden"}'></div></div>
-      <div class="panel" id="ix-b" hidden><div class="stage" data-video="ixana-demo" data-fallback-img="media/img/ixana_wearable_streaming.webp"><span class="tag mono">Early prototype electronics</span></div></div>
-    </div>
-  </article>
-
-  <article class="chapter flip rv" id="magna">
-    <div class="copy">
-      <div class="meta mono"><span>Magna · Ontario</span><span>Co-op</span></div>
-      <h3>Magna</h3>
-      <p class="role">In-Die Crack Detection &amp; Die Condition Monitoring</p>
-      <ul class="points">
-        <li>Streamed strain-gauge data from a hydraulic press over <strong>MQTT</strong> into PostgreSQL, with a live web dashboard for operators.</li>
-        <li>Designed an anomaly detector that learns each part's normal stroke envelope. It caught <strong>100% of cracked parts with zero false positives</strong> across a 350-stroke production run.</li>
-        <li>Built a patent-pending, semaphore-driven multithreaded buffer on a memory-limited Beckhoff PLC, raising data rate from <strong>142 Hz to 500 Hz</strong>.</li>
-      </ul>
-      <div class="chips"><span class="chip">Python</span><span class="chip">MQTT</span><span class="chip">PostgreSQL</span><span class="chip">PLC · multithreading</span><span class="chip">Signal processing</span></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="mg-a">Live detector</button>
-        <button role="tab" aria-selected="false" data-panel="mg-b">Dashboard</button>
-      </div>
-      <div class="panel" id="mg-a"><div class="stage" data-el="as-strain-monitor" data-src="anim/strain-monitor.js"><span class="hint mono">Click to inject a crack</span></div></div>
-      <div class="panel" id="mg-b" hidden><div class="stage"><img class="vid" loading="lazy" src="media/img/magna_crack_detection_dashboard.webp" alt="Dashboard flagging a cracked stroke"></div></div>
-    </div>
-  </article>
-
-  <article class="chapter rv" id="fyelabs">
-    <div class="copy">
-      <div class="meta mono"><span>FYELABS · Ontario</span><span>May – Sep 2023</span></div>
-      <h3>FYELABS</h3>
-      <p class="role">Robotics &amp; Embedded Systems Intern</p>
-      <p class="summary">An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, IR camera, IMU and GPS across 6 microcontrollers.</p>
-      <ul class="points">
-        <li>Designed a <strong>LiDAR dust-filtering algorithm</strong> from field data: five parallel filters that reject dust and still catch people (C++).</li>
-        <li>Designed the <strong>HMI</strong>: 2-layer PCB with two MCUs, a LoRa link with custom checksums, a graphics library and 12-zone object mapping.</li>
-        <li>Designed the 100+ part actuating stainless enclosure over 15 revisions, cutting <strong>cost 56%</strong> and halving lead time.</li>
-        <li>Wrote UART &amp; MQTT LiDAR visualizers with record/replay for live HIL tuning (Python).</li>
-      </ul>
-      <div class="chips"><span class="chip">C++</span><span class="chip">LiDAR</span><span class="chip">EasyEDA</span><span class="chip">LoRa · UART</span><span class="chip">SolidWorks · sheet metal</span></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="fy-a">Sensing</button>
-        <button role="tab" aria-selected="false" data-panel="fy-b">Enclosure</button>
-        <button role="tab" aria-selected="false" data-panel="fy-c">HMI</button>
-      </div>
-      <div class="panel" id="fy-a"><div class="stage" data-el="as-fyelabs-system" data-src="elements/fyelabs/fyelabs-system.js" data-attrs='{"autoplay":"","loop":"","clean":""}'></div></div>
-      <div class="panel" id="fy-b" hidden><div class="stage"><img class="vid" loading="lazy" src="media/img/fyelabs_actuating_case_render.webp" alt="Actuating sensor enclosure render"></div></div>
-      <div class="panel" id="fy-c" hidden><div class="stage"><img class="vid" loading="lazy" src="media/img/fyelabs_hmi_unit.webp" alt="HMI unit and PCB"></div></div>
-    </div>
-  </article>
-</section>
-
-<!-- ═════════════ TEAMS / RESEARCH ═════════════ -->
-<section id="teams" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">02 / Teams &amp; Research</span><h2>Flight &amp; lab</h2></div>
-    <p>Active aerodynamic control for Canada's first liquid-fuelled student rocket, and simulation tooling for robot contact research.</p>
-  </div>
-
-  <article class="chapter rv" id="rocketry">
-    <div class="copy">
-      <div class="meta mono"><span>Waterloo Rocketry · Borealis</span><span>Sep 2023 – Dec 2024</span></div>
-      <h3>Rocket Airbrakes</h3>
-      <p class="role">Active Control Systems: mechanism, CFD, PCB, firmware</p>
-      <ul class="points">
-        <li>Designed the airbrake mechanism: a <strong>modified cam-slot spiral</strong> that drives three panels in perfect sync, with extension linear in servo angle (SolidWorks).</li>
-        <li>Ran Ansys CFD with a teammate for <strong>C<sub>D</sub> vs. extension</strong> and to check the centre-of-pressure margin.</li>
-        <li>Wrote STM32 / FreeRTOS flight firmware: state estimation, <strong>RK4 apogee prediction</strong> and PID fin control.</li>
-        <li>Designed the 4-layer flight computer in KiCad, raising power efficiency from <strong>66% to 95%</strong>, with onboard IMU (I²C) and external AHRS (UART).</li>
-      </ul>
-      <div class="chips"><span class="chip">C · FreeRTOS</span><span class="chip">STM32</span><span class="chip">KiCad</span><span class="chip">Ansys CFD</span><span class="chip">SolidWorks</span></div>
-      <div class="links"><a href="https://www.waterloorocketry.com/rockets/borealis" target="_blank" rel="noopener">Borealis</a></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="rk-a">Mechanism</button>
-        <button role="tab" aria-selected="false" data-panel="rk-b">Control loop</button>
-        <button role="tab" aria-selected="false" data-panel="rk-c">Flight computer</button>
-        <button role="tab" aria-selected="false" data-panel="rk-d">Layout</button>
-      </div>
-      <div class="panel" id="rk-a"><div class="stage" data-el="as-airbrakes" data-src="elements/airbrakes/airbrakes.js" data-attrs='{"autoplay":"","loop":"","clean":""}'><span class="tag mono">One servo · three synchronized panels</span></div></div>
-      <div class="panel" id="rk-b" hidden><div class="stage" style="aspect-ratio:1280/760" data-el="as-flight-control" data-src="elements/airbrakes/flight-control.js" data-attrs='{"autoplay":"","loop":"","clean":""}'></div></div>
-      <div class="panel" id="rk-c" hidden><div class="stage"><img class="vid" loading="lazy" src="media/img/canardian_pcb_render.webp" alt="The Canard-ian 4-layer flight computer render"></div></div>
-      <div class="panel" id="rk-d" hidden><div class="stage"><img class="vid" loading="lazy" src="media/img/canardian_pcb_layout.webp" alt="Flight computer PCB layout in KiCad"></div></div>
-    </div>
-  </article>
-
-  <article class="chapter flip rv" id="ripl">
-    <div class="copy">
-      <div class="meta mono"><span>RIPL Lab · Waterloo</span><span>Sep 2025 – Present</span></div>
-      <h3>MuJoCo × ROS 2</h3>
-      <p class="role">Research Assistant: Robotic Interaction, Perception &amp; Learning Lab</p>
-      <ul class="points">
-        <li>Built a <strong>MuJoCo–ROS 2 bridge</strong> for the Franka Panda so existing robot missions run unchanged in high-fidelity physics.</li>
-        <li>Added <strong>external force injection</strong> with live joint-torque feedback to benchmark torque-based contact localization.</li>
-      </ul>
-      <div class="chips"><span class="chip">Python</span><span class="chip">ROS 2</span><span class="chip">MuJoCo</span><span class="chip">Franka Panda</span></div>
-      <div class="links"><a href="https://youtube.com/shorts/lbKC-9KtVCI" target="_blank" rel="noopener">Demo</a></div>
-    </div>
-    <div class="stage" data-video="mujoco" data-fallback-img="media/img/mujoco_franka_panda_ripl.webp"><span class="tag mono">Force injection → joint torques</span></div>
-  </article>
-</section>
-
-<!-- ═════════════ PROJECTS ═════════════ -->
 <section id="projects" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">03 / Projects</span><h2>Built, tuned, shipped</h2></div>
-    <p>Kinematics, plant models, controllers, PCBs and CAD, usually all in one project.</p>
-  </div>
-
-  <article class="chapter rv" id="stewart">
-    <div class="copy">
-      <div class="meta mono"><span>Personal · 3RRS parallel manipulator</span><span>2025</span></div>
-      <h3>Stewart Platform</h3>
-      <p class="role">Balancing a ball on a plate: kinematics, controls and sensing</p>
-      <ul class="points">
-        <li>Derived <strong>inverse kinematics</strong> mapping a desired plate plane to three servo angles, validated on hardware (Python).</li>
-        <li>Built a <strong>Simscape multibody plant</strong> with a custom C contact S-function to tune controllers before touching hardware.</li>
-        <li>Compared <strong>trajectory-planned feedforward</strong> against classic PID on settling and overshoot.</li>
-        <li>Located the ball with a <strong>3-axis force-torque sensor</strong>, benchmarked against an OpenCV vision baseline.</li>
-      </ul>
-      <div class="chips"><span class="chip">Python</span><span class="chip">Simulink · Simscape</span><span class="chip">Kinematics</span><span class="chip">PID · feedforward</span><span class="chip">OpenCV</span></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="sp-a">Try it</button>
-        <button role="tab" aria-selected="false" data-panel="sp-b">Balance</button>
-        <button role="tab" aria-selected="false" data-panel="sp-c">Test rig</button>
-        <button role="tab" aria-selected="false" data-panel="sp-g">IK</button>
-        <button role="tab" aria-selected="false" data-panel="sp-d">F/T sensing</button>
-        <button role="tab" aria-selected="false" data-panel="sp-f">Simscape</button>
-        <button role="tab" aria-selected="false" data-panel="sp-e">Build</button>
-      </div>
-      <div class="panel" id="sp-a"><div class="stage wide" data-el="as-parallel-manipulator" data-src="elements/platform/parallel-manipulator.js"><span class="live mono">Live sim</span></div></div>
-      <div class="panel" id="sp-b" hidden><div class="stage wide" data-video="stewart-demo" data-fallback-img="media/img/stewart_platform_prototype.webp"></div></div>
-      <div class="panel" id="sp-c" hidden><div class="stage wide" data-video="stewart-setup"></div></div>
-      <div class="panel" id="sp-g" hidden><div class="stage wide" data-video="stewart-ik"></div></div>
-      <div class="panel" id="sp-d" hidden><div class="stage wide" data-video="stewart-sensing"></div></div>
-      <div class="panel" id="sp-f" hidden><div class="stage wide" data-video="stewart-sim"></div></div>
-      <div class="panel" id="sp-e" hidden><div class="stage wide" data-video="stewart-assembly"></div></div>
-    </div>
-  </article>
-
-  <article class="chapter flip rv" id="measure">
-    <div class="copy">
-      <div class="meta mono"><span>Team of 3 · Industrial QA</span><span>2024</span></div>
-      <h3>Automated Tolerance Inspection</h3>
-      <p class="role">Vision-oriented, force-sensed measurement with no human in the loop</p>
-      <ul class="points">
-        <li>Owned all firmware: both motors, encoder-to-dimension mapping, GUI, and a <strong>custom 2-wire clocked protocol</strong> so an ESP32 could talk to a VEX brain that only exposes digital reads.</li>
-        <li>Used OpenCV to find part orientation, streamed angles over WebSockets, and turned to the critical dimension.</li>
-        <li>Rotated parts correctly <strong>100%</strong> of the time and measured within <strong>0.3 mm</strong>. Out-of-spec parts are logged to a server.</li>
-      </ul>
-      <div class="chips"><span class="chip">C++</span><span class="chip">ESP32</span><span class="chip">Protocol design</span><span class="chip">OpenCV</span></div>
-      <div class="links"><a href="https://youtu.be/MB9A7U8ksmc" target="_blank" rel="noopener">Demo</a><a href="https://www.armaansengupta.ca/_files/ugd/13b95a_1665e03860934de58dc3ca61fa309edd.pdf" target="_blank" rel="noopener">Report</a></div>
-    </div>
-    <div>
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-panel="ms-a">Machine</button>
-        <button role="tab" aria-selected="false" data-panel="ms-b">2-wire protocol</button>
-      </div>
-      <div class="panel" id="ms-a"><div class="stage" data-video="measurement" data-fallback-img="media/img/automated_tolerance_inspection.webp"></div></div>
-      <div class="panel" id="ms-b" hidden><div class="stage" data-el="as-wire-protocol" data-src="anim/wire-protocol.js"><span class="hint mono">Drag the turntable</span></div></div>
-    </div>
-  </article>
-
-  <div class="sec-head rv" style="padding-top:96px">
-    <div><span class="idx mono">More builds</span></div>
-    <p>Open one for the full story.</p>
+  <div class="sec-head">
+    <div><span class="idx mono">More builds</span><h2>Built, tuned, shipped</h2></div>
+    <p>Smaller projects, each a few clicks deep. Open one for the full story and media.</p>
   </div>
   <div class="grid" id="grid"></div>
 </section>
 
-<!-- ═════════════ INDEX ═════════════ -->
-<section id="index" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">04 / Index</span><h2>Everything else</h2></div>
-    <p>Twenty-plus projects since grade nine: coursework, hackathons, competition robots.</p>
-  </div>
-  <div class="index rv" id="index-rows"></div>
-</section>
-
-<!-- ═════════════ SKILLS ═════════════ -->
 <section id="skills" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">05 / Skills</span><h2>Toolchain</h2></div>
-    <p>Hover a skill to see where it was used.</p>
+  <div class="sec-head">
+    <div><span class="idx mono">Toolbox</span><h2>Skills, and where they were used</h2></div>
+    <p>Hover a skill to trace it to the work.</p>
   </div>
-  <div class="skills idle rv" id="skills-root">
+  <div class="skills idle" id="skills-root">
     <canvas aria-hidden="true"></canvas>
     <div id="sk-groups"></div>
     <ul class="uses" id="sk-uses"></ul>
   </div>
 </section>
 
-<!-- ═════════════ BEYOND ═════════════ -->
-<section id="beyond" class="wrap">
-  <div class="sec-head rv">
-    <div><span class="idx mono">06 / Community</span><h2>Giving back to robotics</h2></div>
-    <p>Competitive robotics is how I got into engineering. I've spent years since teaching it, mentoring teams and getting kits into schools.</p>
-  </div>
-  <div class="beyond rv">
-    <div><div class="v" data-count="100" data-suffix="+">0</div><h5>FRC team captain</h5><p>Petitioned to start my high school's FRC team, then led 100+ members and taught mechanical design.</p></div>
-    <div><div class="v" data-count="38">0</div><h5>Robot kits to schools</h5><p>With FIRST Canada, I gave kits to schools without clubs and taught them over two summers.</p></div>
-    <div><div class="v">APAC</div><h5>Control Award · FTC 16397</h5><p>Wrote all the software: PIDF holds, TensorFlow vision and sensor localization. Won for software reliability.</p></div>
-    <div><div class="v" data-count="2" data-suffix=" yrs">0</div><h5>FTC Sim instructor</h5><p>Beta-tested FIRST's virtual robotics simulator, then was hired to teach classes on it. I also made tutorials and mentor teams 18846 and 17003.</p></div>
-  </div>
-</section>
-
-<!-- ═════════════ CONTACT ═════════════ -->
 <section id="contact" class="wrap contact">
-  <span class="mono" style="color:var(--mute)">07 / Contact</span>
+  <span class="mono" style="color:var(--mute)">Contact</span>
   <h2>Let's build<br>something that <a href="mailto:senguptaarmaan@gmail.com">moves.</a></h2>
   <div class="grid2 mono">
     <a href="mailto:senguptaarmaan@gmail.com">senguptaarmaan@gmail.com</a>
@@ -353,14 +86,15 @@
 </section>
 </main>
 
-<footer class="mono"><span>© 2026 Armaan Sengupta</span><span>Waterloo, ON · Hand-built. Every animation runs live in your browser.</span></footer>
+<footer class="mono"><span>© 2026 Armaan Sengupta</span><span>Waterloo, ON · Every animation runs live in your browser.</span></footer>
 
-<div class="drawer" id="drawer" aria-hidden="true">
+<div class="pop" id="pop" aria-hidden="true">
   <div class="scrim" data-close></div>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dr-title">
-    <button class="close mono" data-close>Close ✕</button>
-    <div id="dr-body"></div>
-  </div>
+  <article class="card-pop" role="dialog" aria-modal="true" aria-labelledby="pop-title">
+    <button class="close mono" data-close aria-label="Close">Close ✕</button>
+    <div id="pop-body"></div>
+  </article>
 </div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="close mono" aria-label="Close image">✕</button></div>
 </body>
 </html>

@@ -1,14 +1,17 @@
-// <as-segway-sweep>: passive-dynamics parameter study of a human transporter.
-// Left: side-view run (wheel + leaning rider rod) that rolls until it tips.
-// Right: wireframe response surface of distance travelled vs thrust F and
-// initial lean β, with the global maximum marked. The run on the left is the
-// (F, β) under the marker. Hover / drag over the surface to pick (F, β).
-// The surface is an illustrative fit, not the original study data.
+// <as-segway-sweep>: open-loop parameter study of the SYDE 351 human transporter.
+// Left: side-view run (wheel, transporter stem, rider rod) that rolls until it tips past 90°.
+// Right: wireframe surface of distance travelled before tipping vs thrust F and lean |β|, computed
+// in closed form from the report's linearised state model (section 3.3, Table 1 parameters):
+//   θ̈ = λ²(θ + β − F/(C1·g)),  ẍ = (C4·F − C2·C6·(θ + β))/(C1·C4 − C2·C5),  θ(0) = θ̇(0) = 0,
+// so θ(t) = e(cosh λt − 1) with e = β − F/(C1·g); the run ends at |θ| = π/2 (the report's stop criterion).
+// Distance diverges on the balance ridge F = C1·g·β; the surface is clipped at DCLIP for display.
+// The marked point is the report's hand-tuned Simulink result: 12.3 m at 170.203 N, |β| = 0.2 rad
+// (the report quotes β = −0.2 rad in its sign convention); this model reproduces it (12.34 m).
+// Hover / drag over the surface to pick (F, β). Attributes: none. Respects prefers-reduced-motion.
 
 const MONO = '500 10px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
 const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
 const ease = (v) => { v = clamp(v); return v * v * (3 - 2 * v); };
-const GLOW = 'rgba(255,244,226,0.95)';
 
 class AnimBase extends HTMLElement {
   constructor() {
@@ -84,28 +87,44 @@ function ih(n) { n |= 0; n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n = Math.imul
 
 
 // ---------------------------------------------------------------------------
-const F0 = 100, F1 = 200, B0 = 0.2, B1 = 0.8;
-const NF = 21, NB = 17;
-const RUN = 3.1;
-const TRACK = 14;
-
-function distance(F, b) {
-  const a = (F - 170) / 30, c = (b - 0.47) / 0.15;
-  const peak = 10.6 * Math.exp(-0.5 * (a * a + c * c));
-  const ridge = 1.7 * Math.exp(-0.5 * (((F - 122) / 16) ** 2 + ((b - 0.69) / 0.09) ** 2));
-  return 1.2 + peak + ridge + 0.9 * (F - F0) / 100 * (1 - Math.abs(b - 0.5) * 1.6);
+const F0 = 100, F1 = 200, B0 = 0.1, B1 = 0.3;
+const NF = 21, NB = 17, NS = 160;
+const TRACK = 14, DCLIP = 13.5;
+// Table 1 parameters → linearised model constants
+const PM = { M: 35, mu: 50.5, R: 0.127, LG: 1, Iu: 20, Iw: 0.02, g: 9.81 };
+const C1 = PM.M + PM.mu + PM.Iw / (PM.R * PM.R), C2 = PM.mu * PM.LG, C4 = PM.mu * PM.LG * PM.LG + PM.Iu, C6 = PM.mu * PM.g * PM.LG;
+const DET = C1 * C4 - C2 * C2, LAM = Math.sqrt(C1 * C6 / DET), KX = C2 * C6 / DET;
+/** closed-form run of the linearised model: tip time, and state at time t */
+function runOf(F, b) {
+  const e = b - F / (C1 * PM.g), a0 = (C4 * F - C2 * C6 * b) / DET;
+  const tTip = Math.abs(e) < 1e-12 ? Infinity : Math.acosh(1 + (Math.PI / 2) / Math.abs(e)) / LAM;
+  const at = (t) => { const ch = Math.cosh(LAM * t) - 1; return { x: (a0 + KX * e) * t * t / 2 - KX * e * ch / (LAM * LAM), th: e * ch }; };
+  return { e, tTip, at };
 }
-const MAX = (() => {
-  let best = { d: -1, F: 0, b: 0 };
-  for (let i = 0; i <= 200; i++) for (let j = 0; j <= 120; j++) {
-    const F = F0 + (i / 200) * (F1 - F0), b = B0 + (j / 120) * (B1 - B0), d = distance(F, b);
-    if (d > best.d) best = { d, F, b };
+function distance(F, b) { const r = runOf(F, b); return Math.min(DCLIP, Math.max(0, r.at(Math.min(r.tTip, 30)).x)); }
+const REPORT = { F: 170.203, b: 0.2 };
+const ridgeB = F => F / (C1 * PM.g), ridgeF = b => b * C1 * PM.g;
+/** wire lines sampled finely along each direction, with the exact ridge crossing inserted */
+function buildLines() {
+  const lines = [];
+  for (let i = 0; i < NF; i++) {
+    const F = F0 + (i / (NF - 1)) * (F1 - F0), bs = [];
+    for (let k = 0; k <= NS; k++) bs.push(B0 + (k / NS) * (B1 - B0));
+    const br = ridgeB(F); if (br > B0 && br < B1) bs.push(br);
+    bs.sort((a, b) => a - b); lines.push(bs.map(b => [F, b, distance(F, b)]));
   }
-  return best;
-})();
+  for (let j = 0; j < NB; j++) {
+    const b = B0 + (j / (NB - 1)) * (B1 - B0), Fs = [];
+    for (let k = 0; k <= NS; k++) Fs.push(F0 + (k / NS) * (F1 - F0));
+    const fr = ridgeF(b); if (fr > F0 && fr < F1) Fs.push(fr);
+    Fs.sort((a, b) => a - b); lines.push(Fs.map(F => [F, b, distance(F, b)]));
+  }
+  return lines;
+}
+const MAX = { F: REPORT.F, b: REPORT.b, d: Math.min(DCLIP, distance(REPORT.F, REPORT.b)) };
 const SWEEP = (() => {
-  const Fs = [110, 130, 150, 170, 190], Bs = [0.25, 0.35, 0.45, 0.55, 0.65, 0.75], out = [];
-  Bs.forEach((b, j) => (j % 2 ? [...Fs].reverse() : Fs).forEach((F) => out.push([F, b])));
+  const Fs = [120, 145, 170, 195], offs = [-0.03, -0.006, -0.0012, 0.0012, 0.006, 0.03], out = [];
+  Fs.forEach((F, j) => (j % 2 ? [...offs].reverse() : offs).forEach((o) => out.push([F, F / (C1 * PM.g) + o])));
   return out;
 })();
 
@@ -113,9 +132,7 @@ class AsSegwaySweep extends AnimBase {
   static touch = 'pan-y';
   constructor() {
     super();
-    this.H = new Float32Array(NF * NB);
-    for (let i = 0; i < NF; i++) for (let j = 0; j < NB; j++) this.H[i * NB + j] = distance(F0 + (i / (NF - 1)) * (F1 - F0), B0 + (j / (NB - 1)) * (B1 - B0));
-    this.px = new Float32Array(NF * NB); this.py = new Float32Array(NF * NB);
+    this.lines = buildLines();
     this.clock = 0;
     this.idx = 0; this.runT = 0.9;
     this.from = [...SWEEP[SWEEP.length - 1]];
@@ -128,10 +145,11 @@ class AsSegwaySweep extends AnimBase {
   }
   toStatic() {
     this.manual = false; this.par = [MAX.F, MAX.b]; this.cur = [...this.par]; this.from = [...this.par];
-    this.runD = MAX.d; this.runT = 2.6; this.clock = 0;
+    this.runD = MAX.d; this.runT = Math.min(runOf(MAX.F, MAX.b).tTip, 4.2) + 0.3; this.clock = 0;
     this.trail = SWEEP.slice(0, 16).map(([F, b]) => [F, b]);
   }
   layout() {}
+  _runLen() { return Math.min(runOf(this.par[0], this.par[1]).tTip, 4.2) + 1.0; }
   regions() {
     const W = this.w, H = this.h;
     if (W >= 560) { const lw = Math.round(W * 0.42); return { L: { x: 0, y: 0, w: lw, h: H }, R: { x: lw, y: 0, w: W - lw, h: H }, stacked: false }; }
@@ -143,10 +161,10 @@ class AsSegwaySweep extends AnimBase {
     this.runT += dt;
     if (this.manual) {
       this.runD += (distance(...this.par) - this.runD) * (1 - Math.exp(-dt * 8));
-      if (this.runT >= RUN) { this.prevD = this.runD; this.runT = 0.35; }
+      if (this.runT >= this._runLen()) { this.prevD = this.runD; this.runT = 0.35; }
     } else {
       if (this.leaveAt >= 0) { this.leaveAt += dt; }
-      if (this.runT >= RUN) {
+      if (this.runT >= this._runLen()) {
         this.prevD = this.runD;
         this.trail.push([...this.par]);
         this.from = [...this.cur];
@@ -173,7 +191,7 @@ class AsSegwaySweep extends AnimBase {
     const sm = R.h < 200 || R.w < 360, padX = sm ? 30 : 46, padT = sm ? 30 : 40, padB = sm ? 22 : 40;
     const S = Math.min((R.w - padX * 2) / (x1 - x0), (R.h - padT - padB) / (y1 - y0));
     const ox = R.x + R.w / 2 - ((x0 + x1) / 2) * S, oy = R.y + padT + (R.h - padT - padB) / 2 - ((y0 + y1) / 2) * S;
-    const P = (F, b, d) => { const p = raw(((F - F0) / (F1 - F0)) * 2 - 1, ((b - B0) / (B1 - B0)) * 2 - 1, (d / MAX.d) * 0.95); const f = 9 / (9 + p[2]); return [ox + p[0] * S * f, oy + p[1] * S * f]; };
+    const P = (F, b, d) => { const p = raw(((F - F0) / (F1 - F0)) * 2 - 1, ((b - B0) / (B1 - B0)) * 2 - 1, (d / DCLIP) * 0.95); const f = 9 / (9 + p[2]); return [ox + p[0] * S * f, oy + p[1] * S * f]; };
     return { P, S };
   }
   pick(x, y) {
@@ -191,7 +209,7 @@ class AsSegwaySweep extends AnimBase {
     if (!p) return;
     if (!this.manual) { this.manual = true; this.runT = 0.35; this.prevD = -1; this.runD = distance(...p); }
     this.par = p; this.cur = [...p]; this.leaveAt = -1;
-    if (this.reduced) { this.runD = distance(...p); this.runT = 2.6; }
+    if (this.reduced) { this.runD = distance(...p); this.runT = Math.min(runOf(...p).tTip, 4.2) + 0.3; }
     this.cv.style.cursor = 'crosshair';
     this.invalidate();
   }
@@ -205,7 +223,7 @@ class AsSegwaySweep extends AnimBase {
     let best = 1e9;
     SWEEP.forEach(([F, b], i) => { const d = ((F - this.cur[0]) / 100) ** 2 + (b - this.cur[1]) ** 2; if (d < best) { best = d; this.idx = i; } });
     this.par = [...SWEEP[this.idx]]; this.runD = distance(...this.par);
-    if (this.reduced) { this.cur = [...this.par]; this.runT = 2.6; }
+    if (this.reduced) { this.cur = [...this.par]; this.runT = Math.min(runOf(...this.par).tTip, 4.2) + 0.3; }
     this.invalidate();
   }
 
@@ -227,15 +245,15 @@ class AsSegwaySweep extends AnimBase {
   }
   _sim(c, L, stacked) {
     const m = 14, gy = Math.round(L.y + L.h - (stacked ? 22 : Math.max(34, L.h * 0.26))) + 0.5;
-    const gx0 = L.x + m + 8, gx1 = L.x + L.w - m;
     const Lr = stacked ? clamp((gy - L.y - 30) / 1.12, 24, 120) : clamp(Math.min(L.h * 0.42, L.w * 0.4), 30, 190), r = Lr * 0.13;
+    const gx0 = L.x + m + 8 + Lr * 0.45, gx1 = L.x + L.w - m;
     const ppm = Math.max(4, (gx1 - gx0 - Lr * 0.9) / TRACK);
     const t = this.runT;
-    const p = clamp((t - 0.35) / 2.1), pe = ease(p);
-    const fade = Math.min(ease(t / 0.3), 1 - ease((t - (RUN - 0.28)) / 0.28));
-    const D = this.runD, beta = this.cur[1];
-    const xm = D * pe;
-    const theta = beta + (1.3 - beta) * Math.pow(p, 2.3);
+    const run = runOf(this.cur[0], this.cur[1]), tau = Math.min(Math.max(0, t - 0.35), run.tTip, 4.2), sv = run.at(tau);
+    const RUN = this._runLen(), fade = Math.min(ease(t / 0.3), 1 - ease((t - (RUN - 0.28)) / 0.28));
+    const beta = this.cur[1];
+    const xm = clamp(sv.x, -1, TRACK), tilt = sv.th;
+    const theta = tilt + beta; // rider lean = transporter tilt + fixed lean
 
     // ground + ticks
     c.strokeStyle = '#fff'; c.lineWidth = 1;
@@ -257,12 +275,12 @@ class AsSegwaySweep extends AnimBase {
 
     // rig
     const ax = xs, ay = gy - r - 0.5;
-    const st = Math.sin(theta), ct = Math.cos(theta);
+    const st = Math.sin(theta), ct = Math.cos(theta), s2 = Math.sin(tilt), c2 = Math.cos(tilt);
     c.save(); c.globalAlpha = fade; c.strokeStyle = '#fff';
     // vertical reference + lean arc
     c.globalAlpha = 0.22 * fade; c.setLineDash([2, 3]); c.beginPath(); c.moveTo(ax, ay); c.lineTo(ax, ay - Lr * 0.95); c.stroke(); c.setLineDash([]);
-    c.globalAlpha = 0.5 * fade; c.beginPath(); c.arc(ax, ay, Lr * 0.34, -Math.PI / 2, -Math.PI / 2 + theta); c.stroke();
-    if (Lr > 40 && !stacked) label(c, 'θ ' + theta.toFixed(2), ax, ay - Lr * 0.95 - 7, 0.6 * fade, 'center');
+    c.globalAlpha = 0.5 * fade; c.beginPath(); c.arc(ax, ay, Lr * 0.34, -Math.PI / 2, -Math.PI / 2 + tilt, tilt < 0); c.stroke();
+    if (Lr > 40 && !stacked) label(c, 'θ ' + tilt.toFixed(2), ax, ay - Lr * 0.95 - 7, 0.6 * fade, 'center');
     c.globalAlpha = fade;
     // wheel
     c.lineWidth = 1.25; c.beginPath(); c.arc(ax, ay, r, 0, 7); c.stroke();
@@ -273,9 +291,9 @@ class AsSegwaySweep extends AnimBase {
     // platform
     c.lineWidth = 2; c.beginPath(); c.moveTo(ax - r * 1.35, ay); c.lineTo(ax + r * 1.35, ay); c.stroke();
     // stem + bar
-    const sx = ax + st * Lr * 0.62, sy = ay - ct * Lr * 0.62;
+    const sx = ax + s2 * Lr * 0.62, sy = ay - c2 * Lr * 0.62;
     c.lineWidth = 1.5; c.beginPath(); c.moveTo(ax + r * 0.3, ay); c.lineTo(sx, sy); c.stroke();
-    c.beginPath(); c.moveTo(sx - ct * r * 0.6, sy - st * r * 0.6); c.lineTo(sx + ct * r * 0.6, sy + st * r * 0.6); c.stroke();
+    c.beginPath(); c.moveTo(sx - c2 * r * 0.6, sy - s2 * r * 0.6); c.lineTo(sx + c2 * r * 0.6, sy + s2 * r * 0.6); c.stroke();
     // rider rod
     const bx = ax - r * 0.4, by = ay - 1;
     const hx = bx + st * Lr, hy = by - ct * Lr;
@@ -297,7 +315,7 @@ class AsSegwaySweep extends AnimBase {
       label(c, xm.toFixed(1).padStart(4, '0') + ' m', tx, L.y + 22 + big, 0.95);
     }
     c.font = MONO; c.letterSpacing = '0.8px';
-    const ptxt = 'F ' + Math.round(this.cur[0]) + ' N   β ' + this.cur[1].toFixed(2) + ' rad';
+    const ptxt = 'F ' + this.cur[0].toFixed(1) + ' N   |β| ' + this.cur[1].toFixed(3) + ' rad';
     if (stacked) label(c, ptxt, L.x + L.w - m, L.y + 18, 0.6, 'right');
     else label(c, ptxt, tx, L.y + 40 + big, 0.6);
     const mode = this.manual ? 'MANUAL' : 'SWEEP ' + String(this.idx + 1).padStart(2, '0') + '/' + SWEEP.length;
@@ -306,51 +324,49 @@ class AsSegwaySweep extends AnimBase {
   }
 
   drawSurface(c, R) {
-    const view = (this.view = this.makeView(R)), P = view.P, { H, px, py } = this;
-    for (let i = 0; i < NF; i++) for (let j = 0; j < NB; j++) {
-      const k = i * NB + j, q = P(F0 + (i / (NF - 1)) * (F1 - F0), B0 + (j / (NB - 1)) * (B1 - B0), H[k]); px[k] = q[0]; py[k] = q[1];
-    }
+    const view = (this.view = this.makeView(R)), P = view.P;
     // base plane
     const corners = [[F0, B0], [F1, B0], [F1, B1], [F0, B1]].map(([F, b]) => P(F, b, 0));
     c.strokeStyle = '#fff'; c.lineWidth = 1;
     c.globalAlpha = 0.05; c.beginPath();
     for (let i = 0; i <= 10; i++) { const F = F0 + i * 10; let a = P(F, B0, 0), b = P(F, B1, 0); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); }
-    for (let j = 0; j <= 6; j++) { const b0 = B0 + j * 0.1; let a = P(F0, b0, 0), b = P(F1, b0, 0); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); }
+    for (let j = 0; j <= 4; j++) { const b0 = B0 + j * 0.05; let a = P(F0, b0, 0), b = P(F1, b0, 0); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); }
     c.stroke();
     c.globalAlpha = 0.3; c.beginPath(); corners.forEach((q, i) => (i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]))); c.closePath(); c.stroke();
 
-    // mesh, bucketed by height for alpha
-    const NBK = 6;
+    // wire lines, bucketed by height for alpha
+    const NBK = 6, proj = this.lines.map(l => l.map(([F, b, d]) => P(F, b, d)));
     for (let bk = 0; bk < NBK; bk++) {
       c.beginPath();
-      for (let i = 0; i < NF; i++) for (let j = 0; j < NB; j++) {
-        const k = i * NB + j;
-        if (i + 1 < NF) { const k2 = k + NB; const hb = Math.min(NBK - 1, Math.floor(((H[k] + H[k2]) / 2 / MAX.d) * NBK)); if (hb === bk) { c.moveTo(px[k], py[k]); c.lineTo(px[k2], py[k2]); } }
-        if (j + 1 < NB) { const k2 = k + 1; const hb = Math.min(NBK - 1, Math.floor(((H[k] + H[k2]) / 2 / MAX.d) * NBK)); if (hb === bk) { c.moveTo(px[k], py[k]); c.lineTo(px[k2], py[k2]); } }
-      }
-      c.globalAlpha = 0.12 + 0.55 * (bk / (NBK - 1)); c.stroke();
+      this.lines.forEach((l, li) => { const q = proj[li]; for (let k = 0; k + 1 < l.length; k++) { const hb = Math.min(NBK - 1, Math.floor(((l[k][2] + l[k + 1][2]) / 2 / DCLIP) * NBK)); if (hb === bk) { c.moveTo(q[k][0], q[k][1]); c.lineTo(q[k + 1][0], q[k + 1][1]); } } });
+      c.globalAlpha = 0.1 + 0.5 * (bk / (NBK - 1)); c.stroke();
     }
+    // balance ridge F = C1·g·β (distance unbounded there; drawn at the clip height)
+    c.globalAlpha = 0.85; c.lineWidth = 1.25; c.beginPath();
+    for (let k = 0; k <= 60; k++) { const F = F0 + (k / 60) * (F1 - F0), b = ridgeB(F); if (b < B0 || b > B1) continue; const q = P(F, b, DCLIP); k ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); }
+    c.stroke(); c.lineWidth = 1;
+    { const q = P(F0 + 4, ridgeB(F0 + 4), DCLIP); label(c, 'BALANCE RIDGE  F = C1·g·β', Math.max(q[0], R.x + 8), q[1] - 8, 0.55, 'left'); }
     c.globalAlpha = 1;
 
     // axes
     const bF = P(150, B0, 0)[1] > P(150, B1, 0)[1] ? B0 : B1, bO = bF === B0 ? B1 : B0;
-    const fB = P(F0, 0.5, 0)[1] > P(F1, 0.5, 0)[1] ? F0 : F1, fO = fB === F0 ? F1 : F0;
+    const fB = P(F0, 0.2, 0)[1] > P(F1, 0.2, 0)[1] ? F0 : F1, fO = fB === F0 ? F1 : F0;
     const small = R.w < 360 || R.h < 200;
     const nF = (() => { const a = P(150, bF, 0), b = P(150, bO, 0), l = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1; return [(a[0] - b[0]) / l, (a[1] - b[1]) / l]; })();
-    const nB = (() => { const a = P(fB, 0.5, 0), b = P(fO, 0.5, 0), l = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1; return [(a[0] - b[0]) / l, (a[1] - b[1]) / l]; })();
+    const nB = (() => { const a = P(fB, 0.2, 0), b = P(fO, 0.2, 0), l = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1; return [(a[0] - b[0]) / l, (a[1] - b[1]) / l]; })();
     const at = (q, n, d, txt = '') => { d += Math.abs(n[0]) * c.measureText(txt).width / 2; return [q[0] + n[0] * d, q[1] + n[1] * d + 3.5]; };
     c.globalAlpha = 0.3; c.beginPath();
     for (const F of [100, 150, 200]) { const q = P(F, bF, 0); c.moveTo(q[0], q[1]); c.lineTo(q[0] + nF[0] * 4, q[1] + nF[1] * 4); }
-    for (const b of [0.2, 0.5, 0.8]) { const q = P(fB, b, 0); c.moveTo(q[0], q[1]); c.lineTo(q[0] + nB[0] * 4, q[1] + nB[1] * 4); }
+    for (const b of [0.1, 0.2, 0.3]) { const q = P(fB, b, 0); c.moveTo(q[0], q[1]); c.lineTo(q[0] + nB[0] * 4, q[1] + nB[1] * 4); }
     c.stroke(); c.globalAlpha = 1;
     for (const F of [100, 150, 200]) { const q = at(P(F, bF, 0), nF, 9, String(F)); label(c, String(F), q[0], q[1], 0.45, 'center'); }
     if (!small) { const q = at(P(150, bF, 0), nF, 24, 'THRUST F · N'); label(c, 'THRUST F · N', q[0], q[1], 0.32, 'center'); }
-    for (const b of [0.2, 0.5, 0.8]) { const q = at(P(fB, b, 0), nB, 9, '0.0'); label(c, b.toFixed(1), q[0], q[1], 0.45, 'center'); }
-    if (!small) { const q = at(P(fB, 0.5, 0), nB, 24, 'LEAN β · rad'); label(c, 'LEAN β · rad', q[0], q[1], 0.32, 'center'); }
+    for (const b of [0.1, 0.2, 0.3]) { const q = at(P(fB, b, 0), nB, 9, '0.0'); label(c, b.toFixed(1), q[0], q[1], 0.45, 'center'); }
+    if (!small) { const q = at(P(fB, 0.2, 0), nB, 24, 'LEAN |β| · rad'); label(c, 'LEAN |β| · rad', q[0], q[1], 0.32, 'center'); }
     // vertical D axis at the back corner
     let back = corners[0], bi = 0; corners.forEach((q, i) => { if (q[1] < back[1]) { back = q; bi = i; } });
     const bc = [[F0, B0], [F1, B0], [F1, B1], [F0, B1]][bi];
-    const top = P(bc[0], bc[1], MAX.d * 1.05);
+    const top = P(bc[0], bc[1], DCLIP * 1.02);
     c.strokeStyle = '#fff'; c.globalAlpha = 0.3; c.beginPath(); c.moveTo(back[0], back[1]); c.lineTo(top[0], top[1]); c.stroke();
     for (const d of [0, 5, 10]) { const q = P(bc[0], bc[1], d); c.globalAlpha = 0.3; c.beginPath(); c.moveTo(q[0] - 3, q[1]); c.lineTo(q[0], q[1]); c.stroke(); if (!small || d === 10) label(c, d === 10 ? 'D 10 m' : String(d), q[0] - 6, q[1] + 3, 0.42, 'right'); }
     c.globalAlpha = 1;
@@ -363,14 +379,14 @@ class AsSegwaySweep extends AnimBase {
 
     // global max
     const mq = P(MAX.F, MAX.b, MAX.d);
-    c.save(); c.shadowColor = GLOW; c.shadowBlur = 10; c.fillStyle = '#fff';
+    c.save(); c.fillStyle = '#fff';
     c.beginPath(); c.arc(mq[0], mq[1], 2.6, 0, 7); c.fill();
     c.strokeStyle = '#fff'; c.lineWidth = 1; c.globalAlpha = 0.7; c.beginPath(); c.moveTo(mq[0], mq[1] - 5); c.lineTo(mq[0], mq[1] - 20); c.stroke();
     c.restore();
-    const mtxt = 'MAX 12.3 m @ 170 N'; // measured Simulink optimum; surface shape is illustrative
+    const mtxt = 'REPORT 12.3 m @ 170.2 N';
     const mw = c.measureText(mtxt).width;
     const mx = clamp(mq[0], R.x + mw / 2 + 6, R.x + R.w - mw / 2 - 6);
-    c.save(); c.shadowColor = GLOW; c.shadowBlur = 6; label(c, mtxt, mx, mq[1] - 25, 0.95, 'center'); c.restore();
+    label(c, mtxt, mx, mq[1] - 25, 0.9, 'center');
 
     // marker
     const [F, b] = this.cur, d = distance(F, b), q = P(F, b, d), g = P(F, b, 0);

@@ -24,7 +24,7 @@ export function initHero(canvas) {
   }
 
   // trace band lives in the upper ~60% of the hero so the type stays clear
-  const eyebrow = document.querySelector('.hero .eyebrow');
+  const eyebrow = document.querySelector('.intro .eyebrow');
   let bandBot = 0;
   const band = () => ({ top: Math.max(84, H * 0.12), bot: bandBot });
   const toY = (val) => { const b = band(); return b.top + (1 - (val + 1) / 2) * (b.bot - b.top); };

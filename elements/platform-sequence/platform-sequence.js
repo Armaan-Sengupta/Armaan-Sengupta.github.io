@@ -1,3 +1,9 @@
+/* <as-platform-sequence> — 12 s film of the platform: exploded parts assemble (0.8-4.3 s), the ball is released
+ * off-centre and balanced with overshoot by the controller.py PID on the Simulink plant (4.6-12 s).
+ * Attributes: autoplay="false" (start paused), controls="false" (hide the transport bar), time (start time, s).
+ * Methods/props: play(), pause(), seek(s), renderAt(s), currentTime, duration, paused, ready (Promise).
+ * Events: ready, timeupdate {time, state}, sequence-complete, render-error.
+ */
 import {createPlatformRenderer} from '../platform/platform-renderer.js';
 import {PLATFORM_SEQUENCE_DURATION,platformSequenceState} from './platform-trajectory.js';
 export {PLATFORM_SEQUENCE_DURATION,platformSequenceState};
@@ -8,17 +14,17 @@ class PlatformSequence extends HTMLElement {
     super();
     this.attachShadow({mode:'open'});
     this.shadowRoot.innerHTML = `<style>
-      :host{display:block;background:#000;color:#fff;font:12px Arial,sans-serif;min-width:0;contain:content}
-      *{box-sizing:border-box}.stage{width:100%;aspect-ratio:16/9;background:#000;position:relative;overflow:hidden}
+      :host{display:block;background:#08080a;color:#f2efe9;font:11px "JetBrains Mono",ui-monospace,monospace;min-width:0;contain:content}
+      *{box-sizing:border-box}.stage{width:100%;aspect-ratio:16/9;background:#08080a;position:relative;overflow:hidden}
       canvas{width:100%;height:100%;display:block;object-fit:contain}
       .controls{display:flex;gap:12px;align-items:center;min-height:52px;padding:10px 12px;border-top:1px solid #333;color:#ddd}
       button{font:11px Arial,sans-serif;cursor:pointer;color:#fff;background:#111;border:1px solid #555;padding:8px 12px;min-width:58px}
       button:hover{background:#222;border-color:#fff}button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px}
       input{min-width:40px;flex:1;accent-color:#fff}output{font:10px monospace;white-space:nowrap;color:#aaa;width:58px;text-align:right}
       .message{position:absolute;inset:auto 12px 12px;color:#aaa;font:11px monospace}.message:empty{display:none}
-      :host([controls='false']) .controls{display:none}
+      :host([controls="false"]) .controls{display:none}
       @media(max-width:450px){.controls{gap:7px;padding:9px 7px}button{font-size:10px;padding:8px;min-width:48px}output{font-size:9px;width:50px}}
-    </style><div class="stage"><canvas width="1920" height="1080" aria-label="Exploded 3RRS platform assembly collapsing, balancing a rolling ball, and ending at rest"></canvas><div class="message" role="status"></div></div><div class="controls"><button class="toggle" type="button">Play</button><button class="restart" type="button">Replay</button><input type="range" min="0" max="12" step="0.01" value="0" aria-label="Animation time in seconds"><output>0.0 / 12s</output></div>`;
+    </style><div class="stage"><canvas aria-label="Exploded 3RRS platform assembling, then balancing a dropped ball back to centre"></canvas><div class="message" role="status"></div></div><div class="controls"><button class="toggle" type="button">Play</button><button class="restart" type="button">Replay</button><input type="range" min="0" max="12" step="0.01" value="0" aria-label="Animation time in seconds"><output>0.0 / 12s</output></div>`;
     this._time=0;this._playing=false;this._frame=0;this._last=0;this._view=null;this._disposed=false;
     this._canvas=this.shadowRoot.querySelector('canvas');
     this._slider=this.shadowRoot.querySelector('input');
@@ -50,10 +56,10 @@ class PlatformSequence extends HTMLElement {
   }
   async _initialize() {
     try {
-      if(!this._view)this._view=await createPlatformRenderer(this._canvas,{width:1920,height:1080,pixelRatio:1});
+      if(!this._view){this._view=createPlatformRenderer(this._canvas,{});this._view.setCamera('hero-end');this._ro=new ResizeObserver(([e])=>{const r=e.contentRect;this._view.resize(r.width,r.height,Math.min(devicePixelRatio||1,2));this.seek(this._time);});this._ro.observe(this._canvas.parentElement);}
       if(this._view.ready)await this._view.ready;
       if(this._disposed)return this;
-      this.seek(Number(this.getAttribute('time'))||0);
+      this.seek(this.hasAttribute('time')?(Number(this.getAttribute('time'))||0):this._time);
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
       const auto=this.getAttribute('autoplay');
       if(auto!=='false'&&!reduced)this.play();
@@ -65,16 +71,16 @@ class PlatformSequence extends HTMLElement {
       throw error;
     }
   }
-  disconnectedCallback(){this._disposed=true;this.pause();this._view?.dispose?.();this._view=null;}
+  disconnectedCallback(){this._disposed=true;this.pause();this._ro?.disconnect();this._view?.dispose?.();this._view=null;}
   get canvas(){return this._view?.canvas||this._canvas;}
   get duration(){return PLATFORM_SEQUENCE_DURATION;}
   get currentTime(){return this._time;}
   get paused(){return !this._playing;}
-  get restState(){return {tiltX:0,tiltZ:0,ballX:0,ballZ:0,explode:0};}
+  get restState(){return platformSequenceState(this.duration);}
   seek(seconds){
     this._time=clamp(Number(seconds)||0,0,this.duration);
     const state=platformSequenceState(this._time);
-    if(this._view){this._view.setState(state);this._view.render();}
+    if(this._view){this._view.setCamera('hero-end','hero-start',state.explode*state.explode);this._view.setState(state);this._view.render();}
     this._slider.value=String(this._time);
     this._output.value=this._time.toFixed(1)+' / 12s';
     this.dispatchEvent(new CustomEvent('timeupdate',{detail:{time:this._time,state}}));

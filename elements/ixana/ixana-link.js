@@ -1,116 +1,147 @@
-/* Ixana wearable link. Original animation; company assets credited in sources.json. */
-(()=>{
-'use strict';
-const scriptUrl=document.currentScript?.src||location.href;
-const asset=(name)=>new URL('./assets/'+name,scriptUrl).href;
-const W=1440,H=900,TAU=Math.PI*2;
+/* <as-ixana-link>: Ixana wearable video link (ES module, shadow DOM, canvas 2D).
+
+ A camera on smart glasses streams video through the body (Wi-R, body-coupled) to a watch display.
+ The scene (public Ixana wearer photograph) is greyscale; the only colour is the video stream itself:
+ the live camera view at the glasses and the frame-quantised picture on the watch.
+
+ Attributes / properties
+   view       "capture" | "link" | "display"  (default "link"). Eases the camera (1.3 s) between stages:
+              capture = glasses camera + what it sees, link = whole wearer with packets travelling the body,
+              display = close on the watch face playing the received stream.
+   progress   number 0..1, optional scroll scrub: 0 capture → .5 link → 1 display. Overrides view while set.
+   mode       "improved" (13 fps, default) | "baseline" (4 fps). Sets packet bursts and watch frame cadence.
+   controls   "hidden" hides the small 4 / 13 fps toggle (bottom right).
+   paused     boolean; pauses motion (also pauses the stream video).
+   stream-src override for the colour stream video (default ../../media/ixana/ixana-watch-aisle.mp4).
+   person-src override for the wearer photograph (default ./assets/person.webp).
+ Methods: play(), pause(), renderAt(seconds) (deterministic redraw at a time; video frame is whatever is decoded).
+ Events: modechange {mode,fps} (bubbles, composed).
+ Text drawn: small mono HUD readouts only. prefers-reduced-motion → still frame. Pauses offscreen / hidden tab.
+ The link path is illustrative, not a measured field map.
+*/
+const TAU=Math.PI*2;
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
-const ease=t=>t*t*(3-2*t);
-function rounded(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r);}
-function label(c,s,x,y,size=13,color='#a0a0a0',align='left'){c.fillStyle=color;c.textAlign=align;c.font=size+'px ui-monospace,SFMono-Regular,Consolas,monospace';c.fillText(s,x,y);}
-function line(c,pts,color='#777',width=1){c.beginPath();c.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(p=>c.lineTo(...p));c.strokeStyle=color;c.lineWidth=width;c.stroke();}
-function dot(c,x,y,r=3,color='#fff'){c.beginPath();c.arc(x,y,r,0,TAU);c.fillStyle=color;c.fill();}
-function ring(c,x,y,r,color,width=1){c.beginPath();c.arc(x,y,r,0,TAU);c.strokeStyle=color;c.lineWidth=width;c.stroke();}
-function bezier(p,t){let u=1-t;return [u*u*u*p[0][0]+3*u*u*t*p[1][0]+3*u*t*t*p[2][0]+t*t*t*p[3][0],u*u*u*p[0][1]+3*u*u*t*p[1][1]+3*u*t*t*p[2][1]+t*t*t*p[3][1]]}
+const ease=t=>{t=clamp(t);return t*t*(3-2*t)};
+const ease3=t=>{t=clamp(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+// World = person.webp pixel space (2880 x 1800).
+const LENS=[2028,406],PATCH=[2420,1042],WATCH={x:2359.5,y:1617,rx:29,ry:32,rot:-.12};
+const FRAME={x:1505,y:300,w:212,h:260}; // floating "what the camera sees" plane, in front of her face
+const ROUTE=[LENS,[2105,402],[2178,452],[2212,590],[2268,700],[2352,800],[2402,925],PATCH,[2442,1170],[2440,1300],[2420,1440],[2392,1540],[WATCH.x,WATCH.y-28]];
+const KEYS=[{p:0,c:[1790,452],box:[700,440]},{p:.5,c:[2050,960],box:[1060,1640]},{p:1,c:[2384,1612],box:[230,175]}];
+const VIEWS={capture:0,link:.5,display:1};
+function camAt(p,W,H){p=clamp(p);const i=p<=KEYS[1].p?0:1,A=KEYS[i],B=KEYS[i+1],s=ease3((p-A.p)/(B.p-A.p)),fit=k=>Math.min(W/k.box[0],H/k.box[1]),za=fit(A),zb=fit(B),z=Math.exp(lerp(Math.log(za),Math.log(zb),s));
+ let c;if(zb>=za){const k=(za/z)*(1-s);c=[B.c[0]-(B.c[0]-A.c[0])*k,B.c[1]-(B.c[1]-A.c[1])*k]}else{const k=(zb/z)*s;c=[A.c[0]+(B.c[0]-A.c[0])*k,A.c[1]+(B.c[1]-A.c[1])*k]}return {x:c[0],y:c[1],z}}
+// Catmull-Rom route sampled by arc length.
+const PATH=(()=>{const P=ROUTE,pts=[];for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];for(let k=0;k<16;k++){const t=k/16,t2=t*t,t3=t2*t;pts.push([0,1].map(j=>.5*(2*p1[j]+(-p0[j]+p2[j])*t+(2*p0[j]-5*p1[j]+4*p2[j]-p3[j])*t2+(-p0[j]+3*p1[j]-3*p2[j]+p3[j])*t3)))}}pts.push(P[P.length-1]);
+ const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return {pts,L,len:L[L.length-1]}})();
+function along(u){const d=clamp(u)*PATH.len,L=PATH.L;let lo=0,hi=L.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(L[m]<d)lo=m;else hi=m}const r=(d-L[lo])/((L[hi]-L[lo])||1),a=PATH.pts[lo],b=PATH.pts[hi];return [a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r]}
+const PATCH_U=(()=>{let best=0,bd=1e9;for(let i=0;i<=200;i++){const q=along(i/200),d=Math.hypot(q[0]-PATCH[0],q[1]-PATCH[1]);if(d<bd){bd=d;best=i/200}}return best})();
+const LATENCY=1.15; // seconds for a frame burst to travel glasses → watch (illustrative)
+const CSS=`:host{display:block;position:relative;width:100%;height:100%;min-height:240px;background:#08080a;contain:content;color:#f2efe9}
+canvas{display:block;width:100%;height:100%}video{position:absolute;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}
+.ctl{position:absolute;right:14px;bottom:14px;display:flex;gap:6px;font:10px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em}
+.ctl button{font:inherit;letter-spacing:inherit;color:rgba(242,239,233,.62);background:rgba(8,8,10,.6);border:1px solid rgba(255,255,255,.16);border-radius:3px;padding:6px 9px;cursor:pointer}
+.ctl button[aria-pressed=true]{color:#08080a;background:#f2efe9;border-color:#f2efe9}.ctl button:focus-visible{outline:1px solid #f2efe9;outline-offset:3px}
+:host([controls=hidden]) .ctl,:host([controls=false]) .ctl{display:none}`;
 class IxanaLink extends HTMLElement{
- static get observedAttributes(){return ['paused','mode','background','controls','stream-src','stream-cols','stream-rows','stream-frames','stream-fps'];}
- constructor(){super();this.attachShadow({mode:'open'});this._time=0;this._paused=false;this._mode='improved';this._frame=0;this._last=0;this._visible=true;this._pointer=[0,0];this._images={};this._stream=null;this._streamReady=Promise.resolve(false);this._streamError=false;this._reduced=matchMedia('(prefers-reduced-motion: reduce)');this.duration=12;this.shadowRoot.innerHTML='<style>:host{display:block;position:relative;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif;contain:content;width:100%;--as-border:#3c3c3c}*{box-sizing:border-box}.stage{width:100%;aspect-ratio:16/10;position:relative;background:#000;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:pan-y}.controls{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:16px 20px 18px;border-top:1px solid #262626;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.02em}.left{display:flex;gap:7px;align-items:center}button{font:inherit;letter-spacing:inherit;border:1px solid #444;color:#b8b8b8;background:#000;padding:8px 11px;cursor:pointer}button[aria-pressed=true]{background:#fff;border-color:#fff;color:#000}button:focus-visible{outline:2px solid #fff;outline-offset:4px}.status{color:#888;font-size:9px}.pause{min-width:75px}.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}:host([controls=hidden]) .controls{display:none}@media(max-width:600px){.controls{padding:12px 10px;gap:8px}.status{display:none}button{font-size:10px;padding:8px}.left{gap:5px}}</style><div class="stage"><canvas role="img" aria-label="Animated illustration of video captured at smart glasses, transmitted through a body-coupled Wi-R link, and displayed on a smart watch"></canvas><p class="sr">A conceptual animated communication path follows the wearer from glasses to watch. Compare the documented prototype improvement from 4 to 13 frames per second. This is an illustration, not a measured electric field map.</p></div><div class="controls"><div class="left" role="group" aria-label="Compare prototype frame rates"><button data-mode="baseline" aria-pressed="false">4 fps / before</button><button data-mode="improved" aria-pressed="true">13 fps / after</button></div><span class="status" aria-live="polite">Prototype throughput illustration</span><button class="pause" aria-pressed="false" aria-label="Pause animation">Pause</button></div>';this._canvas=this.shadowRoot.querySelector('canvas');this._ctx=this._canvas.getContext('2d',{alpha:false});this._boundTick=this._tick.bind(this);this._onPreference=()=>{this._paused=this._reduced.matches;this._syncControls();this.renderAt(this._time)};}
- get canvas(){return this._canvas;}
- get currentTime(){return this._time;}
- get paused(){return this._paused;}
- get mode(){return this._mode;}
- set mode(v){this._mode=v==='baseline'?'baseline':'improved';this._syncControls();this.renderAt(this._time);}
- connectedCallback(){if(this._connected)return;this._connected=true;this._paused=this.hasAttribute('paused')||this._reduced.matches;this._mode=this.getAttribute('mode')==='baseline'?'baseline':'improved';if(!this._eventsBound){this._eventsBound=true;this.shadowRoot.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{this.mode=b.dataset.mode;this.dispatchEvent(new CustomEvent('modechange',{detail:{mode:this._mode,fps:this._mode==='baseline'?4:13},bubbles:true,composed:true}))}));this.shadowRoot.querySelector('.pause').addEventListener('click',()=>this._paused?this.play():this.pause());this._canvas.addEventListener('pointermove',e=>{const b=this._canvas.getBoundingClientRect();this._pointer=[(e.clientX-b.left)/b.width-.5,(e.clientY-b.top)/b.height-.5];if(this._paused)this.renderAt(this._time)},{passive:true});this._canvas.addEventListener('pointerleave',()=>{this._pointer=[0,0]},{passive:true});}this._resizeObserver=new ResizeObserver(()=>this._resize());this._resizeObserver.observe(this._canvas);this._intersectionObserver=new IntersectionObserver(e=>this._visible=e[0].isIntersecting);this._intersectionObserver.observe(this);this._reduced.addEventListener('change',this._onPreference);this._loadImage('person',this.getAttribute('person-src')||asset('person.webp'));this._loadImage('chip',this.getAttribute('chip-src')||asset('chip.webp'));if(this.getAttribute('stream-src'))this._loadStream(this.getAttribute('stream-src'));this._syncControls();this._resize();this._raf=requestAnimationFrame(this._boundTick);}
- disconnectedCallback(){this._connected=false;cancelAnimationFrame(this._raf);this._resizeObserver?.disconnect();this._intersectionObserver?.disconnect();this._reduced.removeEventListener('change',this._onPreference);}
- attributeChangedCallback(name,old,v){if(old===v)return;if(name==='paused'&&this._connected){v===null?this.play():this.pause()}if(name==='mode'){this.mode=v;}if(name==='stream-src'&&this._connected&&v)this._loadStream(v);if(name.startsWith('stream-')&&this._connected)this.renderAt(this._time);}
- _loadImage(name,src){const img=new Image();img.onload=()=>{this._images[name]=img;this.renderAt(this._time);this.dispatchEvent(new CustomEvent('assetready',{detail:{name},bubbles:true,composed:true}))};img.onerror=()=>{this.dispatchEvent(new CustomEvent('asseterror',{detail:{name,src},bubbles:true,composed:true}));this.renderAt(this._time)};img.src=src;}
- get streamReady(){return Boolean(this._stream);}
- get streamFrameSource(){return this._stream?.src||null;}
- setStreamSource(src,options={}){
- for(const [name,value] of Object.entries({cols:options.cols,rows:options.rows,frames:options.frames,fps:options.fps})){if(value!==undefined)this.setAttribute('stream-'+name,String(value));}
- this.setAttribute('stream-src',src);
- if(!this._connected)this._loadStream(src);
- return this._streamReady;
+ static get observedAttributes(){return ['view','progress','mode','paused','stream-src','person-src']}
+ constructor(){super();this.attachShadow({mode:'open'});
+  this.shadowRoot.innerHTML=`<style>${CSS}</style><canvas role="img" aria-label="Illustration: video from a camera on smart glasses travels through the wearer's body over a Wi-R link to a watch, which displays the colour stream"></canvas><video muted playsinline loop preload="auto" aria-hidden="true"></video><div class="ctl" role="group" aria-label="Frame rate"><button data-mode="baseline" aria-pressed="false">4 FPS</button><button data-mode="improved" aria-pressed="true">13 FPS</button></div>`;
+  this._canvas=this.shadowRoot.querySelector('canvas');this._ctx=this._canvas.getContext('2d');this._video=this.shadowRoot.querySelector('video');
+  this._t=0;this._last=0;this._visible=true;this._p=VIEWS.link;this._from=this._p;this._to=this._p;this._tween=1;this._progress=null;this._mode='improved';this._paused=false;
+  this._rx=document.createElement('canvas');this._rx.width=237;this._rx.height=291;this._rxFrame=-1;this._hasRx=false;
+  this._reduced=matchMedia('(prefers-reduced-motion: reduce)');this._tick=this._tick.bind(this);
+  this._ro=new ResizeObserver(()=>this._resize());this._io=new IntersectionObserver(e=>{this._visible=e[0].isIntersecting;this._last=0;this._syncVideo()});
+  this._onVis=()=>this._syncVideo();
+  this.shadowRoot.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{this.mode=b.dataset.mode;this.dispatchEvent(new CustomEvent('modechange',{detail:{mode:this._mode,fps:this.fps},bubbles:true,composed:true}))}));
+  this._video.addEventListener('loadeddata',()=>{if(this._reduced.matches){try{this._video.currentTime=2.4}catch(e){}}this._render()});
+  this._video.addEventListener('seeked',()=>this._render());
  }
- _loadStream(src){this._streamError=false;this._streamReady=new Promise(resolve=>{const img=new Image();if(/^https?:/.test(src)&&new URL(src,location.href).origin!==location.origin)img.crossOrigin='anonymous';img.onload=()=>{this._stream=img;this.renderAt(this._time);this.dispatchEvent(new CustomEvent('streamready',{detail:{src},bubbles:true,composed:true}));resolve(true)};img.onerror=()=>{this._stream=null;this._streamError=true;this.dispatchEvent(new CustomEvent('streamerror',{detail:{src},bubbles:true,composed:true}));resolve(false)};img.src=src;});return this._streamReady;}
- _streamFrame(c,qt){if(!this._stream)return false;const cols=Math.max(1,Number(this.getAttribute('stream-cols'))||12),rows=Math.max(1,Number(this.getAttribute('stream-rows'))||8),count=Math.min(cols*rows,Math.max(1,Number(this.getAttribute('stream-frames'))||cols*rows)),rate=Math.max(.1,Number(this.getAttribute('stream-fps'))||13),frame=Math.floor(qt*rate)%count,img=this._stream,fw=img.naturalWidth/cols,fh=img.naturalHeight/rows;
- const ratio=158/194,srcRatio=fw/fh;let sx=(frame%cols)*fw,sy=Math.floor(frame/cols)*fh,sw=fw,sh=fh;if(srcRatio>ratio){sw=fh*ratio;sx+=(fw-sw)/2}else{sh=fw/ratio;sy+=(fh-sh)/2}c.drawImage(img,sx,sy,sw,sh,-79,-97,158,194);return true;}
- _resize(){const b=this._canvas.getBoundingClientRect();const d=Math.min(devicePixelRatio||1,2);this._canvas.width=Math.max(1,Math.round(b.width*d));this._canvas.height=Math.max(1,Math.round(b.height*d));this.renderAt(this._time);}
- _syncControls(){if(!this.shadowRoot)return;this.shadowRoot.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===this._mode)));const b=this.shadowRoot.querySelector('.pause');b.textContent=this._paused?'Play':'Pause';b.setAttribute('aria-label',this._paused?'Play animation':'Pause animation');b.setAttribute('aria-pressed',String(this._paused));}
- pause(){this._paused=true;this._syncControls();return this;}
- play(){this._paused=false;this._last=0;this._syncControls();return this;}
- seek(seconds){this._time=Math.max(0,Number(seconds)||0);this._last=0;this.renderAt(this._time);return this;}
- _tick(now){this._raf=requestAnimationFrame(this._boundTick);const dt=this._last?Math.min(.05,(now-this._last)/1000):0;this._last=now;if(this._paused||!this._visible||document.hidden)return;this._time+=dt;this.renderAt(this._time);}
- async ready(){const pending=()=>!this._images.person||!this._images.chip;const start=performance.now();while(pending()&&performance.now()-start<10000)await new Promise(r=>setTimeout(r,50));if(this.getAttribute('stream-src'))await this._streamReady;return this;}
- renderAt(seconds){const c=this._ctx;if(!c)return this;this._time=Math.max(0,Number(seconds)||0);const cw=this._canvas.width,ch=this._canvas.height,k=Math.min(cw/W,ch/H);c.setTransform(1,0,0,1,0,0);c.fillStyle=this.getAttribute('background')||'#000';c.fillRect(0,0,cw,ch);c.translate((cw-W*k)/2,(ch-H*k)/2);c.scale(k,k);this._draw(c,this._time);return this;}
- _draw(c,t){
- const fps=this._mode==='baseline'?4:13;
- c.fillStyle='#000';c.fillRect(0,0,W,H);
- const img=this._images.person,chip=this._images.chip;
- const breathe=Math.sin(t*.45)*1.5;
- // Photograph is a public Ixana asset, converted to grayscale at render time.
- if(img){c.save();c.filter='grayscale(1) contrast(1.12)';c.drawImage(img,img.naturalWidth*.56,0,img.naturalWidth*.39,img.naturalHeight,470+this._pointer[0]*4,24+breathe,560,875);c.restore();const g=c.createLinearGradient(460,0,1030,0);g.addColorStop(0,'#000');g.addColorStop(.12,'#0000');g.addColorStop(.82,'#0000');g.addColorStop(1,'#000');c.fillStyle=g;c.fillRect(460,0,590,H);const bottom=c.createLinearGradient(0,780,0,900);bottom.addColorStop(0,'#0000');bottom.addColorStop(1,'#000');c.fillStyle=bottom;c.fillRect(430,780,650,120);}
- label(c,'IXANA / WEARABLE VIDEO',52,48,13,'#b6b6b6');
- label(c,'A BODY-COUPLED DATA PATH',1388,48,11,'#777','right');
- c.font='500 56px Arial,Helvetica,sans-serif';c.fillStyle='#fff';c.textAlign='left';c.fillText('A wireless',52,143);c.fillText('wire.',52,202);
- label(c,'CAMERA TO DISPLAY',54,243,11,'#888');
- // Camera closeup uses the same real company photograph.
- if(img){c.save();c.beginPath();c.roundRect(55,294,283,156,18);c.clip();c.filter='grayscale(1) contrast(1.22)';c.drawImage(img,img.naturalWidth*.647,img.naturalHeight*.192,img.naturalWidth*.168,img.naturalHeight*.147,55,294,283,156);c.restore();const g=c.createLinearGradient(55,294,55,450);g.addColorStop(0,'#0000');g.addColorStop(1,'#000b');c.fillStyle=g;c.fillRect(55,294,283,156);}
- label(c,'01',55,480,11,'#707070');label(c,'CAPTURE',86,480,13,'#fff');label(c,'Glasses / camera + encoding',55,508,12,'#aaa');
- // Header-to-wrist route follows the physical wearer rather than radiating in space.
- const pathA=[[694,208],[730,255],[777,273],[805,348]];
- const pathB=[[805,348],[840,447],[856,560],[849,686]];
- const pathC=[[849,686],[921,714],[978,618],[1080,557]];
- const paths=[pathA,pathB,pathC];
- c.save();c.setLineDash([2,8]);paths.forEach(p=>{c.beginPath();c.moveTo(...p[0]);c.bezierCurveTo(...p[1],...p[2],...p[3]);c.strokeStyle='#777';c.lineWidth=1.2;c.stroke()});c.restore();
- for(let i=0;i<24;i++){const q=((t*.25+i/24)%1),pi=Math.min(2,Math.floor(q*3)),s=(q*3)%1;const p=bezier(paths[pi],s);const a=.35+.65*Math.pow(Math.sin(q*Math.PI),2);c.save();c.globalAlpha=a;c.shadowColor='#fff';c.shadowBlur=7;dot(c,p[0],p[1],i%4===0?2.5:1.45);c.restore();}
- [[694,208],[849,686],[1080,557]].forEach((p,i)=>{const pulse=(t*.5+i*.34)%1;ring(c,...p,8,'#fff',1.2);ring(c,...p,12+pulse*18,'rgba(255,255,255,'+((1-pulse)*.35)+')');dot(c,...p,2)});
- line(c,[[338,365],[418,365],[555,235],[684,208]],'#757575',.9);
- line(c,[[860,370],[961,267],[1054,267]],'#777',.9);
- label(c,'02',1068,254,11,'#707070');label(c,'TRANSMIT',1098,254,13,'#fff');
- label(c,'Localized electric field',1068,285,12,'#aaa');
- label(c,'Camera > FPGA > MCU',1068,311,11,'#777');
- label(c,'Wi-R > MCU > FPGA > AMOLED',1068,335,11,'#777');
- // Detailed AMOLED receiving watch, a stylized render, not claimed product CAD.
- this._watch(c,t,fps,1175,605);
- label(c,'03',1053,790,11,'#707070');label(c,'DISPLAY',1084,790,13,'#fff');
- label(c,'Watch / display-driver firmware',1053,818,12,'#aaa');
- // A live throughput strip makes the effect of 4 vs 13 fps visible.
- line(c,[[55,578],[348,578]],'#4b4b4b',1);
- label(c,'PROTOTYPE IMPROVEMENT',55,611,10,'#777');
- c.font='400 59px Arial,Helvetica,sans-serif';c.fillStyle='#fff';c.textAlign='left';c.fillText(String(fps),52,685);
- label(c,'frames / second',135,681,12,'#aaa');
- for(let i=0;i<13;i++){const active=i<fps;const p=(Math.floor(t*fps)+i)%13;const a=active?(p===0?1:.35):.08;c.fillStyle='rgba(255,255,255,'+a+')';c.fillRect(55+i*21.3,716,14,34);}
- label(c,this._mode==='baseline'?'BEFORE / 4 FPS':'AFTER / 13 FPS',55,777,12,'#fff');
- label(c,this._mode==='baseline'?'Power baseline':'8% lower power',55,807,14,'#aaa');
- label(c,'Documented prototype results',55,835,10,'#555');
- label(c,'ORIGINAL COMPANY IMAGERY / ANIMATED CONCEPTUAL LINK',52,876,9,'#555');
- label(c,'NOT A MEASURED FIELD MAP',1388,876,9,'#555','right');
+ get canvas(){return this._canvas}
+ get fps(){return this._mode==='baseline'?4:13}
+ get mode(){return this._mode}
+ set mode(v){this._mode=v==='baseline'?'baseline':'improved';this.shadowRoot.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===this._mode)));this._render()}
+ get view(){return this.getAttribute('view')||'link'}
+ set view(v){this.setAttribute('view',v)}
+ get progress(){return this._progress}
+ set progress(v){const n=v===null||v===undefined||v===''?null:Number(v);this._progress=Number.isFinite(n)?clamp(n):null;if(this._progress==null){this._p=this._from=this._to=VIEWS[this.view]??VIEWS.link;this._tween=1}this._render()}
+ get paused(){return this._paused}
+ attributeChangedCallback(n,o,v){if(o===v)return;
+  if(n==='view'){const target=VIEWS[v]??VIEWS.link;if(!this._connected||this._reduced.matches){this._p=this._from=this._to=target;this._tween=1}else{this._from=this._shown();this._to=target;this._tween=0}this._render()}
+  else if(n==='progress')this.progress=v;else if(n==='mode')this.mode=v;
+  else if(n==='paused'){v===null?this.play():this.pause()}
+  else if(n==='stream-src'&&this._connected)this._loadVideo();else if(n==='person-src'&&this._connected)this._loadPerson()}
+ connectedCallback(){if(this._connected)return;this._connected=true;this._paused=this.hasAttribute('paused');this.mode=this.getAttribute('mode');
+  if(!this.hasAttribute('view')&&this._progress==null){this._p=this._from=this._to=VIEWS.link}
+  this._ro.observe(this);this._io.observe(this);document.addEventListener('visibilitychange',this._onVis);this._loadPerson();this._loadVideo();this._resize();this._raf=requestAnimationFrame(this._tick)}
+ disconnectedCallback(){this._connected=false;cancelAnimationFrame(this._raf);this._ro.disconnect();this._io.disconnect();document.removeEventListener('visibilitychange',this._onVis);this._video.pause()}
+ play(){this._paused=false;this._last=0;this._syncVideo();return this}
+ pause(){this._paused=true;this._syncVideo();return this}
+ renderAt(seconds){this._t=Math.max(0,Number(seconds)||0);this._rxFrame=-1;this._render();return this}
+ _loadVideo(){const src=this.getAttribute('stream-src')||new URL('../../media/ixana/ixana-watch-aisle.mp4',import.meta.url).href;this._video.src=src;this._hasRx=false;this._rxFrame=-1;this._syncVideo()}
+ _loadPerson(){const img=new Image();img.decoding='async';img.onload=()=>{const W=img.naturalWidth,H=img.naturalHeight,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.filter='grayscale(1) contrast(1.06)';g.drawImage(img,0,0);g.filter='none';
+   // lift the studio black to the page black so the photo has no visible edge
+   g.globalCompositeOperation='lighten';g.fillStyle='#08080a';g.fillRect(0,0,W,H);g.globalCompositeOperation='source-over';
+   const fade=(x0,y0,x1,y1)=>{const gr=g.createLinearGradient(x0,y0,x1,y1);gr.addColorStop(0,'#08080a');gr.addColorStop(1,'rgba(8,8,10,0)');g.fillStyle=gr;g.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1-x0)||W,Math.abs(y1-y0)||H)};
+   fade(0,H,0,H-140);this._person=cv;this._sx=W/2880;this._render()};img.onerror=()=>this._render();img.src=this.getAttribute('person-src')||new URL('./assets/person.webp',import.meta.url).href}
+ _syncVideo(){const v=this._video;if(!v.src)return;const run=!this._paused&&this._visible&&!document.hidden&&!this._reduced.matches;if(run){const pr=v.play();if(pr&&pr.catch)pr.catch(()=>{})}else v.pause()}
+ _resize(){const b=this.getBoundingClientRect();this._w=Math.max(1,b.width);this._h=Math.max(1,b.height);this._dpr=Math.min(2,devicePixelRatio||1);this._canvas.width=Math.round(this._w*this._dpr);this._canvas.height=Math.round(this._h*this._dpr);this._render()}
+ _shown(){if(this._progress!=null)return this._progress;return lerp(this._from,this._to,ease(this._tween))}
+ _tick(now){this._raf=requestAnimationFrame(this._tick);const dt=this._last?Math.min(.05,(now-this._last)/1000):0;this._last=now;if(!this._visible||document.hidden)return;
+  const still=this._reduced.matches;if(this._tween<1)this._tween=still?1:Math.min(1,this._tween+dt/1.3);if(!this._paused&&!still)this._t+=dt;
+  if(!this._paused&&!still||this._tween<1||!this._drawnOnce||this._video.readyState>=2&&!this._hasRx)this._render()}
+ _render(){const c=this._ctx;if(!c||!this._w)return;this._drawnOnce=true;this._draw(c,this._shown(),this._t)}
+ _videoReady(){return this._video.readyState>=2&&this._video.videoWidth>0}
+ _updateRx(t){const fps=this.fps,f=Math.floor(Math.max(0,t-LATENCY)*fps);if(f!==this._rxFrame&&this._videoReady()){this._rxFrame=f;const g=this._rx.getContext('2d');g.drawImage(this._video,0,0,this._rx.width,this._rx.height);this._hasRx=true}}
+ _draw(c,p,t){
+  const W=this._w,H=this._h,cam=camAt(p,W,H),z=cam.z,fps=this.fps;this._updateRx(t);
+  c.setTransform(this._dpr,0,0,this._dpr,0,0);c.fillStyle='#08080a';c.fillRect(0,0,W,H);
+  const S=(x,y)=>[W/2+(x-cam.x)*z,H/2+(y-cam.y)*z];
+  c.save();c.translate(W/2,H/2);c.scale(z,z);c.translate(-cam.x,-cam.y);
+  if(this._person){c.imageSmoothingQuality='high';c.drawImage(this._person,0,0,this._person.width,this._person.height,0,0,2880,1800)}
+  // focus darkening as the camera closes on the watch: the received picture becomes the subject
+  const near=ease((p-.62)/.38);if(near>0){const r=Math.max(W,H)/z,g=c.createRadialGradient(WATCH.x,WATCH.y,WATCH.ry*1.2,WATCH.x,WATCH.y,r*.75);g.addColorStop(0,'rgba(8,8,10,0)');g.addColorStop(1,'rgba(8,8,10,'+(.55*near)+')');c.fillStyle=g;c.fillRect(cam.x-r,cam.y-r,2*r,2*r)}
+  // received stream on the watch face (colour), frame-held at the selected rate
+  c.save();c.translate(WATCH.x,WATCH.y);c.rotate(WATCH.rot);c.beginPath();c.ellipse(0,0,WATCH.rx,WATCH.ry,0,0,TAU);c.clip();c.fillStyle='#050506';c.fillRect(-WATCH.rx,-WATCH.ry,2*WATCH.rx,2*WATCH.ry);
+  if(this._hasRx){const s=Math.max(2*WATCH.rx/this._rx.width,2*WATCH.ry/this._rx.height)*1.02;c.globalAlpha=.97;c.drawImage(this._rx,-this._rx.width*s/2,-this._rx.height*s/2,this._rx.width*s,this._rx.height*s);c.globalAlpha=1}
+  const gl=c.createLinearGradient(-WATCH.rx,-WATCH.ry,WATCH.rx,WATCH.ry);gl.addColorStop(0,'rgba(255,255,255,.14)');gl.addColorStop(.38,'rgba(255,255,255,0)');gl.addColorStop(1,'rgba(0,0,0,.25)');c.fillStyle=gl;c.fillRect(-WATCH.rx,-WATCH.ry,2*WATCH.rx,2*WATCH.ry);
+  c.restore();
+  c.save();c.translate(WATCH.x,WATCH.y);c.rotate(WATCH.rot);c.beginPath();c.ellipse(0,0,WATCH.rx+.6,WATCH.ry+.6,0,0,TAU);c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=Math.max(.6,1/z);c.stroke();c.restore();
+  c.restore();
+  // camera view at the glasses: live colour, fades as the camera pulls back to the whole link
+  const cap=1-ease((p-.18)/.42);
+  if(cap>0.002){const a=S(FRAME.x,FRAME.y),b=S(FRAME.x+FRAME.w,FRAME.y+FRAME.h),l=S(...LENS),fw=b[0]-a[0],fh=b[1]-a[1];
+   c.save();c.globalAlpha=cap;c.strokeStyle='rgba(242,239,233,.22)';c.lineWidth=1;c.setLineDash([2,4]);c.beginPath();c.moveTo(...l);c.lineTo(b[0],a[1]);c.moveTo(...l);c.lineTo(b[0],b[1]);c.stroke();c.setLineDash([]);
+   c.beginPath();c.roundRect(a[0],a[1],fw,fh,Math.max(2,fw*.03));c.save();c.clip();c.fillStyle='#050506';c.fillRect(a[0],a[1],fw,fh);
+   if(this._videoReady()){const vw=this._video.videoWidth,vh=this._video.videoHeight,s=Math.max(fw/vw,fh/vh);c.drawImage(this._video,a[0]+(fw-vw*s)/2,a[1]+(fh-vh*s)/2,vw*s,vh*s)}
+   c.restore();c.strokeStyle='rgba(242,239,233,.5)';c.stroke();
+   // viewfinder corners + HUD
+   const k=Math.min(14,fw*.08);c.strokeStyle='rgba(242,239,233,.85)';c.lineWidth=1.2;c.beginPath();for(const [x,y,dx,dy] of [[a[0],a[1],1,1],[b[0],a[1],-1,1],[a[0],b[1],1,-1],[b[0],b[1],-1,-1]]){c.moveTo(x+dx*k,y+dy*4);c.lineTo(x+dx*4,y+dy*4);c.lineTo(x+dx*4,y+dy*k)}c.stroke();
+   if(fw>90){this._hud(c,'CAM · 30 FPS',a[0],a[1]-8,'left',.75);const rec=(Math.floor(t*2)%2)?.9:.35;c.fillStyle='rgba(242,239,233,'+rec+')';c.beginPath();c.arc(b[0]-10,a[1]-11,2.5,0,TAU);c.fill()}
+   c.restore()}
+  // the link: frame bursts leave the lens at the selected rate and travel the body to the watch
+  const linkA=.35+.65*ease(1-Math.abs(p-.5)*1.6);
+  c.save();c.globalAlpha=linkA*.5;c.strokeStyle='rgba(242,239,233,.55)';c.lineWidth=1;c.setLineDash([1.5,5]);c.beginPath();PATH.pts.forEach((q,i)=>{const s=S(...q);i?c.lineTo(...s):c.moveTo(...s)});c.stroke();c.setLineDash([]);c.restore();
+  const dotR=clamp(z*1.6,1.3,3.2);c.save();c.globalCompositeOperation='lighter';
+  const f0=Math.floor((t-LATENCY)*fps)-1,f1=Math.floor(t*fps);
+  for(let f=f0;f<=f1;f++){const age=t-f/fps;if(age<0||age>LATENCY)continue;const u=age/LATENCY;
+   for(let k=0;k<5;k++){const uu=u-k*.011;if(uu<0)continue;const q=S(...along(uu)),a=(1-k/5)*linkA*(.55+.45*Math.sin(Math.PI*clamp(uu)));c.fillStyle='rgba(242,239,233,'+a.toFixed(3)+')';c.beginPath();c.arc(q[0],q[1],dotR*(1-k*.12),0,TAU);c.fill()}}
+  c.restore();
+  // nodes: lens, Wi-R patch, watch
+  const nodes=[[LENS,'CAM'],[PATCH,'Wi-R'],[[WATCH.x,WATCH.y],'RX']];
+  nodes.forEach(([q,label],i)=>{if(i===2&&p>.85)return;const s=S(...q),ph=((t*.8+i*.33)%1);c.save();if(i===2)c.globalAlpha=1-ease((p-.6)/.25);const base=i===2?Math.max(WATCH.rx,WATCH.ry)*z+6:clamp(z*14,7,16);
+   c.strokeStyle='rgba(242,239,233,'+(.75*linkA)+')';c.lineWidth=1;c.beginPath();c.arc(s[0],s[1],base,0,TAU);c.stroke();
+   c.strokeStyle='rgba(242,239,233,'+((1-ph)*.35*linkA)+')';c.beginPath();c.arc(s[0],s[1],base+ph*16,0,TAU);c.stroke();
+   if(i<2&&p>.2&&p<.85)this._hud(c,label,s[0]+base+8,s[1]+3,'left',.7*ease(1-Math.abs(p-.5)*3.2+.6));c.restore()});
+  // receive HUD beside the watch
+  const rxA=ease((p-.55)/.35);if(rxA>0){const s=S(WATCH.x,WATCH.y),rr=Math.max(WATCH.rx,WATCH.ry)*z,side=s[0]+rr+28+170<W-8;let x=side?s[0]+rr+28:Math.max(14,s[0]-80),y=side?s[1]-rr*.55:s[1]+rr+34;c.save();c.globalAlpha=rxA;
+   c.strokeStyle='rgba(242,239,233,.35)';c.lineWidth=1;c.beginPath();if(side){c.moveTo(s[0]+rr+8,s[1]-rr*.2);c.lineTo(x-6,y+10)}else{c.moveTo(s[0],s[1]+rr+8);c.lineTo(x+4,y-14)}c.stroke();
+   this._hud(c,'RX · '+fps+' FPS',x,y,'left',.9,12);
+   const cells=13,cw=Math.min(9,Math.max(5,rr*.06)),gap=3,fi=Math.floor(Math.max(0,t-LATENCY)*fps);for(let i=0;i<cells;i++){const on=i<fps;c.fillStyle=on?(i===fi%fps?'rgba(242,239,233,.95)':'rgba(242,239,233,.35)'):'rgba(242,239,233,.08)';c.fillRect(x+i*(cw+gap),y+10,cw,14)}
+   this._hud(c,this._mode==='baseline'?'BEFORE':'AFTER · −8% POWER',x,y+42,'left',.55,10);c.restore()}
  }
- _watch(c,t,fps,x,y){
- c.save();c.translate(x,y);c.rotate(-.12+Math.sin(t*.4)*.015);
- // Strap, fastener slots, and polished layered watch bezel.
- let strap=c.createLinearGradient(-48,0,48,0);strap.addColorStop(0,'#111');strap.addColorStop(.45,'#383838');strap.addColorStop(1,'#0d0d0d');c.fillStyle=strap;rounded(c,-45,-202,90,405,25);c.fill();c.strokeStyle='#555';c.lineWidth=.8;c.stroke();for(let i=0;i<5;i++){rounded(c,-13,115+i*15,26,6,3);c.fillStyle='#090909';c.fill();}
- c.shadowBlur=34;c.shadowColor='#000';c.fillStyle='#333';rounded(c,-102,-120,204,240,52);c.fill();c.shadowBlur=0;
- let metal=c.createLinearGradient(-105,-115,100,105);metal.addColorStop(0,'#aaa');metal.addColorStop(.22,'#222');metal.addColorStop(.5,'#777');metal.addColorStop(.74,'#151515');metal.addColorStop(1,'#ccc');c.fillStyle=metal;rounded(c,-100,-118,200,236,50);c.fill();c.fillStyle='#070707';rounded(c,-92,-110,184,220,44);c.fill();c.strokeStyle='#777';c.lineWidth=.7;c.stroke();
- c.fillStyle='#888';rounded(c,100,-30,9,37,4);c.fill();c.strokeStyle='#ddd';c.lineWidth=1;c.beginPath();c.moveTo(104,-23);c.lineTo(104,0);c.stroke();
- c.save();rounded(c,-79,-97,158,194,34);c.clip();c.fillStyle='#0a0a0a';c.fillRect(-79,-97,158,194);
- const qt=Math.floor(t*fps)/fps,scroll=qt*30;
- // Original colour footage is supplied as a deterministic frame atlas.
- const realFootage=this._streamFrame(c,qt);
- if(!realFootage){
-  // Colour is confined to the AMOLED display. Fallback is explicitly illustrative.
-  let sky=c.createLinearGradient(0,-97,0,75);sky.addColorStop(0,'#63a9ce');sky.addColorStop(.5,'#d5bc8c');sky.addColorStop(1,'#26454c');c.fillStyle=sky;c.fillRect(-79,-97,158,194);
-  c.fillStyle='#263f46';c.beginPath();c.moveTo(-79,2);c.lineTo(-55,-45);c.lineTo(-31,0);c.lineTo(-10,-62);c.lineTo(24,-1);c.lineTo(42,-34);c.lineTo(79,12);c.lineTo(79,97);c.lineTo(-79,97);c.fill();
-  c.fillStyle='#3c634e';c.beginPath();c.moveTo(-79,30);c.lineTo(-47,0);c.lineTo(-18,23);c.lineTo(17,-3);c.lineTo(79,31);c.lineTo(79,97);c.lineTo(-79,97);c.fill();
-  c.strokeStyle='#98bec2';c.lineWidth=.6;for(let i=0;i<6;i++){let yy=(i*25+scroll)%150-20;c.beginPath();c.moveTo(-79,yy+20);c.lineTo(79,yy+7);c.stroke();}
-  c.fillStyle='#e9b68c';c.globalAlpha=.9;c.beginPath();c.arc(-40+Math.sin(qt*.85)*34,18,6,0,TAU);c.fill();c.fillStyle='#d8945c';c.fillRect(-45+Math.sin(qt*.85)*34,24,10,24);c.globalAlpha=1;
- }
- c.fillStyle='#000a';c.fillRect(-79,-97,158,25);label(c,(realFootage?'DEMO':'ILLUSTRATIVE')+' / '+fps+' FPS',0,-78,7.5,'#fff','center');
- c.fillStyle='#ffffff30';const scan=-97+((t*.25)%1)*194;c.fillRect(-79,scan,158,1);
- c.restore();c.strokeStyle='#ffffff55';c.lineWidth=.8;rounded(c,-79,-97,158,194,34);c.stroke();c.restore();
- }
+ _hud(c,s,x,y,align='left',a=.7,size=10){c.font=size+'px "JetBrains Mono",ui-monospace,Consolas,monospace';c.textAlign=align;c.fillStyle='rgba(242,239,233,'+a.toFixed(3)+')';c.fillText(s,x,y)}
 }
 if(!customElements.get('as-ixana-link'))customElements.define('as-ixana-link',IxanaLink);
-})();
+export { IxanaLink };
