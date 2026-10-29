@@ -121,7 +121,7 @@ export function createPlatformRenderer(host, options = {}) {
   const tex = makeBallTexture();
   const M = {
     acrylicBlack: new THREE.MeshPhysicalMaterial({ color: 0x2a2a2e, roughness: 0.32, metalness: 0, clearcoat: 0.6, clearcoatRoughness: 0.25, flatShading: true }),
-    plateBlack: new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.78, metalness: 0 }),
+    plateBlack: new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.78, metalness: 0, side: THREE.DoubleSide }),   // double-sided: the open skirt and edge bands show their inside while exploded
     plateTop: new THREE.MeshStandardMaterial({ color: 0x2a2a2c, roughness: 0.62, metalness: 0 }),
     clear: new THREE.MeshPhysicalMaterial({ color: 0x9fb0b4, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide, clearcoat: 1 }),
     clearEdge: new THREE.LineBasicMaterial({ color: 0x9fb1b6, transparent: true, opacity: 0.35 }),
@@ -131,7 +131,7 @@ export function createPlatformRenderer(host, options = {}) {
     steel: new THREE.MeshStandardMaterial({ color: 0xb9b9b6, roughness: 0.3, metalness: 0.9 }),
     darkSteel: new THREE.MeshStandardMaterial({ color: 0x4a4a4c, roughness: 0.4, metalness: 0.8 }),
     sensor: new THREE.MeshStandardMaterial({ color: 0x8e9092, roughness: 0.35, metalness: 0.85 }),
-    led: new THREE.MeshStandardMaterial({ color: 0xd8d5ce, roughness: 0.6, metalness: 0, emissive: 0x2a2826, emissiveIntensity: 1 }),
+    led: new THREE.MeshStandardMaterial({ color: 0xd8d5ce, roughness: 0.6, metalness: 0, emissive: 0x2a2826, emissiveIntensity: 1, side: THREE.DoubleSide }),
     ball: new THREE.MeshStandardMaterial({ map: tex.map, metalnessMap: tex.metal, metalness: 1, roughness: 0.38 }),
     floor: new THREE.MeshStandardMaterial({ color: 0x0d0c0b, roughness: 0.9, metalness: 0 }),
   };
