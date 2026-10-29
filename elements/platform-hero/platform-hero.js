@@ -59,9 +59,18 @@ class ASPlatformHero extends HTMLElement {
     this._canvas.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true });
     this._canvas.addEventListener('pointerup', (e) => {
       if (!down) return; const ok = Math.hypot(e.clientX - down.x, e.clientY - down.y) < 8 && performance.now() - down.t < 600; down = null;
-      if (!ok || !this._live || this._demoTarget) return;
+      if (!ok || !this._live || this._demoMix > 0.02) return;
       const p = this._view.pickPlate(e.clientX, e.clientY); if (p && p.inside) this.dropBall(p.x, p.y);
     });
+    // reticle under the cursor wherever a click would drop the ball
+    const aim = (e) => {
+      const p = e && e.pointerType === 'mouse' && this._live && this._demoMix < 0.02 ? this._view.pickPlate(e.clientX, e.clientY) : null;
+      const on = !!(p && p.inside && Math.hypot(p.x, p.y) < 0.13);
+      this._canvas.style.cursor = on ? 'crosshair' : '';
+      this._view.setTarget(on ? p.x : 0, on ? p.y : 0, on); this._dirty = true;
+    };
+    this._canvas.addEventListener('pointermove', aim, { passive: true });
+    this._canvas.addEventListener('pointerleave', () => aim(null));
     const loop = (now) => { this._raf = requestAnimationFrame(loop); this._frame(now); };
     this._raf = requestAnimationFrame(loop);
   }
@@ -77,6 +86,9 @@ class ASPlatformHero extends HTMLElement {
     if (p >= 0.999 && !this._live) this._assemble();
     else if (p < 0.999 && this._live) { this._live = false; this._frozen = this.sim.snapshot(); }
   }
+  // demo (0..1 or null): scroll-driven camera blend to the real video's framing; null hands back to the timed blend
+  get demo() { return this._demoScroll ?? null; }
+  set demo(v) { this._demoScroll = v == null ? null : clamp(Number(v) || 0, 0, 1); if (this._demoScroll) { this._ensureTrack(); this._view?.setTarget(0, 0, false); } this._dirty = true; }
   get videoTime() { return this._videoTime; }
   set videoTime(t) { this._videoTime = clamp(Number(t) || 0, 0, DEMO_DURATION); this._dirty = true; }
   get state() { return this._composeState(); }
@@ -111,7 +123,8 @@ class ASPlatformHero extends HTMLElement {
     if (!this._view || !this._visible || document.hidden) { this._last = 0; return; }
     const dt = this._last ? Math.min((now - this._last) / 1000, 0.05) : 0; this._last = now;
     // demo camera blend
-    if (this._demoMix !== this._demoTarget) { this._demoMix = this._demoTarget ? Math.min(1, this._demoMix + dt / 0.9) : Math.max(0, this._demoMix - dt / 0.9); if (this._reduced.matches) this._demoMix = this._demoTarget; this._dirty = true; }
+    if (this._demoScroll != null) { if (this._demoMix !== this._demoScroll) { this._demoMix = this._demoScroll; this._dirty = true; } }
+    else if (this._demoMix !== this._demoTarget) { this._demoMix = this._demoTarget ? Math.min(1, this._demoMix + dt / 0.9) : Math.max(0, this._demoMix - dt / 0.9); if (this._reduced.matches) this._demoMix = this._demoTarget; this._dirty = true; }
     if (this._demoMix > 0) { this._videoTime = this._video ? this._video.currentTime : (this._reduced.matches ? this._videoTime : (this._videoTime + dt) % DEMO_DURATION); this._dirty = true; }
     if (this._live && !this._reduced.matches && this._demoMix < 1) {
       this._acc += dt; let n = 0; while (this._acc >= this.sim.dt && n < 80) { this.sim.step(); this._acc -= this.sim.dt; n++; } if (n >= 80) this._acc = 0;

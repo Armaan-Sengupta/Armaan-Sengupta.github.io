@@ -32,8 +32,7 @@ export const chapters = [
     views: [
       { id: 'assemble', label: 'Assembly', el: EL.platform, progress: 'view', len: 1.3 },
       { id: 'live', label: 'Live model', el: EL.platform, hint: 'Click the plate to drop the ball' },
-      { id: 'demo', label: 'Full system demo', el: withAttrs(EL.platform, { camera: 'demo' }), compare: 'media/stewart-demo.mp4' },
-      { id: 'build', label: 'Build', video: 'media/stewart-assembly.mp4' }
+      { id: 'demo', label: 'Full system demo', el: EL.platform, compare: 'media/stewart-demo.mp4', len: 1.2 }
     ]
   },
   {
@@ -45,8 +44,9 @@ export const chapters = [
       { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
       { id: 'flight', label: 'Control loop', el: EL.flight },
-      { id: 'pcb', label: 'Flight computer', img: 'media/airbrakes/pcb-processor-render.webp' },
-      { id: 'hardware', label: 'Hardware', img: 'media/airbrakes/photo-assembly.jpg' }
+      { id: 'pcb', label: 'Flight computer', img: 'media/airbrakes/canardian-render.webp' },
+      { id: 'hardware', label: 'Hardware', img: 'media/airbrakes/irl/airbrake-07.webp' },
+      { id: 'launch', label: 'Launch', scrub: 'media/airbrakes/launch-scrub.mp4', progress: 'view', len: 0.8 }
     ]
   },
   {
@@ -91,6 +91,7 @@ export const chapters = [
     title: 'Tesla', role: 'Vehicle Firmware · Body Controls Intern',
     points: ['~20 Semi exterior lighting channels from bare hardware to production', 'Cybercab lighting ADC sampling cut from 10 ms to 1 ms', 'Fixed out-of-sync Cybertruck headlamp stepper calibration'],
     views: [
+      { id: 'semi', label: 'Semi', el: withAttrs(EL.tesla, { view: 'semi' }) },
       { id: 'cybercab', label: 'Cybercab', el: withAttrs(EL.tesla, { view: 'cybercab' }) },
       { id: 'cybertruck', label: 'Cybertruck', el: withAttrs(EL.tesla, { view: 'cybertruck' }) }
     ]
@@ -111,10 +112,10 @@ export const chapters = [
     id: 'magna', flow: 'professional', mono: true,
     org: 'Magna · Ontario', dates: 'Jan – Apr 2024',
     title: 'Magna', role: 'In-die crack detection and die condition monitoring',
-    points: ['Strain-gauge data over MQTT into PostgreSQL with a live dashboard', 'Caught 100% of cracked parts, zero false positives, 350 strokes', 'Patent-pending PLC buffer: 142 Hz → 500 Hz'],
+    points: ['Strain-gauge data over MQTT into PostgreSQL with a live dashboard', 'Caught 100% of cracked parts with zero false positives over 150 parts', 'Patent-pending PLC buffer: 142 Hz → 500 Hz'],
     views: [
       { id: 'detector', label: 'Live detector', el: EL.strain, hint: 'Click to inject a crack' },
-      { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp' }
+      { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
     ]
   },
   {
@@ -124,6 +125,7 @@ export const chapters = [
     points: ['Back-up safety for garbage trucks: 10 LiDARs, 3 depth cameras, 6 MCUs', 'LiDAR dust filter: five parallel filters reject dust, still catch people', 'Actuating 100+ part enclosure, cost cut 56%'],
     views: [
       { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view' },
+      { id: 'built', label: 'As built', img: 'media/fyelabs/case-photo.webp' },
       { id: 'lidar', label: 'LiDAR array', el: withAttrs(EL.fyelabs, { view: 'lidar' }) },
       { id: 'dust', label: 'Dust filter', el: withAttrs(EL.fyelabs, { view: 'dust' }) },
       { id: 'dust-test', label: 'Real dust test', video: 'media/fyelabs/dust-test-loop.mp4' },
@@ -142,7 +144,7 @@ export const cards = [
   { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
   { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
   { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
-  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { video: 'media/ftc-ring-shooter.mp4' } },
+  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
   { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
   { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
   { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
@@ -150,15 +152,15 @@ export const cards = [
 
 // details shown in the popup for any project (chapters and cards). Gallery comes from content.json too.
 export const details = {
-  platform: { gallery: [
-      { type: 'video', src: 'media/stewart-demo.mp4', poster: 'media/stewart-demo.jpg', caption: 'Full system demo: the ball held on the plate; the LED ring turns green once balanced' },
+  platform: { hero: 'CxzUW5jrmIc', gallery: [
+      { type: 'video', src: 'media/stewart-assembly.mp4', poster: 'media/stewart-assembly.jpg', caption: 'Assembly timelapse' },
       { type: 'video', src: 'media/stewart-setup.mp4', poster: 'media/stewart-setup.jpg', caption: 'Desk setup with live ball-position and kinematics plots' },
       { type: 'video', src: 'media/stewart-ik.mp4', poster: 'media/stewart-ik.jpg', caption: 'Prototype tilting alongside the live 3D inverse-kinematics plot' },
       { type: 'video', src: 'media/stewart-sensing.mp4', poster: 'media/stewart-sensing.jpg', caption: 'Force-torque sensor estimating contact position' },
+      { type: 'video', src: 'media/stewart-demo.mp4', poster: 'media/stewart-demo.jpg', caption: 'Full system demo: the ball held on the plate; the LED ring turns green once balanced' },
       { type: 'video', src: 'media/stewart-sim.mp4', poster: 'media/stewart-sim.jpg', caption: 'Simscape ball-on-plate simulation' },
       { type: 'video', src: 'media/stewart-trajectory.mp4', poster: 'media/stewart-trajectory.jpg', caption: 'Trajectory planner profiles (simulation study)' },
       { type: 'video', src: 'media/stewart-skeleton.mp4', poster: 'media/stewart-skeleton.jpg', caption: 'SolidWorks kinematic skeleton' },
-      { type: 'video', src: 'media/stewart-assembly.mp4', poster: 'media/stewart-assembly.jpg', caption: 'Assembly timelapse' },
       { type: 'image', src: 'media/platform/spv4-ik-plot.webp', caption: 'Matplotlib inverse-kinematics model of the three chains' },
       { type: 'image', src: 'media/platform/simulink-plant-controller.webp', caption: 'Simulink plant and controller model' },
       { type: 'image', src: 'media/img/stewart_kinematics_diagram.webp', caption: 'Ball free-body diagram and overview' },
@@ -169,8 +171,24 @@ export const details = {
       'Trajectory-planned feedforward was compared against classic PID on settling and overshoot, and the ball was located with a 3-axis force-torque sensor, benchmarked against an OpenCV vision baseline.'],
     chips: ['Python', 'Simulink · Simscape', 'Kinematics', 'PID · feedforward', 'OpenCV']
   },
-  airbrakes: { gallery: [
+  airbrakes: { hero: 'Z126ZESX3uA', gallery: [
+      { type: 'video', src: 'media/airbrakes/irl/actuation-1.mp4', caption: 'Bench actuation: the cam plate drives all three panels out together' },
+      { type: 'video', src: 'media/airbrakes/irl/actuation-2.mp4', caption: 'Bench actuation, top view through the clear cam plate' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-07.webp', caption: 'The machined airbrakes, panels deployed' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-03.webp', caption: 'Cam plate and followers, close up' },
       { type: 'video', src: 'media/airbrakes/airframe-deploy.mp4', poster: 'media/airbrakes/airframe-deploy.jpg', caption: 'Panels deploying through the airframe' },
+      { type: 'video', src: 'media/airbrakes/irl/actuation-3.mp4', caption: 'Actuation seen from below, inside the body tube' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-01.webp', caption: 'Retracted: the panels sit flush with the airframe' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-02.webp', caption: 'Panels deployed' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-04.webp', caption: 'Panels deployed, three-quarter view' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-05.webp', caption: 'Spiral cam plate from above' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-06.webp', caption: 'Deployed, from above' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-08.webp', caption: 'Panels deployed, side view' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-09.webp', caption: 'Underside: three-spoke bulkhead and servo' },
+      { type: 'image', src: 'media/airbrakes/irl/airbrake-10.webp', caption: 'Brass shims and bearings on the followers' },
+      { type: 'image', src: 'media/airbrakes/canardian-render.webp', caption: 'The Canard-ian: 4-layer STM32H7 avionics board for the roll-control canards (render)' },
+      { type: 'image', src: 'media/airbrakes/canardian-board.webp', caption: 'The Canard-ian, assembled' },
+      { type: 'image', src: 'media/airbrakes/canardian-layout.webp', caption: 'The Canard-ian, KiCad layout' },
       { type: 'image', src: 'media/airbrakes/render-deployed.webp', caption: 'Final design, panels deployed' },
       { type: 'image', src: 'media/airbrakes/render-retracted.webp', caption: 'Final design, panels retracted' },
       { type: 'image', src: 'media/airbrakes/render-underside.webp', caption: 'Underside: rail carriages and the brushless servo' },
@@ -180,15 +198,11 @@ export const details = {
       { type: 'image', src: 'media/airbrakes/cad-cross-section.webp', caption: 'Cross-section through the follower stack and servo coupler' },
       { type: 'image', src: 'media/airbrakes/cad-airframe.webp', caption: 'Panels deploying through the airframe' },
       { type: 'image', src: 'media/airbrakes/slide-cam-slot-desmos.webp', caption: 'Cam-slot study: 0.78 in of travel per 90° of rotation' },
-      { type: 'image', src: 'media/airbrakes/photo-assembly.jpg', caption: 'The real assembled mechanism' },
       { type: 'image', src: 'media/airbrakes/photo-bulkhead-rails.jpg', caption: 'Machined bulkhead with linear rails' },
       { type: 'image', src: 'media/airbrakes/photo-bulkhead.webp', caption: 'Machined bulkhead with bearing' },
       { type: 'image', src: 'media/airbrakes/photo-follower-stack.webp', caption: 'Follower parts: shoulder bolt, brass shims, bearings' },
       { type: 'image', src: 'media/airbrakes/photo-load-test.jpg', caption: '15 lb-per-panel repeated-actuation test' },
       { type: 'image', src: 'media/airbrakes/slide-integration-section.webp', caption: 'Section view of the vent section, airbrakes and upper body tube' },
-      { type: 'image', src: 'media/airbrakes/pcb-processor-render.webp', caption: 'Flight computer render' },
-      { type: 'image', src: 'media/airbrakes/pcb-render-2.webp', caption: 'Flight computer render' },
-      { type: 'image', src: 'media/airbrakes/pcb-layout.webp', caption: 'Flight computer layout' },
       { type: 'image', src: 'media/airbrakes/slide-firmware-overview.webp', caption: 'Firmware block diagram' },
       { type: 'image', src: 'media/airbrakes/slide-state-estimation.webp', caption: 'State estimation with a Madgwick filter' },
       { type: 'image', src: 'media/airbrakes/slide-rk4-prediction.webp', caption: 'RK4 apogee prediction' },
@@ -252,13 +266,14 @@ export const details = {
   },
   magna: {
     body: ['Streamed strain-gauge data from a hydraulic press over MQTT into PostgreSQL, with a live web dashboard for operators.',
-      'An anomaly detector learns each part\'s normal stroke envelope; it caught 100% of cracked parts with zero false positives across a 350-stroke production run. A patent-pending, semaphore-driven multithreaded buffer on a memory-limited Beckhoff PLC raised the data rate from 142 Hz to 500 Hz.'],
+      'An anomaly detector learns each part\'s normal stroke envelope; it caught 100% of cracked parts with zero false positives across a 150-part production run. A patent-pending, semaphore-driven multithreaded buffer on a memory-limited Beckhoff PLC raised the data rate from 142 Hz to 500 Hz.'],
     chips: ['Python', 'MQTT', 'PostgreSQL', 'PLC · multithreading', 'Signal processing']
   },
   fyelabs: { gallery: [
       { type: 'video', src: 'media/fyelabs/dust-test.mp4', poster: 'media/fyelabs/dust-test.jpg', caption: 'Dust filtering test' },
       { type: 'video', src: 'media/fyelabs/person-detection.mp4', poster: 'media/fyelabs/person-detection.jpg', caption: 'Person detection test' },
       { type: 'video', src: 'media/fyelabs/viz-showcase.mp4', poster: 'media/fyelabs/viz-showcase.jpg', caption: 'LiDAR visualizer used for live tuning' },
+      { type: 'image', src: 'media/fyelabs/case-photo.webp', caption: 'The built enclosure on the test rig' },
       { type: 'image', src: 'media/fyelabs/manufactured-case.webp', caption: 'The real welded, black powder-coated sheet-metal case' },
       { type: 'image', src: 'media/fyelabs/case-hidden.webp', caption: 'Inner case with the cover hidden: camera window and LiDAR window band' },
       { type: 'image', src: 'media/fyelabs/case-bottom-section.webp', caption: 'Ten single-beam LiDARs on a semicircular bracket' },
@@ -296,8 +311,18 @@ export const details = {
   'beam-balancer': { body: ['A ball rolls on a beam tilted by a servo through a four-bar linkage. Link lengths were chosen from 2-D constraints for mechanical advantage and a compact footprint. An OpenCV tracker measures ball position and a tuned controller commands the servo through embedded C firmware.'], chips: ['Python', 'C', 'PID', 'OpenCV', 'SolidWorks'], links: [['Demo video', 'https://youtube.com/shorts/xsgP9gpsP7k'], ['Code', 'https://github.com/Armaan-Sengupta/Ball-Beam-Control']] },
   gantry: { body: ['An STM32 drives two stepper axes. Interrupts on the endstops stop motion into a limit, a homing routine zeros the machine, UART sets position from a PC, and a characterized ADC lets a potentiometer position each axis precisely.'], chips: ['C', 'STM32', 'UART'], links: [['C code', 'https://github.com/Armaan-Sengupta/2-Axis-Gantry']] },
   lidar: { body: ['Processing a large urban LiDAR scan with laspy, Open3D and NumPy: voxel downsampling, a nearest-neighbour outlier filter for dust and artifacts, and a custom furthest-pair search fast enough for 1M+ points.'], chips: ['Python', 'NumPy', 'LiDAR'], links: [['Code and write-up', 'https://github.com/Armaan-Sengupta/Fyelabs-Project/blob/master/README.md']] },
-  ftc: { body: ['Wrote all the robot software in Java: PIDF control holds the arm in position and the flywheel at speed under load, TensorFlow vision detects game elements, and distance sensors and gyros handle localization. The team won the Control Award at the Asia Pacific Open Championship.'], chips: ['Java', 'PID', 'TensorFlow'], links: [['Robot reveal', 'https://youtu.be/yTg-Im7ZjQQ'], ['Top match', 'https://youtu.be/hSD0i93UDiY']] },
-  ri3d: { body: ['As team lead of UW REACT, organized an FRC Robot-in-3-Days event and built a ring-launching robot in 48 hours with five people.'], chips: ['FRC', 'Rapid prototyping'] },
+  ftc: { hero: 'yTg-Im7ZjQQ', gallery: [
+      { type: 'youtube', src: 'JKgwHWdiYf8', caption: 'Freight Frenzy Control Award submission' },
+      { type: 'youtube', src: 'jVzE0RhTxNA', caption: 'Autonomous systems: Control Award video' },
+      { type: 'youtube', src: 'hSD0i93UDiY', caption: 'Ontario Provincials match 6: 240 points' },
+      { type: 'youtube', src: 'g0cYa1xLYmY', caption: 'Canada Cup match 6: 258 points' },
+      { type: 'video', src: 'media/ftc-ring-shooter.mp4', poster: 'media/ftc-ring-shooter.jpg', caption: 'Ultimate Goal ring shooter in slow motion' },
+      { type: 'youtube', src: 'JrPHVg6NnLc', caption: 'Ultimate Goal robot reveal v2.1' },
+      { type: 'youtube', src: 'UXFpl0-dEx8', caption: 'Ultimate Goal shooter prototype' },
+      { type: 'youtube', src: 'yatwMM1BCuk', caption: 'Skystone robot reveal' },
+      { type: 'youtube', src: 'Pv3DPuoHrXA', caption: 'Robot version 1 CAD' }
+    ], body: ['Wrote all the robot software in Java: PIDF control holds the arm in position and the flywheel at speed under load, TensorFlow vision detects game elements, and distance sensors and gyros handle localization. The team won the Control Award at the Asia Pacific Open Championship.'], chips: ['Java', 'PID', 'TensorFlow'], links: [['Robot reveal', 'https://youtu.be/yTg-Im7ZjQQ'], ['Top match', 'https://youtu.be/hSD0i93UDiY']] },
+  ri3d: { hero: 'qqqrSge0pF4', body: ['As team lead of UW REACT, organized an FRC Robot-in-3-Days event and built a ring-launching robot in 48 hours with five people.'], chips: ['FRC', 'Rapid prototyping'] },
   'tank-tread': { body: ['A custom tank-tread drive for off-road terrain, designed in CAD and tested on rock.'], chips: ['CAD'] }
 };
 

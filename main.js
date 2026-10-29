@@ -5,6 +5,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const smooth = (t) => t * t * (3 - 2 * t);
 const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const allProjects = new Map([...chapters, ...cards].map((p) => [p.id, p]));
 
@@ -116,7 +117,7 @@ async function mountChapter(st) {
       }
     }
     if (v.video || v.img || v.lottie || v.scrub || v.compare) {
-      layer = document.createElement('div'); layer.className = 'layer';
+      layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video ? ' media' : '') + (v.color ? ' color' : '');
       if (v.video) layer.append(makeVideo(v.video));
       if (v.img) { const im = new Image(); im.src = v.img; im.alt = `${st.ch.title}: ${v.label}`; im.className = 'fit'; im.loading = 'lazy'; layer.append(im); }
       if (v.lottie || v.scrub) { layer.classList.add('lottie'); layer.player = makeLottie(layer, v, !v.progress); }
@@ -133,9 +134,10 @@ function buildCompare(layer, src) {
   const handle = document.createElement('div'); handle.className = 'split'; handle.innerHTML = '<span class="mono">Model</span><i></i><span class="mono">Real</span>';
   layer.append(handle);
   let x = 0.5;
-  const set = (k) => { x = clamp(k, 0.04, 0.96); vid.style.clipPath = `inset(0 0 0 ${x * 100}%)`; handle.style.left = `${x * 100}%`; };
+  const set = (k, free) => { x = free ? clamp(k) : clamp(k, 0.04, 0.96); vid.style.clipPath = `inset(0 0 0 ${x * 100}%)`; handle.style.left = `${x * 100}%`; handle.classList.toggle('away', x > 0.985); };
   set(0.5);
-  const move = (e) => { const r = layer.getBoundingClientRect(); set((e.clientX - r.left) / r.width); };
+  layer.split = (k) => set(k, true);   // scroll-driven slide-in
+  const move = (e) => { layer.userMoved = true; const r = layer.getBoundingClientRect(); set((e.clientX - r.left) / r.width); };
   handle.addEventListener('pointerdown', (e) => { handle.setPointerCapture(e.pointerId); e.preventDefault(); });
   handle.addEventListener('pointermove', (e) => { if (handle.hasPointerCapture(e.pointerId)) move(e); });
   layer.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && !e.buttons && layer.classList.contains('follow')) move(e); });
@@ -165,6 +167,16 @@ function updateChapter(st, force) {
     if (v.el) { const n = st.els.get(v.el.tag)?.node; if (n) n.progress = val; }
     if (v.lottie || v.scrub) st.layers[i]?.player?.then((pl) => pl.seek(val));
   }
+  // full system demo: the model turns to the camera's angle first, then the real video slides in from the right;
+  // after that the split is the reader's to drag
+  if (v.compare) {
+    const n = st.els.get(v.el.tag)?.node, layer = st.layers[i];
+    if (n) n.demo = clamp(local / 0.4);
+    if (layer?.split) {
+      if (local < 0.8) layer.userMoved = false;
+      if (!layer.userMoved) layer.split(1 - 0.5 * smooth(clamp((local - 0.4) / 0.4)));
+    }
+  }
   if (ch.hero) st.sec.style.setProperty('--assemble', i === 0 ? local : 1);
 }
 
@@ -189,12 +201,13 @@ function setView(st, i) {
       st.applied.set(tag, new Set(Object.keys(want)));
       if (!v.progress && 'progress' in n && v.id !== 'assemble' && st.ch.hero) n.progress = 1;
       if (v.compare && n.syncVideo) n.syncVideo($('video', st.layers[i]));
+      if (!v.compare && 'demo' in n) n.demo = null;
     });
   }
   st.layers.forEach((l, k) => {
     if (!l) return;
     const on = k === i; l.classList.toggle('on', on);
-    $$('video', l).forEach((vid) => (on && st.visible && !reduce ? vid.play().catch(() => {}) : vid.pause()));
+    if (!l.classList.contains('lottie')) $$('video', l).forEach((vid) => (on && st.visible && !reduce ? vid.play().catch(() => {}) : vid.pause()));
     l.player?.then((pl) => (on ? pl.play() : pl.pause()));
   });
   if (prev !== i) $('.frame', st.sec).classList.toggle('compare-on', !!v.compare);
@@ -285,21 +298,43 @@ function cardScrub() {
   scrubbers.forEach((s) => {
     const r = s.card.getBoundingClientRect();
     if (r.bottom < 0 || r.top > VH) return;
-    s.seek(clamp((VH - r.top) / (VH + r.height * 0.5)));
+    s.seek(clamp((VH * 0.8 - r.top) / (VH * 0.8 + r.height * 0.5)));
   });
 }
 
-/* ═════════════ popup card ═════════════ */
-const pop = $('#pop'), popBody = $('#pop-body');
+/* ═════════════ popup card ═════════════
+   One template for every project: brief (text, points, skills, links), the headline media, up to four
+   highlights at full size, a compact gallery that opens in the lightbox, documents, then the links again. */
+const pop = $('#pop'), popBody = $('#pop-body'), lightbox = $('#lightbox');
 let lastFocus = null, popId = null;
-function galleryItem(g, title) {
-  const cap = g.caption ? `<figcaption>${esc(g.caption)}</figcaption>` : '';
-  if (g.type === 'video') return `<figure class="g-video"><video controls playsinline preload="none" ${g.poster ? `poster="${g.poster}"` : ''} src="${g.src}"></video>${cap}</figure>`;
-  if (g.type === 'youtube') return `<figure class="g-video"><button class="yt" data-yt="${esc(g.src)}" aria-label="Play video${g.caption ? `: ${esc(g.caption)}` : ''}"><img loading="lazy" src="https://i.ytimg.com/vi/${esc(g.src)}/hqdefault.jpg" alt=""><span class="play" aria-hidden="true"></span></button>${cap}</figure>`;
-  if (g.type === 'vimeo') return `<figure class="g-video"><iframe src="https://player.vimeo.com/video/${esc(g.src)}?dnt=1" title="${esc(g.caption || 'Video')}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>${cap}</figure>`;
-  if (g.type === 'pdf') return `<figure class="g-pdf"><a href="${g.src}" target="_blank" rel="noopener"><span class="mono">PDF</span><b>${esc(g.caption || 'Report')}</b><span class="mono">Open ↗</span></a></figure>`;
-  return `<figure><button class="zoom" data-full="${g.src}"><img loading="lazy" src="${g.src}" alt="${esc(g.caption || title)}" ${g.w ? `width="${g.w}" height="${g.h}"` : ''}></button>${cap}</figure>`;
+const ytThumb = (id) => `https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg`;
+const isVid = (g) => ['video', 'youtube', 'vimeo'].includes(g.type);
+const lbData = (g) => esc(JSON.stringify({ type: g.type || 'image', src: g.src, caption: g.caption || '' }));
+const cap = (g) => (g.caption ? `<figcaption>${esc(g.caption)}</figcaption>` : '');
+// full size, plays in place
+function mediaBox(g, title) {
+  if (g.type === 'video') return `<video controls playsinline preload="metadata" ${g.poster ? `poster="${g.poster}"` : ''} src="${g.src}"></video>`;
+  if (g.type === 'youtube') return `<button class="yt" data-yt="${esc(g.src)}" aria-label="Play video${g.caption ? `: ${esc(g.caption)}` : ''}"><img loading="lazy" src="${ytThumb(g.src)}" alt=""><span class="play" aria-hidden="true"></span></button>`;
+  if (g.type === 'vimeo') return `<iframe src="https://player.vimeo.com/video/${esc(g.src)}?dnt=1" title="${esc(g.caption || 'Video')}" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  return `<button class="zoom" data-lb="${lbData(g)}"><img loading="lazy" src="${g.src}" alt="${esc(g.caption || title)}"></button>`;
 }
+// compact tile, opens in the lightbox
+function tile(g, title) {
+  const thumb = g.type === 'youtube' ? ytThumb(g.src) : g.type === 'video' ? g.poster : g.type === 'vimeo' ? '' : g.src;
+  const media = thumb ? `<img loading="lazy" src="${thumb}" alt="${esc(g.caption || title)}">`
+    : g.type === 'video' ? `<video muted playsinline preload="metadata" src="${g.src}#t=0.5"></video>` : '<span class="mono">Video</span>';
+  return `<figure class="tile"><button data-lb="${lbData(g)}" aria-label="${esc(g.caption || 'Open media')}">${media}${isVid(g) ? '<span class="play" aria-hidden="true"></span>' : ''}</button>${cap(g)}</figure>`;
+}
+function openLightbox(g) {
+  const box = $('.lb-media', lightbox);
+  box.innerHTML = g.type === 'video' ? `<video controls autoplay playsinline src="${g.src}"></video>`
+    : g.type === 'youtube' ? `<iframe src="https://www.youtube-nocookie.com/embed/${esc(g.src)}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`
+    : g.type === 'vimeo' ? `<iframe src="https://player.vimeo.com/video/${esc(g.src)}?dnt=1&autoplay=1" title="Video" allow="autoplay; fullscreen" allowfullscreen></iframe>`
+    : `<img src="${g.src}" alt="${esc(g.caption)}">`;
+  $('.lb-cap', lightbox).textContent = g.caption || '';
+  lightbox.hidden = false;
+}
+function closeLightbox() { lightbox.hidden = true; $('.lb-media', lightbox).innerHTML = ''; }
 async function openPop(id, { push = true } = {}) {
   const p = allProjects.get(id); if (!p) return;
   await contentReady;
@@ -307,30 +342,43 @@ async function openPop(id, { push = true } = {}) {
   lastFocus = lastFocus || document.activeElement; popId = id;
   const body = d.body || (c.summary ? [c.summary] : []);
   const points = p.points || c.bullets || [];
-  const links = [...(d.links || []), ...((c.links || []).map((l) => [l.label, l.href]))].filter((l, i, a) => a.findIndex((x) => x[1] === l[1]) === i);
-  const gallery = [...(d.gallery || []), ...(c.gallery || [])].filter((g, i, a) => a.findIndex((x) => x.src === g.src) === i);
-  const lead = p.views ? p.views.find((v) => v.el && !v.compare) || p.views[0] : p.media;
+  const all = [...(d.gallery || []), ...(c.gallery || [])].filter((g, i, a) => a.findIndex((x) => x.src === g.src) === i);
+  let links = [...(d.links || []), ...((c.links || []).map((l) => [l.label, l.href]))].filter((l, i, a) => a.findIndex((x) => x[1] === l[1]) === i);
+  const docs = all.filter((g) => g.type === 'pdf');
+  links.filter(([, u]) => /\.pdf$/i.test(u) && !docs.some((g) => g.src === u)).forEach(([t, u]) => docs.push({ type: 'pdf', src: u, caption: t }));
+  links = links.filter(([, u]) => !/\.pdf$/i.test(u));
+  let media = all.filter((g) => g.type !== 'pdf');
+  const heroSrc = d.hero || media.find(isVid)?.src;
+  const hero = media.find((g) => g.src === heroSrc) || (d.hero ? { type: 'youtube', src: d.hero } : null);
+  media = media.filter((g) => g !== hero);
+  const top = media.slice(0, 4), rest = media.slice(4);
+  const linkRow = (cls) => (links.length ? `<div class="${cls}">${links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join('')}</div>` : '');
   popBody.innerHTML = `
     <header>
       <div class="meta mono"><span>${esc(p.org || p.kicker)}</span><span>${esc(p.dates || c.dates || '')}</span></div>
       <h3 id="pop-title">${esc(p.title)}</h3>
       ${p.role ? `<p class="role">${esc(p.role)}</p>` : ''}
     </header>
-    <div class="pop-stage"></div>
     <div class="pop-text">
       <div>${body.map((t) => `<p>${t}</p>`).join('')}</div>
       <aside>
         ${points.length ? `<ul class="points">${points.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
         ${d.chips ? `<div class="chips">${d.chips.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-        ${links.length ? `<div class="links">${links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join('')}</div>` : ''}
+        ${linkRow('links')}
       </aside>
     </div>
-    ${gallery.length ? `<div class="gallery">${gallery.map((g) => galleryItem(g, p.title)).join('')}</div>` : ''}`;
-  const stage = $('.pop-stage', popBody);
-  if (lead.el) makeEl(lead.el).then((n) => { stage.append(n); if ('progress' in n && lead.progress) n.progress = 1; }).catch(() => {});
-  else if (lead.video) { const v = makeVideo(lead.video); stage.append(v); v.play().catch(() => {}); }
-  else if (lead.img) { const im = new Image(); im.src = lead.img; im.className = 'fit'; im.alt = ''; stage.append(im); }
-  else if (lead.lottie || lead.scrub) makeLottie(stage, { ...lead, loop: true }, true).then(() => { const v = $('video', stage); if (v) { v.loop = true; v.play().catch(() => {}); } });
+    <figure class="pop-hero"><div class="pop-stage">${hero ? mediaBox(hero, p.title) : ''}</div>${hero ? cap(hero) : ''}</figure>
+    ${top.length ? `<div class="pop-top">${top.map((g) => `<figure><div class="box">${mediaBox(g, p.title)}</div>${cap(g)}</figure>`).join('')}</div>` : ''}
+    ${rest.length ? `<h4 class="pop-h mono">More media · ${rest.length}</h4><div class="tiles">${rest.map((g) => tile(g, p.title)).join('')}</div>` : ''}
+    ${docs.length ? `<div class="pop-docs">${docs.map((g) => `<a class="doc" href="${g.src}" target="_blank" rel="noopener"><span class="mono">PDF</span><b>${esc(g.caption || 'Report')}</b><span aria-hidden="true">↗</span></a>`).join('')}</div>` : ''}
+    ${linkRow('pop-links')}`;
+  if (!hero) {
+    const stage = $('.pop-stage', popBody), lead = p.views ? p.views.find((v) => v.el && !v.compare) || p.views[0] : p.media;
+    if (lead.el) makeEl(lead.el).then((n) => { stage.append(n); if ('progress' in n && lead.progress) n.progress = 1; }).catch(() => {});
+    else if (lead.video) { const v = makeVideo(lead.video); stage.append(v); v.play().catch(() => {}); }
+    else if (lead.img) { const im = new Image(); im.src = lead.img; im.className = 'fit'; im.alt = ''; stage.append(im); }
+    else if (lead.lottie || lead.scrub) makeLottie(stage, { ...lead, loop: true }, true).then(() => { const v = $('video', stage); if (v) { v.loop = true; v.play().catch(() => {}); } });
+  }
   pop.classList.add('open'); pop.setAttribute('aria-hidden', 'false');
   document.documentElement.classList.add('locked');
   $('.card-pop', pop).scrollTop = 0;
@@ -347,18 +395,18 @@ function closePop({ push = true } = {}) {
   lastFocus && lastFocus.focus({ preventScroll: true }); lastFocus = null;
 }
 document.addEventListener('click', (e) => {
+  if (!lightbox.hidden) { if (e.target.closest('.close') || !e.target.closest('.lb-media > *')) closeLightbox(); return; }
   const o = e.target.closest('[data-open]');
   if (o) { e.preventDefault(); lastFocus = o; openPop(o.dataset.open); return; }
   if (e.target.closest('[data-close]')) closePop();
   const yt = e.target.closest('.yt');
   if (yt) yt.outerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${yt.dataset.yt}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-  const z = e.target.closest('.zoom');
-  if (z) { const lb = $('#lightbox'); $('img', lb).src = z.dataset.full; lb.hidden = false; }
-  if (e.target.closest('#lightbox')) $('#lightbox').hidden = true;
+  const lb = e.target.closest('[data-lb]');
+  if (lb) { $$('video', popBody).forEach((v) => v.pause()); openLightbox(JSON.parse(lb.dataset.lb)); }
 });
 addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (!$('#lightbox').hidden) $('#lightbox').hidden = true; else closePop();
+  if (!lightbox.hidden) closeLightbox(); else closePop();
 });
 function routeHash() {
   const id = decodeURIComponent(location.hash.slice(1));

@@ -207,27 +207,6 @@
      "src": "SJO39WQ7Uv0",
      "poster": "https://i.ytimg.com/vi/SJO39WQ7Uv0/hqdefault.jpg",
      "caption": "My presentation on the airbrakes"
-    },
-    {
-     "type": "image",
-     "src": "media/gallery/airbrakes/canard-pcb-render.webp",
-     "caption": "2025 central avionics PCB (4-layer, KiCad) render",
-     "w": 1724,
-     "h": 930
-    },
-    {
-     "type": "image",
-     "src": "media/gallery/airbrakes/canard-pcb-layout.webp",
-     "caption": "Central avionics PCB layout",
-     "w": 960,
-     "h": 540
-    },
-    {
-     "type": "image",
-     "src": "media/gallery/airbrakes/canard-pcb.webp",
-     "caption": "Central avionics PCB render",
-     "w": 1162,
-     "h": 1548
     }
    ]
   },
@@ -1073,12 +1052,6 @@
      "src": "qqqrSge0pF4",
      "poster": "https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg",
      "caption": "UW REACT Robot in 3 Days build"
-    },
-    {
-     "type": "video",
-     "src": "media/ftc-ring-shooter.mp4",
-     "caption": "Ring shooter in slow motion",
-     "poster": "media/ftc-ring-shooter.jpg"
     }
    ]
   },

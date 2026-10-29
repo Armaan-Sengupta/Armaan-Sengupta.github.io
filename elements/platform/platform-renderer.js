@@ -243,6 +243,16 @@ export function createPlatformRenderer(host, options = {}) {
     part(topBolts, [0, 0.255, 0], 0.83);
     void face; void under;
   }
+  // drop target: a subtle grey reticle lying on the top face under the cursor
+  const target = new THREE.Group(); target.visible = false; plate.add(target);
+  {
+    const tm = new THREE.MeshBasicMaterial({ color: 0xbdbab4, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide });
+    const flat = (g, x = 0, z = 0, rz = 0) => { const o = new THREE.Mesh(G(g), tm); o.rotation.set(-Math.PI / 2, 0, rz); o.position.set(x, PUCK.top + 0.0006, z); o.renderOrder = 3; target.add(o); };
+    flat(new THREE.RingGeometry(BALL.radius * 0.92, BALL.radius * 1.08, 48));
+    flat(new THREE.CircleGeometry(BALL.radius * 0.12, 16));
+    for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2, r = BALL.radius * 1.5; flat(new THREE.PlaneGeometry(BALL.radius * 0.5, BALL.radius * 0.07), Math.cos(a) * r, Math.sin(a) * r, -a); }
+  }
+  function setTarget(x, y, on) { target.visible = !!on; if (on) target.position.set(x, 0, -y); return api; }
   const ballPivot = new THREE.Group(); plate.add(ballPivot);
   const ball = mesh(new THREE.SphereGeometry(BALL.radius, 48, 32), M.ball, ballPivot);
   part(ballPivot, [0, 0.20, 0], 0.88);
@@ -360,7 +370,7 @@ export function createPlatformRenderer(host, options = {}) {
 
   const api = {
     canvas, renderer, scene, camera, ready, CAMERAS,
-    setState: setStateStatic, setCamera, setCameraResolved, resolveCamera: (spec) => resolveCamera(specOf(spec), width / height), render, resize, pickPlate, videoToPlate,
+    setState: setStateStatic, setCamera, setCameraResolved, resolveCamera: (spec) => resolveCamera(specOf(spec), width / height), render, resize, pickPlate, videoToPlate, setTarget,
     getState: () => ({ ...state }), getKinematics: () => pose,
     setBackground(c) { bg.set(c); renderer.setClearColor(bg, 1); return api; },
     dispose() { renderer.dispose(); envRT.dispose(); geoms.forEach((g) => g.dispose()); Object.values(M).forEach((m) => m.dispose()); tex.map.dispose(); tex.metal.dispose(); },
