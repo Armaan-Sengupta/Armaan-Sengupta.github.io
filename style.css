@@ -122,6 +122,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .mono-ch .frame img,.mono-ch .frame video{filter:grayscale(1)}
 .mono-ch .frame .layer.color img,.mono-ch .frame .layer.color video{filter:none}
 .layer.media{background:var(--bg-2)}
+.layer .swap-b{position:absolute;inset:0;opacity:0}
 .split.away{opacity:0;pointer-events:none}
 
 /* flow switch */

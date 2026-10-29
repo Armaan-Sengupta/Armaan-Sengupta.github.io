@@ -1,5 +1,6 @@
 // Page content. Chapters are pinned scroll sections; cards sit in the grid.
 // View media: {el:{tag,src,classic?,attrs?}} | {video} | {img} | {lottie} | {scrub} (all-intra mp4 scrubbed by scroll)
+// | {swap:[render, real]} (crossfades as the view scrolls). video + once: plays from the start on entry, its tab bar follows the video.
 // progress: 'view' feeds the view's own scroll progress to the element, 'chapter' the whole chapter's.
 // len: scroll length of a view in viewport heights (default 0.5).
 
@@ -44,9 +45,9 @@ export const chapters = [
       { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
       { id: 'flight', label: 'Control loop', el: EL.flight },
-      { id: 'pcb', label: 'Flight computer', img: 'media/airbrakes/canardian-render.webp' },
-      { id: 'hardware', label: 'Hardware', img: 'media/airbrakes/irl/airbrake-07.webp' },
-      { id: 'launch', label: 'Launch', scrub: 'media/airbrakes/launch-scrub.mp4', progress: 'view', len: 0.8 }
+      { id: 'pcb', label: 'Flight computer', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
+      { id: 'hardware', label: 'Hardware', swap: ['media/airbrakes/render-deployed.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
+      { id: 'launch', label: 'Launch', video: 'media/airbrakes/launch-scrub.mp4', once: true }
     ]
   },
   {

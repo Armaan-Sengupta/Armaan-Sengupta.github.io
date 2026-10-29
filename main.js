@@ -113,12 +113,16 @@ async function mountChapter(st) {
       if (!st.els.has(v.el.tag)) {
         const el = document.createElement('div'); el.className = 'layer el-layer';
         host.append(el);
-        st.els.set(v.el.tag, { layer: el, node: null, ready: makeEl(v.el).then((n) => { el.append(n); st.els.get(v.el.tag).node = n; return n; }).catch((e) => console.warn('element failed', v.el.tag, e)) });
+        st.els.set(v.el.tag, { layer: el, node: null, ready: makeEl(v.el).then((n) => { el.append(n); st.els.get(v.el.tag).node = n; updateChapter(st); return n; }).catch((e) => console.warn('element failed', v.el.tag, e)) });
       }
     }
-    if (v.video || v.img || v.lottie || v.scrub || v.compare) {
-      layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video ? ' media' : '') + (v.color ? ' color' : '');
-      if (v.video) layer.append(makeVideo(v.video));
+    if (v.video || v.img || v.swap || v.lottie || v.scrub || v.compare) {
+      layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video || v.swap ? ' media' : '') + (v.color ? ' color' : '');
+      if (v.video) {
+        const vid = makeVideo(v.video, { loop: !v.once }); layer.append(vid);
+        if (v.once) vid.addEventListener('timeupdate', () => { if (st.active === i && vid.duration) $$('.ch-tabs b', st.sec)[i].style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
+      }
+      if (v.swap) v.swap.forEach((src, k) => { const im = new Image(); im.src = src; im.alt = `${st.ch.title}: ${v.label}${k ? ' (real)' : ' (render)'}`; im.className = 'fit' + (k ? ' swap-b' : ''); im.loading = 'lazy'; layer.append(im); });
       if (v.img) { const im = new Image(); im.src = v.img; im.alt = `${st.ch.title}: ${v.label}`; im.className = 'fit'; im.loading = 'lazy'; layer.append(im); }
       if (v.lottie || v.scrub) { layer.classList.add('lottie'); layer.player = makeLottie(layer, v, !v.progress); }
       if (v.compare) { layer.classList.add('compare'); buildCompare(layer, v.compare); }
@@ -157,8 +161,10 @@ function updateChapter(st, force) {
   const local = clamp((p - starts[i]) / (end - starts[i] || 1));
   // tab bars
   $$('.ch-tabs button', st.sec).forEach((b, k) => {
+    if (k === i && ch.views[i].once) return;   // follows its video instead
     b.querySelector('b').style.transform = `scaleX(${k < i ? 1 : k === i ? local : 0})`;
   });
+  if (st.mounted && ch.views[i].swap) { const b = $('.swap-b', st.layers[i]); if (b) b.style.opacity = smooth(clamp((local - 0.3) / 0.4)); }
   if (i !== st.active || force) setView(st, i);
   if (!st.mounted) return;
   const v = ch.views[i];
@@ -209,7 +215,10 @@ function setView(st, i) {
   st.layers.forEach((l, k) => {
     if (!l) return;
     const on = k === i; l.classList.toggle('on', on);
-    if (!l.classList.contains('lottie')) $$('video', l).forEach((vid) => (on && st.visible && !reduce ? vid.play().catch(() => {}) : vid.pause()));
+    if (!l.classList.contains('lottie')) $$('video', l).forEach((vid) => {
+      if (on && k !== prev && st.ch.views[k].once) vid.currentTime = 0;
+      on && st.visible && !reduce ? vid.play().catch(() => {}) : vid.pause();
+    });
     l.player?.then((pl) => (on ? pl.play() : pl.pause()));
   });
   if (prev !== i) $('.frame', st.sec).classList.toggle('compare-on', !!v.compare);
