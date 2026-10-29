@@ -89,7 +89,7 @@ function buildChapter(ch) {
         </div>
       </div>
       <div class="ch-stage">
-        <div class="frame"><div class="layers"></div><span class="hint mono"></span></div>
+        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<button class="btn hero-more" data-open="${ch.id}">Details, media and videos <span aria-hidden="true">→</span></button>` : ''}</div>
         <div class="ch-tabs mono" role="tablist">${ch.views.map((v, i) => `<button role="tab" data-i="${i}" aria-selected="${i === 0}"><span>${esc(v.label)}</span><i><b></b></i></button>`).join('')}</div>
         ${ch.disclaimer ? `<p class="disclaimer mono">${esc(ch.disclaimer)}</p>` : ''}
       </div>
@@ -172,6 +172,7 @@ function updateChapter(st, force) {
   if (v.compare) {
     const n = st.els.get(v.el.tag)?.node, layer = st.layers[i];
     if (n) n.demo = clamp(local / 0.4);
+    st.sec.classList.toggle('demo-done', local >= 0.8);
     if (layer?.split) {
       if (local < 0.8) layer.userMoved = false;
       if (!layer.userMoved) layer.split(1 - 0.5 * smooth(clamp((local - 0.4) / 0.4)));
@@ -185,6 +186,7 @@ function setView(st, i) {
   const v = st.ch.views[i];
   st.sec.dataset.view = v.id;
   st.sec.classList.toggle('after-first', i > 0);
+  if (!v.compare) st.sec.classList.remove('demo-done');
   $$('.ch-tabs button', st.sec).forEach((b, k) => b.setAttribute('aria-selected', k === i));
   const hint = $('.hint', st.sec); hint.textContent = v.hint || ''; hint.classList.toggle('on', !!v.hint);
   if (!st.mounted) return;

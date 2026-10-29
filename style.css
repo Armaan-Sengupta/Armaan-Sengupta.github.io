@@ -112,6 +112,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .chapter.hero .ch-copy h3{font-size:clamp(30px,3.4vw,52px)}
 .chapter.hero .ch-tabs{opacity:calc(var(--assemble,0) * 1.2 - .1);max-width:760px;width:100%;margin:0 auto}
 .chapter.hero[data-view="demo"] .frame{border-color:var(--line)}
+.chapter.hero .hint{top:auto;right:auto;left:50%;bottom:clamp(10px,3vh,28px);transform:translateX(-50%);white-space:nowrap}
+.hero-more{position:absolute;left:50%;bottom:clamp(12px,3vh,28px);z-index:4;transform:translate(-50%,10px);opacity:0;pointer-events:none;
+  background:rgba(8,8,10,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .4s,transform .4s}
+.chapter.hero.demo-done .hero-more{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 @media(min-width:861px){.chapter.hero[data-view="demo"] .ch-copy{opacity:0;pointer-events:none}}
 
 /* black-and-white chapters */
