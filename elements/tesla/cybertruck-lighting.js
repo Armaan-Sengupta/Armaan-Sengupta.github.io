@@ -6,9 +6,9 @@
  *   view="semi|cybercab|cybertruck"   (default semi)
  *     semi       : exterior lighting bring-up (markers, clearance, tail, ID bar, turn + repeaters), then a
  *                  turn / brake function test. Headlights stay off.
- *     cybercab   : champagne-gold Cybercab. Front light bar wakes, then a current-sense self-test
- *                  sweeps the bar channel by channel; an open-load channel is caught at the 1 ms
- *                  ADC sample. Camera swings to the rear bar.
+ *     cybercab   : current-sense self-test per exterior light (the rear bar is one channel). A disconnected
+ *                  turn lamp false-passes on residual filter-cap charge with the original sample time,
+ *                  then is caught once the sample time is lengthened. Headlights stay off.
  *     cybertruck : headlamp leveling calibration. Both stepper motors home and step to aim;
  *                  first with the start-offset bug (L/R out of sync), then fixed (in sync).
  *   progress (0..1, optional)  scrubs the current view's timeline; remove / set null to loop.
@@ -289,6 +289,7 @@ void main(){ vec3 c = vec3(0.);
  gl_FragColor = vec4(c, 1.); }`;
 
 /* illustrative channel groups for the Semi bring-up HUD (not firmware data) */
+const CAB_CH = ['REAR LIGHT BAR', 'TURN L', 'TURN R', 'REPEATER L', 'REPEATER R'], CAB_BAD = 2;   // TURN R disconnected
 const SEMI_CH = ['SIDE MARKERS', 'REAR CLEARANCE', 'ROOF CLEARANCE', 'TAIL', 'REAR ID BAR', 'TURN L + REPEATER', 'TURN R + REPEATER'];
 
 /* ---------------- element ---------------- */
@@ -367,25 +368,25 @@ class CybertruckLighting extends HTMLElement {
   _t(v) { const T = DUR[v]; return this._progress !== null ? this._progress * T * .9999 : this._clock % T; }
 
   /* ---- sequences: each returns camera + sets lights + hud state ---- */
-  // rear 3/4: tail bar wakes, current-sense self-test sweeps its channels (one open load caught at the 1 ms sample),
-  // then brake and turn signals with the side repeaters; the front bar (headlights) stays off
+  // Cybercab current-sense self-test, one channel per light (the rear bar is a single channel). Run 1 uses the
+  // original ADC sample time: a disconnected turn lamp still reads residual charge on the filter capacitor and
+  // false-passes. Run 2 samples after the capacitor has discharged and the open endpoint is caught. Then a
+  // brake / turn function test. Headlights stay off.
   _cybercab(t) {
-    const V = this._veh.cybercab, F = V.bars.front, R = V.bars.rear, N = 16, fault = 10;
-    const wake = sm(.2, 1.4, t), test = t >= 1.6 && t < 7.6, ti = test ? Math.floor((t - 1.6) / .375) : (t >= 7.6 ? N : -1), tp = test ? ((t - 1.6) / .375) % 1 : 0;
-    const brake = sm(8.0, 8.3, t) * (1 - sm(9.8, 10.1, t)) + sm(12.6, 12.9, t), blink = t > 10.2 && (t - 10.2) % .7 < .38 ? 1 : 0;
-    F.set(() => 0);
-    R.set((u) => {
-      const seg = Math.min(N - 1, Math.floor(u * N)), d = Math.abs(u - .5) * 2, w = sm(d - .08, d, wake * 1.08);
-      if (t < 1.6) return w * .5;
-      if (seg === fault && t >= 1.6 + fault * .375) return 0;
-      if (test) { if (seg === ti) return .55 + .45 * Math.sin(tp * Math.PI); return seg < ti ? .5 : .2; }
-      return .5 + .5 * brake;
-    });
-    V.turns.forEach((l, i) => l.set(i === 1 ? blink : 0)); V.repeaters.forEach((l, i) => l.set(i === 1 ? blink : 0));
-    this._hudState = { kind: 'cab', t, N, fault, ti, tp, test, brake, blink };
-    const k = sm(10.0, 12.2, t), e = k * k * (3 - 2 * k);
-    const a = lerp(Math.atan2(4.2, -4.6), Math.atan2(5.2, 1.6), e) + Math.sin(t * .3) * .03, rad = lerp(8.8, 8.0, e);
-    return { pos: new THREE.Vector3(Math.sin(a) * rad, lerp(2.2, 1.8, e), Math.cos(a) * rad), tgt: new THREE.Vector3(0, .7, lerp(-.5, .3, e)) };
+    const V = this._veh.cybercab, R = V.bars.rear, bad = CAB_BAD, n = CAB_CH.length, step = 1.0;
+    const run = t < 1.6 ? -1 : t < 6.7 ? 0 : t < 11.8 ? 1 : 2, rt = run === 0 ? t - 1.6 : run === 1 ? t - 6.8 : -1;
+    const ci = rt >= 0 ? Math.min(n - 1, Math.floor(rt / step)) : -1, cp = rt >= 0 ? clamp((rt - ci * step) / step) : 0;
+    const on = (k) => (run < 2 && k === ci && cp < .65 && k !== bad ? 1 : 0);
+    const blink = run === 2 && (t - 11.8) % .7 < .38 ? 1 : 0, brake = run === 2 ? sm(11.9, 12.1, t) : 0;
+    V.bars.front.set(() => 0);
+    const bar = Math.max(sm(.2, 1.2, t) * .45, on(0)) * (1 - .55 * on(0) * 0) + brake * .5;
+    R.set(() => bar);                                                     // one LED channel: all or nothing
+    V.turns.forEach((l, i) => l.set(i === 0 ? Math.max(on(1), blink) : on(2)));
+    V.repeaters.forEach((l, i) => l.set(i === 0 ? Math.max(on(3), blink) : on(4)));
+    this._hudState = { kind: 'cab', run, ci, cp };
+    const e = sm(11.4, 13.4, t);
+    const a = lerp(Math.atan2(4.6, -4.4), Math.atan2(-2.4, -6), e) + Math.sin(t * .3) * .03, rad = lerp(8.8, 8.4, e);
+    return { pos: new THREE.Vector3(Math.sin(a) * rad, 2.1, Math.cos(a) * rad), tgt: new THREE.Vector3(0, .7, lerp(-.6, -.2, e)) };
   }
   // Semi exterior lighting bring-up: channels come up group by group with a current-sense check,
   // then turn signals, repeaters and brake run as a function test. Headlights stay off.
@@ -452,40 +453,38 @@ class CybertruckLighting extends HTMLElement {
     const txt = (s, x, y, col = dim, al = 'left') => { c.fillStyle = col; c.textAlign = al; c.fillText(s, x, y); };
     if (!S) return;
     if (S.kind === 'cab') {
-      const { t, N, fault, ti, tp, test } = S;
-      const phase = t < 1.6 ? 'TAIL BAR WAKE' : test ? 'CURRENT-SENSE SELF-TEST' : t < 8 ? 'SELF-TEST COMPLETE' : t < 10.2 ? 'BRAKE' : 'TURN SIGNAL · SIDE REPEATER';
-      txt(phase, pad, pad + fs, mid);
-      txt('ADC SAMPLE  1 ms', pad, pad + fs + lh, dim);
-      // channel strip
-      const cw = Math.min(14, (W * .42) / N), y0 = H - pad - fs * 7.2;
-      for (let i = 0; i < N; i++) {
-        const x = pad + i * (cw + 3), done = ti > i || ti >= N, act = test && ti === i, isF = i === fault && (ti > fault || ti >= N || (act));
-        c.strokeStyle = isF ? ACC : act ? hi : 'rgba(242,239,233,.22)'; c.lineWidth = 1; c.strokeRect(x + .5, y0 + .5, cw, cw * .7);
-        if (done && !isF) { c.fillStyle = 'rgba(242,239,233,.55)'; c.fillRect(x + 2, y0 + 2, cw - 3, cw * .7 - 3); }
-        if (act && !isF) { c.fillStyle = hi; c.fillRect(x + 2, y0 + 2, (cw - 3) * clamp(tp * 1.4), cw * .7 - 3); }
-      }
-      const cur = test ? ti : (t < 1.6 ? -1 : fault), isFault = cur === fault && (test || t >= 7.6);
-      txt(cur >= 0 ? `CH ${String(cur + 1).padStart(2, '0')}` : 'CH --', pad, y0 - 8, mid);
-      if (cur >= 0) txt(isFault ? 'OPEN LOAD · FLAGGED' : (test ? 'PASS' : ''), pad + fs * 6, y0 - 8, isFault ? ACC : hi);
-      // trace: commanded current vs time; sample at 1 ms
-      const bw = Math.min(260, W * .42), bh = fs * 4.2, bx = pad, by = H - pad - bh;
+      const { run, ci, cp } = S, bad = CAB_BAD, fixed = run >= 1;
+      txt('CYBERCAB · EXTERIOR LIGHT CURRENT-SENSE SELF-TEST', pad, pad + fs, mid);
+      txt(run < 0 ? 'WAKE' : run === 0 ? 'ADC SAMPLE TIME · ORIGINAL' : run === 1 ? 'ADC SAMPLE TIME · LENGTHENED' : 'FUNCTION TEST · BRAKE / TURN', pad, pad + fs + lh, run === 1 ? hi : dim);
+      // per-light results
+      const bw = Math.min(260, W * .42), bh = fs * 4.2, bx = pad, by = H - pad - bh, y0 = by - lh * (CAB_CH.length + 1.2);
+      CAB_CH.forEach((name, k) => {
+        const done = run >= 2 || (run >= 0 && (k < ci || (k === ci && cp > .7))), act = run >= 0 && run < 2 && k === ci;
+        txt(name, pad, y0 + lh * k, done ? mid : act ? hi : 'rgba(242,239,233,.22)');
+        if (done) {
+          const isBad = k === bad;
+          txt(isBad ? (fixed ? 'OPEN · FAULT CAUGHT' : 'PASS  (FALSE: RESIDUAL CHARGE)') : 'PASS', pad + fs * 15, y0 + lh * k, isBad ? ACC : hi);
+        }
+      });
+      // sense voltage for the light under test; dashed line is the pass threshold, solid line the ADC sample point
       c.strokeStyle = 'rgba(242,239,233,.14)'; c.strokeRect(bx + .5, by + .5, bw, bh);
       const thY = by + bh * .55; c.setLineDash([2, 3]); c.strokeStyle = 'rgba(242,239,233,.25)'; c.beginPath(); c.moveTo(bx, thY); c.lineTo(bx + bw, thY); c.stroke(); c.setLineDash([]);
-      const sx = bx + bw * .3; c.strokeStyle = 'rgba(242,239,233,.35)'; c.beginPath(); c.moveTo(sx, by + 3); c.lineTo(sx, by + bh - 3); c.stroke();
-      txt('1 ms', sx + 4, by + fs + 1, dim);
-      if (cur >= 0) {
-        const prog = test ? clamp(tp * 1.25) : 1; c.strokeStyle = isFault ? ACC : hi; c.lineWidth = 1.3; c.beginPath();
-        for (let i = 0; i <= 80 * prog; i++) { const u = i / 80, x = bx + 4 + (bw - 8) * u, ms = u * 3.3; let yv;
-          if (isFault) yv = .78 * Math.exp(-ms / .22) * (ms > .05 ? 1 : ms / .05); else yv = .82 * (1 - Math.exp(-ms / .12));
+      const su = fixed ? .55 : .12, sx = bx + 4 + (bw - 8) * su;
+      c.strokeStyle = 'rgba(242,239,233,.45)'; c.beginPath(); c.moveTo(sx, by + 3); c.lineTo(sx, by + bh - 3); c.stroke();
+      txt('SAMPLE', sx + 4, by + fs + 1, dim); txt('SENSE', bx + bw, by - 6, dim, 'right');
+      if (run >= 0 && run < 2 && ci >= 0) {
+        const open = ci === bad, prog = clamp(cp * 1.4);
+        c.strokeStyle = open ? ACC : hi; c.lineWidth = 1.3; c.beginPath();
+        for (let i = 0; i <= 80 * prog; i++) { const u = i / 80, x = bx + 4 + (bw - 8) * u, ms = u * 3.3;
+          const yv = open ? .78 * Math.exp(-ms / .9) : .82 * (1 - Math.exp(-ms / .12));   // open: only the filter cap's residual charge
           const y = by + bh - 5 - (bh - 10) * yv; i ? c.lineTo(x, y) : c.moveTo(x, y); }
         c.stroke(); c.lineWidth = 1;
       }
-      txt('SENSE', bx + bw, by - 6, dim, 'right');
       return;
     }
     if (S.kind === 'semi') {
       const { ci, func, blink, brake } = S;
-      txt('TESLA SEMI · EXTERIOR LIGHTING BRING-UP', pad, pad + fs, mid);
+      txt('TESLA SEMI · ~20 EXTERIOR LIGHTS · HW LAYER TO APP LAYER', pad, pad + fs, mid);
       txt(func ? 'FUNCTION TEST · TURN / BRAKE' : 'CURRENT-SENSE CHECK PER CHANNEL', pad, pad + fs + lh, func ? hi : dim);
       const y0 = H - pad - lh * (SEMI_CH.length + 1);
       SEMI_CH.forEach((n, i) => { const done = i < ci, act = i === ci && !func; txt(n, pad, y0 + lh * i, done ? mid : act ? hi : 'rgba(242,239,233,.22)'); txt(done ? 'OK' : act ? '..' : '', pad + fs * 20, y0 + lh * i, done ? hi : dim); });

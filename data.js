@@ -90,7 +90,7 @@ export const chapters = [
     id: 'tesla', flow: 'professional',
     org: 'Tesla · California', dates: 'May – Aug 2025',
     title: 'Tesla', role: 'Vehicle Firmware · Body Controls Intern',
-    points: ['~20 Semi exterior lighting channels from bare hardware to production', 'Cybercab lighting ADC sampling cut from 10 ms to 1 ms', 'Fixed out-of-sync Cybertruck headlamp stepper calibration'],
+    points: ['Brought up ~20 Semi exterior lights and their current-sense ADCs, hardware to app layer', 'Current-sense self-tests for every Cybercab exterior light', 'Fixed out-of-sync Cybertruck headlamp stepper calibration'],
     views: [
       { id: 'semi', label: 'Semi', el: withAttrs(EL.tesla, { view: 'semi' }) },
       { id: 'cybercab', label: 'Cybercab', el: withAttrs(EL.tesla, { view: 'cybercab' }) },
@@ -253,9 +253,10 @@ export const details = {
       { type: 'image', src: 'media/tesla/semi-lighting-front.webp', caption: 'Tesla Semi front lighting (render)' },
       { type: 'image', src: 'media/tesla/semi-lighting-quarter.webp', caption: 'Tesla Semi lighting, front quarter (render)' }
     ],
-    body: ['Took ~20 exterior lighting channels on the Semi from bare hardware to production readiness: C drivers written from Altium schematics, homologated app-layer behaviour, ADC current-sense self-tests.',
-      'Cut Cybercab lighting ADC sampling from 10 ms to 1 ms and traced an RC time-constant fault that let the sample-and-hold retain charge and pass faulty lamps. Fixed a Cybertruck bug that calibrated the left and right headlamp stepper motors out of sync. Wrote Pytest software-in-the-loop suites guarding lighting behaviour across programs.'],
-    chips: ['C', 'Altium', 'ADC', 'Pytest · SIL']
+    body: ['Brought up all ~20 exterior lights on the Tesla Semi and their current-sense ADCs, from the hardware layer through to app-layer integration, writing the C drivers against the Altium schematics.',
+      'Developed current-sense self-tests for every Cybercab exterior light so faulty units are caught before leaving the line. Diagnosed an ADC sample time that was too short: residual charge in a filter capacitor let disconnected endpoints false-pass, and fixing it means open lights are now caught in production.',
+      'Corrected a logic error on legacy platforms (Model 3, Model Y and Cybertruck) where disconnected lights did not raise a fault, enabling better retroactive failure analysis. Fixed a Cybertruck bug that calibrated the left and right headlamp stepper motors out of sync, so headlights no longer move at night. Refined auto high-beam latching to activate only at night, with SIL tests (pytest and C unit tests) verifying homologated behaviour across previous vehicle platforms.'],
+    chips: ['C', 'Altium', 'ADC · current sense', 'pytest · SIL', 'C unit tests']
   },
   ixana: { gallery: [
       { type: 'video', src: 'media/ixana/ixana-wir-demo-full.mp4', poster: 'media/ixana/ixana-wir-demo-full.jpg', caption: 'CES demo: video sent through the body over Wi-R (full length, with audio)' },

@@ -131,8 +131,8 @@ class IxanaLink extends HTMLElement{
   // nodes: lens, Wi-R patch, watch
   const nodes=[[LENS,'CAM'],[PATCH,'Wi-R'],[[WATCH.x,WATCH.y],'RX']];
   nodes.forEach(([q,label],i)=>{if(i===2&&p>.85)return;const s=S(...q),ph=((t*.8+i*.33)%1);c.save();if(i===2)c.globalAlpha=1-ease((p-.6)/.25);const base=i===2?Math.max(WATCH.rx,WATCH.ry)*z+6:clamp(z*14,7,16);
-   c.strokeStyle='rgba(242,239,233,'+(.75*linkA)+')';c.lineWidth=1;c.beginPath();c.arc(s[0],s[1],base,0,TAU);c.stroke();
-   c.strokeStyle='rgba(242,239,233,'+((1-ph)*.35*linkA)+')';c.beginPath();c.arc(s[0],s[1],base+ph*16,0,TAU);c.stroke();
+   if(i!==1){c.strokeStyle='rgba(242,239,233,'+(.75*linkA)+')';c.lineWidth=1;c.beginPath();c.arc(s[0],s[1],base,0,TAU);c.stroke();
+   c.strokeStyle='rgba(242,239,233,'+((1-ph)*.35*linkA)+')';c.beginPath();c.arc(s[0],s[1],base+ph*16,0,TAU);c.stroke();}   // no node on the arm: the label marks the stream
    if(i<2&&p>.2&&p<.85)this._hud(c,label,s[0]+base+8,s[1]+3,'left',.7*ease(1-Math.abs(p-.5)*3.2+.6));c.restore()});
   // receive HUD beside the watch
   const rxA=ease((p-.55)/.35);if(rxA>0){const s=S(WATCH.x,WATCH.y),rr=Math.max(WATCH.rx,WATCH.ry)*z,side=s[0]+rr+28+170<W-8;let x=side?s[0]+rr+28:Math.max(14,s[0]-80),y=side?s[1]-rr*.55:s[1]+rr+34;c.save();c.globalAlpha=rxA;
