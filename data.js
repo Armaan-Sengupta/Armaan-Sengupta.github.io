@@ -69,8 +69,7 @@ export const chapters = [
     views: [
       { id: 'ride', label: 'Ride', el: EL.segRide, hint: 'Click to push' },
       { id: 'sweep', label: 'Parameter sweep', el: EL.segSweep }
-    ],
-    more: ['Equations and graphs', 'https://www.armaansengupta.ca/third-year']
+    ]
   },
 
   /* ─────────── professional ─────────── */
@@ -222,7 +221,7 @@ export const details = {
     body: ['Owned all firmware: both motors, encoder-to-dimension mapping, the GUI, and a custom 2-wire clocked protocol so an ESP32 could talk to a VEX brain that only exposes digital reads.',
       'OpenCV finds part orientation, angles stream over WebSockets, and the part turns to its critical dimension. Out-of-spec parts are logged to a server.'],
     chips: ['C++', 'ESP32', 'Protocol design', 'OpenCV'],
-    links: [['Demo', 'https://youtu.be/MB9A7U8ksmc'], ['Report', 'https://www.armaansengupta.ca/_files/ugd/13b95a_1665e03860934de58dc3ca61fa309edd.pdf']]
+    links: [['Demo', 'https://youtu.be/MB9A7U8ksmc']]
   },
   segway: { gallery: [
       { type: 'video', src: 'media/segway/simulationx-run.mp4', poster: 'media/segway/simulationx-run.jpg', caption: 'SimulationX model riding until it tips' },
@@ -237,7 +236,7 @@ export const details = {
     body: ['We derived the nonlinear kinematic and kinetic equations of a human transporter, then linearized them with a small-angle approximation into a state-space model.',
       'A Simulink model swept thrust force and lean angle, coarse first and then finely. SimulationX models the system acausally without hand-derived equations; the gap between the two is the cost of the idealizations.'],
     chips: ['MATLAB', 'Simulink', 'SimulationX', 'Python'],
-    links: [['Equations and graphs', 'https://www.armaansengupta.ca/third-year'], ['Code', 'https://github.com/Armaan-Sengupta/MTE-351-Code']]
+    links: [['Code', 'https://github.com/Armaan-Sengupta/MTE-351-Code']]
   },
   neuralink: { gallery: [
       { type: 'video', src: 'elements/neuralink/media/neural-journey.mp4', poster: 'elements/neuralink/media/neural-journey.jpg', caption: 'From implant to perceived image. This is an artistic rendering, not official Neuralink material, and does not indicate product fidelity.' },

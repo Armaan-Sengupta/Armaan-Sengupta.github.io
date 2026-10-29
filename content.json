@@ -105,10 +105,6 @@
     {
      "label": "Airbrakes presentation (YouTube)",
      "href": "https://youtu.be/SJO39WQ7Uv0"
-    },
-    {
-     "label": "Rocketry page (Wix)",
-     "href": "https://www.armaansengupta.ca/rocketry"
     }
    ],
    "gallery": [
@@ -332,10 +328,6 @@
     {
      "label": "SimX files & Python",
      "href": "https://github.com/Armaan-Sengupta/MTE-351-Code/tree/main/SimX"
-    },
-    {
-     "label": "Full report (PDF)",
-     "href": "media/gallery/segway/report.pdf"
     }
    ],
    "gallery": [
@@ -394,11 +386,6 @@
      "caption": "SimulationX sweep: distance travelled vs force and lean angle",
      "w": 795,
      "h": 636
-    },
-    {
-     "type": "pdf",
-     "src": "media/gallery/segway/report.pdf",
-     "caption": "SYDE 351 technical report (PDF)"
     }
    ]
   },
@@ -478,12 +465,7 @@
     "Automatic gain control for the custom RF chip: +45% packet reception",
     "Rigol arbitrary-waveform-generator library for HIL testing of custom silicon (Python); SPI/I2C timing debug between FPGA and MCU"
    ],
-   "links": [
-    {
-     "label": "Ixana page (Wix)",
-     "href": "https://www.armaansengupta.ca/ixana"
-    }
-   ],
+   "links": [],
    "gallery": [
     {
      "type": "vimeo",
@@ -515,12 +497,7 @@
     "Patent-pending PLC buffering on a Beckhoff controller: semaphore-driven threads + staged queues lifted collection from ~140 Hz to 500+ Hz",
     "Web dashboard for operators to compare strain profiles across batches and review anomalies"
    ],
-   "links": [
-    {
-     "label": "Magna page (Wix)",
-     "href": "https://www.armaansengupta.ca/magna"
-    }
-   ],
+   "links": [],
    "gallery": [
     {
      "type": "image",
@@ -575,12 +552,7 @@
     "LiDAR dust filtering: 5 parallel algorithms in C++ firmware from clean vs dusty flux/distance data",
     "Python LiDAR visualiser (serial, then wireless MQTT) with record and real-time playback used by the team for tuning"
    ],
-   "links": [
-    {
-     "label": "FYELABS page (Wix)",
-     "href": "https://www.armaansengupta.ca/fyelabs"
-    }
-   ],
+   "links": [],
    "lottie": {
     "json": "media/lottie/hmi-pcb.json",
     "mp4": "media/lottie/hmi-pcb.mp4",
@@ -1291,10 +1263,6 @@
     "Mentored FTC teams 18846 and 17003; FTC video tutorial series"
    ],
    "links": [
-    {
-     "label": "Robotics page (Wix)",
-     "href": "https://www.armaansengupta.ca/robotics"
-    },
     {
      "label": "FTC 16397",
      "href": "https://relativelyquantum.wixsite.com/home"
