@@ -46,7 +46,7 @@ export const chapters = [
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
       { id: 'flight', label: 'Control loop', el: EL.flight },
       { id: 'pcb', label: 'Flight computer', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
-      { id: 'hardware', label: 'Hardware', swap: ['media/airbrakes/render-deployed.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
+      { id: 'hardware', label: 'Hardware', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
       { id: 'launch', label: 'Launch', video: 'media/airbrakes/launch-scrub.mp4', once: true }
     ]
   },
@@ -136,18 +136,18 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
-  { id: 'trashminator', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'Autonomous robot that collects floating trash.', media: { scrub: 'media/lottie/trashminator.mp4' } },
-  { id: 'radial-engine', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'A working six-cylinder radial engine in CAD.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
-  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'Low-profile shaft hub, sold by Studica.', media: { el: EL.hub, progress: true } },
-  { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'Force injection in MuJoCo to test contact localization.', media: { el: EL.contact } },
-  { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform.', media: { video: 'media/beam-balancer.mp4' } },
-  { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'STM32 stepper gantry with homing and UART control.', media: { el: EL.gantry } },
-  { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering and searching million-point scans.', media: { el: EL.cloud } },
-  { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All the software. Control Award, Asia Pacific Open.', media: { video: 'media/ftc-robot.mp4' } },
-  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'An FRC robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
-  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A tracked drive for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
-  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sorts invasive from protected bird eggs.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
-  { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Kit to bone-sorting arm in under 8 hours.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
+  { id: 'trashminator', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
+  { id: 'radial-engine', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
+  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
+  { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
+  { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
+  { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
+  { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
+  { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
+  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
+  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
+  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
+  { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
 
 // details shown in the popup for any project (chapters and cards). Gallery comes from content.json too.

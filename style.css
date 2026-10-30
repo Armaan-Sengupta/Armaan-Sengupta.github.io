@@ -266,3 +266,9 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
   .flow-switch button{min-width:104px;padding:8px 12px}
 }
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
+
+/* on phones these demos would trap the scroll: show them, but let touches pass through to the page */
+@media (max-width:860px),(pointer:coarse){
+  #ch-measurement .el-layer,#ch-segway .el-layer,#ch-magna .el-layer{pointer-events:none}
+  #ch-measurement .hint,#ch-segway .hint,#ch-magna .hint{display:none}
+}
