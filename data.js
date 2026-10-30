@@ -28,8 +28,8 @@ export const chapters = [
   {
     id: 'platform', flow: 'personal', hero: true,
     org: 'MTE 380 · 3RRS parallel manipulator', dates: 'Sep – Dec 2025',
-    title: 'Stewart Platform', role: 'Balancing a ball on a plate: kinematics, dynamics, controls and sensing',
-    points: ['Inverse kinematics from plate plane to three servo angles', 'Simscape plant with a custom contact S-function', 'Ball located by a 3-axis force-torque sensor'],
+    title: 'Stewart Platform', role: 'Ball-on-plate balancing robot',
+    points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],
     views: [
       { id: 'assemble', label: 'Assembly', el: EL.platform, progress: 'view', len: 1.3 },
       { id: 'live', label: 'Live model', el: EL.platform, hint: 'Click the plate to drop the ball' },
@@ -39,8 +39,8 @@ export const chapters = [
   {
     id: 'airbrakes', flow: 'personal',
     org: 'Waterloo Rocketry · Borealis', dates: '2023 – 2024',
-    title: 'Rocket Airbrakes', role: 'Active control system: mechanism, CFD, flight computer and firmware',
-    points: ['Cam-slot spiral drives three panels in sync from one servo', 'STM32 / FreeRTOS: estimate, predict apogee, control', '4-layer flight computer, power efficiency 66% → 95%'],
+    title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
+    points: ['One servo drives three panels', 'Firmware predicts apogee and controls drag', 'Avionics PCB: 66% → 95% efficiency'],
     views: [
       { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
@@ -53,8 +53,8 @@ export const chapters = [
   {
     id: 'measurement', flow: 'personal',
     org: 'MTE 201 · Team of 3', dates: 'Sep – Dec 2023',
-    title: 'Automated Tolerance Inspection', role: 'Vision-oriented, force-sensed measurement with no human in the loop',
-    points: ['OpenCV finds the part orientation and turns it to the critical dimension', 'Custom 2-wire clocked protocol: ESP32 ↔ VEX brain', 'Rotated correctly 100% of the time, measured within 0.3 mm'],
+    title: 'Automated Tolerance Inspection', role: 'Hands-off part measurement',
+    points: ['OpenCV orients the part', 'Custom 2-wire ESP32 ↔ VEX protocol', 'Within 0.3 mm, every time'],
     views: [
       { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
       { id: 'protocol', label: '2-wire protocol', el: EL.wire, hint: 'Drag the turntable' },
@@ -64,8 +64,8 @@ export const chapters = [
   {
     id: 'segway', flow: 'personal',
     org: 'SYDE 351 · Modelling', dates: 'Jan – Apr 2025',
-    title: 'Segway Dynamics', role: 'A human transporter, from hand-derived equations of motion to simulation',
-    points: ['Nonlinear EOMs linearized into a state-space model', 'Simulink sweep over thrust force and lean angle', 'Cross-checked acausally in SimulationX'],
+    title: 'Segway Dynamics', role: 'Equations of motion to simulation',
+    points: ['Hand-derived nonlinear model', 'Simulink parameter sweep', 'Cross-checked in SimulationX'],
     views: [
       { id: 'ride', label: 'Ride', el: EL.segRide, hint: 'Click to push' },
       { id: 'sweep', label: 'Parameter sweep', el: EL.segSweep }
@@ -77,7 +77,7 @@ export const chapters = [
     id: 'neuralink', flow: 'professional', mono: true,
     org: 'Neuralink · California', dates: 'Jan – Aug 2026',
     title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern',
-    points: ['Firmware for a 1st-gen neural stimulation implant across 3,000+ electrodes', 'App-to-ASIC stack for Blindsight, a visual prosthesis', 'Registration cut from 8 min to 15 s per trial'],
+    points: ['Stimulation implant firmware, 3,000+ electrodes', 'App-to-ASIC stack for Blindsight', 'Registration: 8 min → 15 s per trial'],
     views: [
       { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },
       { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter' },
@@ -88,8 +88,8 @@ export const chapters = [
   {
     id: 'tesla', flow: 'professional',
     org: 'Tesla · California', dates: 'May – Aug 2025',
-    title: 'Tesla', role: 'Vehicle Firmware · Body Controls Intern',
-    points: ['Brought up ~20 Semi exterior lights and their current-sense ADCs, hardware to app layer', 'Current-sense self-tests for every Cybercab exterior light', 'Fixed out-of-sync Cybertruck headlamp stepper calibration'],
+    title: 'Tesla', role: 'Vehicle Firmware Intern · Body Controls',
+    points: ['Brought up ~20 Semi exterior lights', 'Cybercab light self-tests', 'Cybertruck headlamp calibration fix'],
     views: [
       { id: 'semi', label: 'Semi', el: withAttrs(EL.tesla, { view: 'semi' }) },
       { id: 'cybercab', label: 'Cybercab', el: withAttrs(EL.tesla, { view: 'cybercab' }) },
@@ -99,8 +99,8 @@ export const chapters = [
   {
     id: 'ixana', flow: 'professional',
     org: 'Ixana · Indiana', dates: 'Aug – Dec 2024',
-    title: 'Ixana', role: 'Embedded Systems & Firmware Engineering Intern',
-    points: ['Video from smart glasses to a watch over Wi-R body-coupled silicon', 'Frame rate 4 → 13 fps with a bare-metal C++ core OS', 'Owned the MIPI-DSI display drivers'],
+    title: 'Ixana', role: 'Embedded Firmware Intern',
+    points: ['Glasses to watch, through the body', 'Frame rate 4 → 13 fps', 'MIPI-DSI display drivers'],
     views: [
       { id: 'capture', label: 'Capture', el: withAttrs(EL.ixana, { view: 'capture' }) },
       { id: 'link', label: 'Through the body', el: withAttrs(EL.ixana, { view: 'link' }) },
@@ -111,8 +111,8 @@ export const chapters = [
   {
     id: 'magna', flow: 'professional', mono: true,
     org: 'Magna · Ontario', dates: 'Jan – Apr 2024',
-    title: 'Magna', role: 'In-die crack detection and die condition monitoring',
-    points: ['Strain-gauge data over MQTT into PostgreSQL with a live dashboard', 'Caught 100% of cracked parts with zero false positives over 150 parts', 'Patent-pending PLC buffer: 142 Hz → 500 Hz'],
+    title: 'Magna', role: 'Crack detection in a stamping die',
+    points: ['Strain gauges → MQTT → live dashboard', 'Every cracked part caught, zero false alarms', 'Patent-pending PLC buffer: 142 → 500 Hz'],
     views: [
       { id: 'detector', label: 'Live detector', el: EL.strain, hint: 'Click to inject a crack' },
       { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
@@ -121,8 +121,8 @@ export const chapters = [
   {
     id: 'fyelabs', flow: 'professional',
     org: 'FYELABS · Ontario', dates: 'May – Sep 2023',
-    title: 'FYELABS', role: 'Robotics & Embedded Systems Intern',
-    points: ['Back-up safety for garbage trucks: 10 LiDARs, 3 depth cameras, 6 MCUs', 'LiDAR dust filter: five parallel filters reject dust, still catch people', 'Actuating 100+ part enclosure, cost cut 56%'],
+    title: 'FYELABS', role: 'Robotics & Embedded Intern',
+    points: ['Back-up safety for garbage trucks', 'LiDAR dust filter that still sees people', '100+ part enclosure, cost cut 56%'],
     views: [
       { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view' },
       { id: 'built', label: 'As built', img: 'media/fyelabs/case-photo.webp' },
@@ -136,18 +136,18 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
-  { id: 'trashminator', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
-  { id: 'radial-engine', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
-  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
-  { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
-  { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
-  { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
-  { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
-  { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
-  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
-  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
-  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
-  { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
+  { id: 'trashminator', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'Autonomous robot that collects floating trash.', media: { scrub: 'media/lottie/trashminator.mp4' } },
+  { id: 'radial-engine', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'A working six-cylinder radial engine in CAD.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
+  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'Low-profile shaft hub, sold by Studica.', media: { el: EL.hub, progress: true } },
+  { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'Force injection in MuJoCo to test contact localization.', media: { el: EL.contact } },
+  { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform.', media: { video: 'media/beam-balancer.mp4' } },
+  { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'STM32 stepper gantry with homing and UART control.', media: { el: EL.gantry } },
+  { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering and searching million-point scans.', media: { el: EL.cloud } },
+  { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All the software. Control Award, Asia Pacific Open.', media: { video: 'media/ftc-robot.mp4' } },
+  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'An FRC robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
+  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A tracked drive for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
+  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sorts invasive from protected bird eggs.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
+  { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Kit to bone-sorting arm in under 8 hours.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
 
 // details shown in the popup for any project (chapters and cards). Gallery comes from content.json too.

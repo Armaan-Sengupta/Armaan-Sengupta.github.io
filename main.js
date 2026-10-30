@@ -84,12 +84,12 @@ function buildChapter(ch) {
         <p class="role">${esc(ch.role)}</p>
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
         <div class="ch-actions">
-          <button class="btn" data-open="${ch.id}">Details, media and videos <span aria-hidden="true">→</span></button>
+          <button class="btn" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>
           ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
         </div>
       </div>
       <div class="ch-stage">
-        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<button class="btn hero-more" data-open="${ch.id}">Details, media and videos <span aria-hidden="true">→</span></button>` : ''}</div>
+        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<button class="btn hero-more" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>` : ''}</div>
         <div class="ch-tabs mono" role="tablist">${ch.views.map((v, i) => `<button role="tab" data-i="${i}" aria-selected="${i === 0}"><span>${esc(v.label)}</span><i><b></b></i></button>`).join('')}</div>
         ${ch.disclaimer ? `<p class="disclaimer mono">${esc(ch.disclaimer)}</p>` : ''}
       </div>
@@ -289,7 +289,7 @@ grid.innerHTML = cards.map((c) => `
   <a class="card" href="#${c.id}" data-open="${c.id}">
     <div class="thumb"></div>
     <div class="body">
-      <div class="k mono"><span>${esc(c.kicker)}</span><span>Open →</span></div>
+      <div class="k mono"><span>${esc(c.kicker)}</span></div>
       <h4>${esc(c.title)}</h4>
       <p>${esc(c.blurb)}</p>
     </div>
@@ -430,7 +430,7 @@ addEventListener('hashchange', routeHash);
 const skRoot = $('#skills-root'), skCanvas = $('canvas', skRoot), skCtx = skCanvas.getContext('2d');
 $('#sk-groups').innerHTML = Object.entries(skills).map(([g, items]) => `
   <div class="sk-group"><span class="mono">${esc(g)}</span><div class="sk-list">${Object.keys(items).map((s) => `<button class="sk" data-g="${esc(g)}">${esc(s)}</button>`).join('')}</div></div>`).join('');
-$('#sk-uses').innerHTML = uses.map(([id, label]) => `<li data-u="${id}"><button data-open="${id}"><span>${esc(label)}</span><span>Open →</span></button></li>`).join('');
+$('#sk-uses').innerHTML = uses.map(([id, label]) => `<li data-u="${id}"><button data-open="${id}"><span>${esc(label)}</span><span aria-hidden="true">→</span></button></li>`).join('');
 let skActive = null, skAnim = 0, skRaf = 0;
 function drawLinks() {
   const r = skRoot.getBoundingClientRect(), d = Math.min(devicePixelRatio, 2);
