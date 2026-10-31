@@ -374,9 +374,11 @@ html:not(.rocket-fell) .crash{display:none}
 @media(max-width:860px){.rail{display:none}}
 
 /* reduce-motion toggle */
-.motion-toggle{color:var(--mute);font:inherit;letter-spacing:inherit;text-transform:inherit}
-.motion-toggle:hover{color:var(--fg)}
-.nav .motion-toggle{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+/* small fixed pause/play in the corner: reduce motion */
+.motion-toggle{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:39;width:30px;height:30px;display:grid;place-items:center;
+  border-radius:50%;border:1px solid var(--line-2);background:rgba(14,14,17,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--mute);opacity:.6;transition:opacity .25s,color .25s}
+.motion-toggle svg{width:12px;height:12px}
+.motion-toggle:hover,.motion-toggle:focus-visible{opacity:1;color:var(--fg)}
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;scroll-behavior:auto!important}
 html.rm .fall-rocket{display:none}
 
