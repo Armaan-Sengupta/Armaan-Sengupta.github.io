@@ -130,6 +130,14 @@ function buildSequence(ch) {
   wrap.append(det);
   return wrap;
 }
+function buildHead(ch) {
+  const head = document.createElement('header'); head.className = 'seq-head';
+  head.innerHTML = `
+    ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
+    <h3>${titleHTML(ch)}</h3>
+    ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}`;
+  return head;
+}
 function buildBeat(ch) {
   const sec = document.createElement('div');
   sec.className = 'chapter beat'; sec.dataset.ch = ch.id;
@@ -511,7 +519,7 @@ skRoot.addEventListener('mouseleave', () => setSkill(null));
 /* ═════════════ boot ═════════════ */
 for (const ch of chapters) {
   if (ch.seq) flows[ch.flow].append(buildSequence(ch));
-  else if (ch.intro) flows[ch.flow].append(buildBeat({ ...ch, views: ch.views.slice(0, ch.intro) }), buildChapter({ ...ch, views: ch.views.slice(ch.intro) }));
+  else if (ch.intro) flows[ch.flow].append(buildHead(ch), buildBeat({ ...ch, views: ch.views.slice(0, ch.intro) }), buildChapter({ ...ch, views: ch.views.slice(ch.intro) }));
   else flows[ch.flow].append(buildChapter(ch));
 }
 chapterState.forEach((st) => chapterIO.observe(st.sec));
