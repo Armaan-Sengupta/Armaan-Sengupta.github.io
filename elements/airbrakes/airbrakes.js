@@ -6,6 +6,8 @@
  *
  * Attributes / properties
  *   view="mechanism" | "top" | "airframe"   camera + airframe shell, smooth transition (default mechanism)
+ *   view="journey"   one scroll-driven story (progress 0..1): panels deploy on the bench, retract while the camera pulls
+ *                    back into the airframe, then deploy into a CFD-style air stream that also flows around the cursor
  *   progress  0..1   scroll-scrubbed deployment. Once set, it drives the panels (autoplay is ignored).
  *   extension 0..1   direct deployment (same as progress, unsmoothed)
  *   autoplay, loop   cycle retract → deploy → hold → retract while no progress is supplied
@@ -25,9 +27,71 @@ const VIEWS = {
   //            azimuth  elevation  distance  target-y  airframe opacity
   mechanism: { az: -0.55, el: 0.62, d: 15.5, ty: 0.15, shell: 0 },
   top:       { az: -Math.PI / 2, el: 1.38, d: 15.5, ty: 0.4, shell: 0 },
-  airframe:  { az: -0.4, el: 0.16, d: 21, ty: 0.9, shell: 1 }
+  airframe:  { az: -Math.PI, el: 0.12, d: 30, ty: 0.9, shell: 1 }   // one panel points away, the other two stand out either side
 };
 export const AIRBRAKE_DURATION = 9;
+// journey: deploy on the bench, retract while the camera pulls back into the airframe, deploy into the flow
+function journeyAt(p) {
+  const ext = p < 0.3 ? smooth(p / 0.3) : p < 0.4 ? 1 : p < 0.6 ? 1 - smooth((p - 0.4) / 0.2) : p < 0.68 ? 0 : smooth((p - 0.68) / 0.26);
+  return { ext, cam: smooth((p - 0.38) / 0.28) };
+}
+
+/* Screen-space air stream, coloured by speed like a CFD velocity plot. Freestream falls from the top of the
+ * frame (the rocket flies up), slows in the boundary layer along the airframe, accelerates around each panel tip
+ * and curls into an eddy behind it. The cursor is a small round obstacle. */
+const CFD = [[0.3, [59, 111, 214]], [0.62, [67, 194, 122]], [0.9, [242, 207, 74]], [1.05, [240, 160, 64]], [1.4, [229, 83, 58]]];
+function cfdColor(k) {
+  if (k <= CFD[0][0]) return CFD[0][1];
+  for (let i = 1; i < CFD.length; i++) if (k <= CFD[i][0]) { const [k0, a] = CFD[i - 1], [k1, b] = CFD[i], t = (k - k0) / (k1 - k0); return a.map((v, j) => v + (b[j] - v) * t); }
+  return CFD[CFD.length - 1][1];
+}
+class AirStream {
+  constructor(canvas) { this.c = canvas; this.g = canvas.getContext('2d'); this.ps = []; this.w = 0; this.h = 0; this.mouse = null; }
+  resize(w, h, dpr) { this.w = w; this.h = h; this.dpr = dpr; this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr); this.ps = []; }
+  clear() { if (this.ps.length) { this.g.setTransform(1, 0, 0, 1, 0, 0); this.g.clearRect(0, 0, this.c.width, this.c.height); this.ps = []; } }
+  spawn(geo, top) {
+    const { w, h } = this; let x;
+    do { x = Math.random() * w; } while (x > geo.bx0 - 3 && x < geo.bx1 + 3);
+    return { x, y: top ? -Math.random() * h * 0.05 : Math.random() * h, life: 0 };
+  }
+  step(dt, geo, alpha) {
+    const { w, h, g } = this; if (!w || !h) return;
+    const n = Math.round(Math.min(650, Math.max(200, w * h / 3200)));
+    while (this.ps.length < n) this.ps.push(this.spawn(geo, false));
+    g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,.075)'; g.fillRect(0, 0, w, h);
+    g.globalCompositeOperation = 'source-over'; g.lineWidth = 1.5; g.lineCap = 'round';
+    const U = h * 0.5, cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
+    const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
+    for (const q of this.ps) {
+      const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, dx = (q.x - edge) * side;
+      let vx = 0, vy = U * (0.35 + 0.65 * smooth(dx / 46));             // boundary layer along the airframe
+      const ext = geo.ext[side < 0 ? 0 : 1], py = geo.py;
+      if (ext > 3) {
+        const above = py - q.y, below = q.y - py, k = 1 - clamp((dx - ext) / (ext * 0.6 + 20));
+        if (above > 0 && above < 190 && k > 0) {                           // pushed out and over the panel tip
+          const f = Math.exp(-above / 60) * k; vx += side * U * 1.9 * f; vy *= 1 - 0.55 * f * (dx < ext ? 1 : 0.3);
+        }
+        if (below >= 0 && below < ext * 2.6 + 30 && dx < ext * 1.15) {    // eddy behind the panel
+          const ex = edge + side * ext * 0.55, ey = py + ext * 0.75 + 10, rx = q.x - ex, ry = q.y - ey, r = Math.hypot(rx, ry) + 1;
+          const sw = U * 1.3 * Math.exp(-r / (ext * 0.9 + 12));
+          vx += (-ry / r) * sw * side; vy = vy * 0.35 + (rx / r) * sw * side;
+        } else if (below >= 0 && below < ext * 4 && dx < ext * 1.6) vy *= 0.6 + 0.4 * below / (ext * 4);
+        if (Math.abs(q.y - py) < 5 && dx < ext) q.x = edge + side * (ext + 2);   // never through the panel
+      }
+      if (M) {                                                             // cursor: flow around a small cylinder
+        const rx = q.x - M.x, ry = q.y - M.y, d2 = rx * rx + ry * ry, d = Math.sqrt(d2) + 0.01;
+        if (d < rc * 4) { const k = (rc * rc) / Math.max(d2, rc * rc * 0.6); vx += (rx / d) * U * 1.4 * k; vy += (ry / d) * U * 0.4 * k - U * 0.3 * k; }
+      }
+      const ox = q.x, oy = q.y; q.x += vx * dt; q.y += vy * dt; q.life += dt;
+      const nd = (q.x - edge) * side; if (nd < 1.5) q.x = edge + side * 1.5;
+      const sp = Math.hypot(vx, vy) / U, col = cfdColor(sp);
+      g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha).toFixed(3)})`;
+      g.beginPath(); g.moveTo(ox, oy); g.lineTo(q.x, q.y); g.stroke();
+      if (q.y > h + 8 || q.x < -8 || q.x > w + 8 || q.life > 7) Object.assign(q, this.spawn(geo, true));
+    }
+  }
+}
 export function airbrakeStateAt(t) {
   t = clamp(t, 0, AIRBRAKE_DURATION);
   const e = t < 0.8 ? 0 : t < 3.6 ? smooth((t - 0.8) / 2.8) : t < 5 ? 1 : t < 7.8 ? 1 - smooth((t - 5) / 2.8) : 0;
@@ -176,6 +240,23 @@ export class AirbrakeRenderer {
     this.sliders.forEach(s => { s.position.x = k.travel; });
     return true;
   }
+  setCamMix(m) { const a = VIEWS.mechanism, b = VIEWS.airframe, e = smooth(m); for (const k of Object.keys(a)) this.cam[k] = a[k] + (b[k] - a[k]) * e; this._viewT = 1; }
+  // the airframe silhouette and how far each side's panels reach beyond it, in CSS px (for the air stream)
+  flowGeometry(w, h) {
+    this._applyCamera(); this.camera.updateMatrixWorld(); this.root.updateMatrixWorld(true);
+    const P = (v) => { v.project(this.camera); return [(v.x + 1) / 2 * w, (1 - v.y) / 2 * h]; };
+    const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0); right.y = 0; right.normalize();
+    const y = this.Y.panel + 0.12, R = G.AIRFRAME_R;
+    const a = P(right.clone().multiplyScalar(-R).setY(y)), b = P(right.clone().multiplyScalar(R).setY(y));
+    const bx0 = Math.min(a[0], b[0]), bx1 = Math.max(a[0], b[0]), ext = [0, 0];
+    for (const s of this.sliders) {
+      for (const z of [-0.9, 0, 0.9]) {
+        const [x] = P(s.localToWorld(new THREE.Vector3(R, y, z)));
+        if (x < bx0) ext[0] = Math.max(ext[0], bx0 - x); else if (x > bx1) ext[1] = Math.max(ext[1], x - bx1);
+      }
+    }
+    return { bx0, bx1, py: (a[1] + b[1]) / 2, ext };
+  }
   setView(name, instant = false) {
     const v = VIEWS[name] || VIEWS.mechanism;
     this._from = { ...this.cam }; this._to = { ...v }; this._viewT = instant ? 1 : 0;
@@ -225,7 +306,8 @@ class ASAirbrakes extends HTMLElement {
       .controls input{flex:1;accent-color:#f2efe9}</style>
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
-      <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>`;
+      <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>
+      <canvas class="flow" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>`;
     this._canvas = root.querySelector('canvas');
     try { this.r = new AirbrakeRenderer(this._canvas); }
     catch (e) { root.querySelector('.stage').innerHTML = '<div style="padding:24px;font:12px monospace;color:#999">WebGL unavailable</div>'; return; }
@@ -233,10 +315,14 @@ class ASAirbrakes extends HTMLElement {
     this._btn = root.querySelector('button'); this._range = root.querySelector('input');
     this._btn.addEventListener('click', () => this._playing ? this.pause() : this.play());
     this._range.addEventListener('input', () => { this.pause(); this._progress = null; this._target = this._ext = this._range.value / 1000; this._kick(); });
-    this.r.setView(this.view, true);
+    this._journey = this.view === 'journey'; this._jp = 0; this._mix = 0;
+    this._flow = new AirStream(root.querySelector('.flow'));
+    this.addEventListener('pointermove', (e) => { const r = this.getBoundingClientRect(); this._flow.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; });
+    this.addEventListener('pointerleave', () => { this._flow.mouse = null; });
+    if (this._journey) this.r.setCamMix(0); else this.r.setView(this.view, true);
     if (this.hasAttribute('progress')) this.progress = this.getAttribute('progress');
     else if (this.hasAttribute('extension')) this._target = this._ext = clamp(+this.getAttribute('extension') || 0);
-    this._ro = new ResizeObserver(es => { const c = es[0].contentRect; this.r.resize(c.width, c.height); this._dirty = true; this._kick(); });
+    this._ro = new ResizeObserver(es => { const c = es[0].contentRect; this.r.resize(c.width, c.height); this._flow.resize(c.width, c.height, Math.min(2, devicePixelRatio || 1)); this._w = c.width; this._h = c.height; this._dirty = true; this._kick(); });
     this._ro.observe(root.querySelector('.stage'));
     this._io = new IntersectionObserver(es => { this._visible = es[es.length - 1].isIntersecting; this._kick(); }, { rootMargin: '64px' });
     this._io.observe(this);
@@ -247,7 +333,7 @@ class ASAirbrakes extends HTMLElement {
   disconnectedCallback() { this._connected = false; cancelAnimationFrame(this._raf); this._raf = 0; this._ro?.disconnect(); this._io?.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.r?.dispose(); this.r = null; }
   attributeChangedCallback(n, o, v) {
     if (!this.r) return;
-    if (n === 'view') { this.r.setView(v || 'mechanism', this._reduced?.matches); this._kick(); }
+    if (n === 'view') { this._journey = v === 'journey'; if (!this._journey) { this._flow?.clear(); this.r.setView(v || 'mechanism', this._reduced?.matches); } this._dirty = true; this._kick(); }
     else if (n === 'progress' && v !== null) this.progress = v;
     else if (n === 'extension' && v !== null) { this._progress = null; this._target = this._ext = clamp(+v || 0); this._dirty = true; this._kick(); }
   }
@@ -265,7 +351,12 @@ class ASAirbrakes extends HTMLElement {
     if (active) {
       const auto = this._playing && this._progress === null && !this._reduced.matches;
       if (auto) { this.time += dt; if (this.time > this.duration) { if (this.hasAttribute('loop')) this.time %= this.duration; else { this.time = this.duration; this.pause(); } } this._target = airbrakeStateAt(this.time).extension; moving = true; }
-      if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }
+      if (this._journey) {
+        const tgt = this._progress ?? 0, k = this._reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
+        this._jp += (tgt - this._jp) * k; if (Math.abs(tgt - this._jp) > 1e-4) moving = true; else this._jp = tgt;
+        const J = journeyAt(this._jp); this._target = this._ext = J.ext; if (J.cam !== this._mix) { this.r.setCamMix(J.cam); this._mix = J.cam; this._dirty = true; }
+      }
+      else if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }
       else this._ext = this._target;
       if (this.r.stepView(dt)) moving = true;
       if (this.r.setExtension(this._ext) || this._dirty || moving) {
@@ -273,6 +364,8 @@ class ASAirbrakes extends HTMLElement {
         const k = this.r.kin; this._hudA.textContent = (k.rot * 180 / Math.PI).toFixed(1) + '°'; this._hudT.textContent = (k.travel * 25.4).toFixed(1) + ' mm';
         if (this._range && document.activeElement !== this._range) this._range.value = String(Math.round(k.fraction * 1000));
       }
+      const fa = this._journey && !this._reduced.matches ? smooth((this._mix - 0.55) / 0.35) : 0;
+      if (fa > 0) { this._flow.step(dt, this.r.flowGeometry(this._w, this._h), fa); moving = true; } else this._flow.clear();
     }
     if (active && (moving || this._playing)) { this._raf = requestAnimationFrame(n => this._tick(n)); }
   }

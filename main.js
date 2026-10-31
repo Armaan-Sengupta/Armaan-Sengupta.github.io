@@ -103,6 +103,43 @@ function buildChapter(ch) {
   return sec;
 }
 const flowTop = () => $('#work').offsetTop;
+const titleHTML = (ch) => (ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title));
+
+// One thing on screen at a time: the project's name, then each visual full screen with a single caption,
+// then the text. Consecutive views that share an element stay together as one beat so it can animate between them.
+function buildSequence(ch) {
+  const wrap = document.createElement('section');
+  wrap.className = 'seq' + (ch.mono ? ' mono-ch' : '');
+  wrap.id = `ch-${ch.id}`; wrap.dataset.ch = ch.id; wrap.setAttribute('aria-label', ch.title);
+  wrap.innerHTML = `
+    <header class="seq-head">
+      <div class="meta mono"><span>${esc(ch.org)}</span></div>
+      <h3>${titleHTML(ch)}</h3>
+      ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
+    </header>`;
+  const groups = [];
+  ch.views.forEach((v) => { const g = groups[groups.length - 1]; if (g && v.el && g[0].el && g[0].el.tag === v.el.tag) g.push(v); else groups.push([v]); });
+  groups.forEach((views) => wrap.append(buildBeat({ ...ch, views })));
+  const det = document.createElement('div'); det.className = 'seq-details';
+  det.innerHTML = `
+    <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
+    <div class="ch-actions">
+      <button class="btn" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>
+      ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
+    </div>`;
+  wrap.append(det);
+  return wrap;
+}
+function buildBeat(ch) {
+  const sec = document.createElement('div');
+  sec.className = 'chapter beat'; sec.dataset.ch = ch.id;
+  const lens = ch.views.map((v) => v.len ?? 0.5);
+  const total = lens.reduce((a, b) => a + b, 0);
+  const starts = lens.map((_, i) => lens.slice(0, i).reduce((a, b) => a + b, 0) / total);
+  sec.innerHTML = `<div class="pin"><div class="ch-stage"><div class="frame"><div class="layers"></div><span class="hint mono"></span><p class="cap"></p></div></div></div>`;
+  chapterState.push({ ch, sec, lens, total, starts, active: -1, mounted: false, els: new Map(), layers: [], applied: new Map(), visible: false });
+  return sec;
+}
 
 async function mountChapter(st) {
   if (st.mounted) return; st.mounted = true;
@@ -120,7 +157,7 @@ async function mountChapter(st) {
       layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video || v.swap ? ' media' : '') + (v.color ? ' color' : '');
       if (v.video) {
         const vid = makeVideo(v.video, { loop: !v.once }); layer.append(vid);
-        if (v.once) vid.addEventListener('timeupdate', () => { if (st.active === i && vid.duration) $$('.ch-tabs b', st.sec)[i].style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
+        if (v.once) vid.addEventListener('timeupdate', () => { const b = $$('.ch-tabs b', st.sec)[i]; if (b && st.active === i && vid.duration) b.style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
       }
       if (v.swap) v.swap.forEach((src, k) => { const im = new Image(); im.src = src; im.alt = `${st.ch.title}: ${v.label}${k ? ' (real)' : ' (render)'}`; im.className = 'fit' + (k ? ' swap-b' : ''); im.loading = 'lazy'; layer.append(im); });
       if (v.img) { const im = new Image(); im.src = v.img; im.alt = `${st.ch.title}: ${v.label}`; im.className = 'fit'; im.loading = 'lazy'; layer.append(im); }
@@ -195,6 +232,7 @@ function setView(st, i) {
   if (!v.compare) st.sec.classList.remove('demo-done');
   $$('.ch-tabs button', st.sec).forEach((b, k) => b.setAttribute('aria-selected', k === i));
   const hint = $('.hint', st.sec); hint.textContent = v.hint || ''; hint.classList.toggle('on', !!v.hint);
+  const cap = $('.cap', st.sec); if (cap) cap.textContent = v.caption || '';
   if (!st.mounted) return;
   // element layers: visible if this view uses them; apply this view's attributes
   for (const [tag, e] of st.els) {
@@ -470,7 +508,7 @@ $$('.sk').forEach((b) => {
 skRoot.addEventListener('mouseleave', () => setSkill(null));
 
 /* ═════════════ boot ═════════════ */
-for (const ch of chapters) flows[ch.flow].append(buildChapter(ch));
+for (const ch of chapters) flows[ch.flow].append(ch.hero ? buildChapter(ch) : buildSequence(ch));
 chapterState.forEach((st) => chapterIO.observe(st.sec));
 layout();
 initHero($('#hero-canvas'));

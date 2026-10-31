@@ -42,12 +42,11 @@ export const chapters = [
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
     points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction and PI control', 'Designed the 4-layer avionics PCB for the canards, raising power efficiency from 66% to 95%'],
     views: [
-      { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
-      { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
-      { id: 'flight', label: 'Control loop', el: EL.flight },
-      { id: 'pcb', label: 'Flight computer', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
-      { id: 'hardware', label: 'Hardware', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
-      { id: 'launch', label: 'Launch', video: 'media/airbrakes/launch-scrub.mp4', once: true }
+      { id: 'mechanism', label: 'Mechanism', caption: 'One servo turns the cam plate, which drives all three panels out together and through the airframe', el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 2.4 },
+      { id: 'flight', label: 'Control loop', caption: 'Every few milliseconds the firmware estimates its state, predicts apogee and sets how far to deploy', el: EL.flight },
+      { id: 'pcb', label: 'Flight computer', caption: 'The Canard-ian avionics board, from render to the assembled board', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
+      { id: 'hardware', label: 'Hardware', caption: 'The machined airbrakes, from CAD to the real part', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
+      { id: 'launch', label: 'Launch', caption: 'Borealis lifting off at Launch Canada, August 2024', video: 'media/airbrakes/launch-scrub.mp4', once: true }
     ]
   },
   {
@@ -56,9 +55,9 @@ export const chapters = [
     title: 'Automated Measurement System', role: '',
     points: ['Used OpenCV to turn each part to its critical dimension', 'Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain', 'Measured parts to within 0.3 mm'],
     views: [
-      { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
-      { id: 'protocol', label: '2-wire protocol', el: EL.wire },
-      { id: 'real', label: 'Real run', video: 'media/gallery/measurement/demo-loop.mp4' }
+      { id: 'machine', label: 'Machine', caption: 'The measurement rig', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
+      { id: 'protocol', label: '2-wire protocol', caption: 'Two wires carry each angle from the ESP32 to the VEX brain', el: EL.wire },
+      { id: 'real', label: 'Real run', caption: 'A full run: find the orientation, turn the part, measure', video: 'media/gallery/measurement/demo-loop.mp4' }
     ]
   },
 
@@ -93,10 +92,10 @@ export const chapters = [
     title: 'Ixana', role: 'Embedded Firmware Intern',
     points: ['Streamed video from smart glasses to a watch through the body', 'Raised the frame rate from 4 to 13 fps', 'Owned the MIPI-DSI display drivers'],
     views: [
-      { id: 'capture', label: 'Capture', el: withAttrs(EL.ixana, { view: 'capture' }) },
-      { id: 'link', label: 'Through the body', el: withAttrs(EL.ixana, { view: 'link' }) },
-      { id: 'display', label: 'On the watch', el: withAttrs(EL.ixana, { view: 'display' }) },
-      { id: 'ces', label: 'CES demo', video: 'media/ixana/ixana-wir-demo-full.mp4' }
+      { id: 'capture', label: 'Capture', caption: 'A camera on smart glasses captures video', el: withAttrs(EL.ixana, { view: 'capture' }) },
+      { id: 'link', label: 'Through the body', caption: 'The video travels through the body over Wi-R', el: withAttrs(EL.ixana, { view: 'link' }) },
+      { id: 'display', label: 'On the watch', caption: 'It plays back on the watch', el: withAttrs(EL.ixana, { view: 'display' }) },
+      { id: 'ces', label: 'CES demo', caption: 'The live demo at CES', video: 'media/ixana/ixana-wir-demo-full.mp4' }
     ]
   },
   {
@@ -105,8 +104,8 @@ export const chapters = [
     title: 'Magna', role: 'Crack detection in a stamping die',
     points: ['Streamed strain-gauge data over MQTT to a live dashboard', 'Caught every cracked part with no false alarms', 'Built a patent-pending PLC buffer that raised sampling from 142 to 500 Hz'],
     views: [
-      { id: 'detector', label: 'Live detector', el: EL.strain },
-      { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
+      { id: 'detector', label: 'Live detector', caption: 'Each stroke is checked against the learned normal envelope; cracked parts stand out', el: EL.strain },
+      { id: 'dashboard', label: 'Dashboard', caption: 'The operator dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
     ]
   },
   {
@@ -116,11 +115,11 @@ export const chapters = [
     points: ['Built back-up safety sensing for garbage trucks', 'Designed a LiDAR dust filter that still detects people', 'Designed the 100+ part enclosure and cut its cost by 56%'],
     views: [
       { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view' },
-      { id: 'built', label: 'As built', img: 'media/fyelabs/case-photo.webp' },
+      { id: 'built', label: 'As built', caption: 'The built enclosure on the test rig', img: 'media/fyelabs/case-photo.webp' },
       { id: 'lidar', label: 'LiDAR array', el: withAttrs(EL.fyelabs, { view: 'lidar' }) },
       { id: 'dust', label: 'Dust filter', el: withAttrs(EL.fyelabs, { view: 'dust' }) },
-      { id: 'dust-test', label: 'Real dust test', video: 'media/fyelabs/dust-test-loop.mp4' },
-      { id: 'hmi', label: 'HMI', img: 'media/fyelabs/hmi-prototype.webp' }
+      { id: 'dust-test', label: 'Real dust test', caption: 'Dust test in the field', video: 'media/fyelabs/dust-test-loop.mp4' },
+      { id: 'hmi', label: 'HMI', caption: 'The HMI prototype mapping objects to zones', img: 'media/fyelabs/hmi-prototype.webp' }
     ]
   }
 ];
@@ -163,7 +162,8 @@ export const details = {
       'Trajectory-planned feedforward was compared against classic PID on settling and overshoot, and the ball was located with a 3-axis force-torque sensor, benchmarked against an OpenCV vision baseline.'],
     chips: ['Python', 'Simulink · Simscape', 'Kinematics', 'PID · feedforward', 'OpenCV']
   },
-  airbrakes: { hero: 'Z126ZESX3uA', gallery: [
+  airbrakes: { hero: 'SJO39WQ7Uv0', gallery: [
+      { type: 'youtube', src: 'Z126ZESX3uA', caption: 'Borealis launch, Launch Canada 2024' },
       { type: 'video', src: 'media/airbrakes/irl/actuation-1.mp4', caption: 'Bench actuation: the cam plate drives all three panels out together' },
       { type: 'video', src: 'media/airbrakes/irl/actuation-2.mp4', caption: 'Bench actuation, top view through the clear cam plate' },
       { type: 'image', src: 'media/airbrakes/irl/airbrake-07.webp', caption: 'The machined airbrakes, panels deployed' },

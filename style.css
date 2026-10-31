@@ -268,7 +268,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
 
 /* the protocol and crack-detector demos run on their own; no interaction */
-#ch-measurement .el-layer,#ch-magna .el-layer{pointer-events:none}
+[data-ch="measurement"] .el-layer,[data-ch="magna"] .el-layer{pointer-events:none}
 
 /* professional chapters: white company logo in place of the name */
 .ch-copy h3 .logo{display:block;width:auto;max-width:100%;filter:brightness(0) invert(1);margin:.12em 0 .18em}
@@ -282,3 +282,23 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 .sec-head{border-bottom:0;padding-bottom:0}
 .chip{font:400 13px var(--body,inherit);letter-spacing:0;border:0;background:var(--bg-3);color:var(--fg-2);padding:6px 11px}
 .pop-links{border-top:0}
+
+/* sequences: name, then one full-screen visual at a time, then the text */
+.seq-head{min-height:70svh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:12vh var(--gutter) 6vh}
+.seq-head .meta{justify-content:center;margin-bottom:14px}
+.seq-head h3{font:500 clamp(44px,7vw,108px)/1 var(--display);letter-spacing:-.04em;margin:0 0 16px}
+.seq-head h3 .logo{display:block;margin:0 auto;filter:brightness(0) invert(1);font-size:clamp(44px,7vw,108px)}
+.seq-head .role{font-size:clamp(16px,1.5vw,20px);margin:0}
+.beat .pin{display:block;max-width:none;padding:0}
+.beat .ch-stage{position:absolute;inset:0}
+.beat .frame{position:absolute;inset:0;border-radius:0;background:transparent}
+.beat .cap{position:absolute;left:var(--gutter);bottom:clamp(76px,10vh,110px);z-index:3;margin:0;max-width:min(560px,80vw);color:var(--fg-2);font-size:15px;line-height:1.45;pointer-events:none;text-shadow:0 1px 12px #08080a,0 0 3px #08080a}
+.beat .cap:empty{display:none}
+.beat .hint{top:auto;right:auto;left:var(--gutter);bottom:clamp(40px,6vh,70px)}
+.seq-details{max-width:640px;margin:0 auto;padding:10vh var(--gutter) 22vh}
+.seq-details .points li{font-size:16px;padding:7px 0 7px 22px}
+.seq-details .points li::before{top:19px}
+/* visuals sit between the nav and the floating switch, so neither covers them */
+.beat .frame{top:var(--nav);bottom:74px}
+.beat .cap{bottom:16px}
+.beat .hint{bottom:16px;left:auto;right:var(--gutter)}
