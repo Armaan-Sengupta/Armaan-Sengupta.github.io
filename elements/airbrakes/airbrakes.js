@@ -88,7 +88,9 @@ class AirStream {
   step(dt, geo, alpha) {
     const { w, h, g } = this; if (!w || !h) return;
     const n = Math.round(Math.min(950, Math.max(280, w * h / 2200)));
-    while (this.ps.length < n) this.ps.push(this.spawn(geo, false));
+    // as the rocket climbs out, its fins sweep up the screen and blast the stream off to the sides; nothing new starts
+    const sweep = geo.sweep ?? null, ended = sweep != null && sweep < this.vh * 1.05;
+    if (!ended) while (this.ps.length < n) this.ps.push(this.spawn(geo, false));
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,.075)'; g.fillRect(0, 0, w, h);
     g.globalCompositeOperation = 'source-over'; g.lineWidth = 1.5; g.lineCap = 'round';
@@ -114,6 +116,7 @@ class AirStream {
         if (below > ext * 1.2 && below < ext * 9 && dx > 2 && dx < ext * 3) vx -= side * U * 0.22 * Math.exp(-(below - ext * 1.2) / (ext * 4));   // reattaches to the body downstream
         if (Math.abs(q.y - py) < 5 && dx < ext) q.x = edge + side * (ext + 2);   // never through the panel
       }
+      if (sweep != null && q.y > sweep - 40) { const f = Math.exp(-Math.max(0, q.y - sweep) / (this.vh * 0.3)); vx += side * U * 8 * f; vy *= 1 - 0.5 * f; }
       if (M) {                                                             // cursor: flow around a small cylinder
         const rx = q.x - M.x, ry = q.y - M.y, d2 = rx * rx + ry * ry, d = Math.sqrt(d2) + 0.01;
         if (d < rc * 4) { const k = (rc * rc) / Math.max(d2, rc * rc * 0.6); vx += (rx / d) * U * 1.4 * k; vy += (ry / d) * U * 0.4 * k - U * 0.3 * k; }
@@ -124,8 +127,9 @@ class AirStream {
       const D = this.dim, inChart = D && q.x > D.x0 && q.x < D.x1 && q.y > D.y0 && q.y < D.y1 ? 1 - 0.8 * D.k : 1;   // quieter behind the chart
       g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha * inChart).toFixed(3)})`;
       g.beginPath(); g.moveTo(ox, oy); g.lineTo(q.x, q.y); g.stroke();
-      if (q.y > h + 8 || q.x < -8 || q.x > w + 8 || q.life > 7) Object.assign(q, this.spawn(geo, true));
+      if (q.y > h + 8 || q.x < -8 || q.x > w + 8 || q.life > 7) { if (ended) q.dead = true; else Object.assign(q, this.spawn(geo, true)); }
     }
+    if (ended) { this.ps = this.ps.filter((q) => !q.dead); if (!this.ps.length) { this._fade = (this._fade || 0) + dt; if (this._fade > 1.2) g.clearRect(0, 0, w, h); } } else this._fade = 0;   // the trail fade never quite reaches zero
   }
 }
 export function airbrakeStateAt(t) {
@@ -461,6 +465,7 @@ class ASAirbrakes extends HTMLElement {
         if (this._rf > 0.5) {
           const P = BOREALIS_PROFILE, cxs = (geo.bx0 + geo.bx1) / 2;
           geo.tail = y + BOREALIS.h * k;
+          if (this._J && this._J.exit > 0.02) geo.sweep = geo.tail;
           geo.edgeAt = (yy, side) => { const i = Math.round(((yy - y) / k + 300 - P.y0) / P.step); if (i < 0 || i >= P.l.length) return null; const hw = side < 0 ? P.l[i] : P.r[i]; return hw ? cxs + side * hw * k : null; };
         }
         // the two panels standing out either side, drawn over the rocket at the extension the 3D model is at
