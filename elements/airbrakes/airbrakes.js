@@ -381,17 +381,14 @@ class ASAirbrakes extends HTMLElement {
     // altitude climbs toward the same point
     const N = CONTROL.length - 1, yT = top + 8;
     const X = (i) => x0 + (x1 - x0) * i / N, Yp = (x) => yT + (mid - yT) * 0.6 * x, Ye = (e) => bot - (bot - mid - 56) * e;
-    const Ya = (i) => { const t = i / N; return mid - 4 + (Yp(CONTROL[i].x) - mid + 4) * (1 - (1 - t) * (1 - t)); };
+    const Ya = (i) => { const t = i / N; return mid - 4 + (Yp(Math.max(0, CONTROL[i].x)) - mid + 4) * (1 - (1 - t) * (1 - t)); };
     this._flow.dim = { x0: x0 - 18, x1: x1 + 18, y0: top - 34, y1: bot + 18, k: al };
     g.globalAlpha = al; g.font = `400 ${narrow ? 12 : 13}px Inter, system-ui, sans-serif`; g.textBaseline = 'alphabetic';
     g.fillStyle = 'rgba(8,8,10,.55)'; g.fillRect(x0 - 18, top - 34, x1 - x0 + 36, bot - top + 52);
     // target apogee
     g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, yT); g.lineTo(x1, yT); g.stroke(); g.setLineDash([]);
     g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, yT + 18);
-    g.textAlign = 'left'; g.fillStyle = '#f0a040'; g.fillText('Predicted apogee', x0, top - 8);
-    g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0 + g.measureText('Predicted apogee').width + 18, top - 8);
-    g.strokeStyle = '#f0a040'; g.lineWidth = 2; g.beginPath();
-    for (let i = 0; i <= n; i++) { const y = Yp(CONTROL[i].x); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    g.textAlign = 'left'; g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0, top - 8);
     g.strokeStyle = 'rgba(242,239,233,.9)'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Ya(i); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
     // extension
@@ -399,7 +396,7 @@ class ASAirbrakes extends HTMLElement {
     g.strokeStyle = 'rgba(242,239,233,.15)'; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x1, bot); g.stroke();
     g.strokeStyle = '#8fb4ff'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Ye(CONTROL[i].e); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
-    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f2efe9'; g.beginPath(); g.arc(X(n), Ya(n), 3.5, 0, 7); g.fill(); g.fillStyle = '#f0a040'; g.beginPath(); g.arc(X(n), Yp(c.x), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
+    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f2efe9'; g.beginPath(); g.arc(X(n), Ya(n), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
     g.globalAlpha = 1;
   }
   _sizeFlow(w, h) {
