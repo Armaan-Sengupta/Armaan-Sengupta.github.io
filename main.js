@@ -11,6 +11,8 @@ const allProjects = new Map([...cards, ...chapters].map((p) => [p.id, p]));   //
 
 /* ── content.json: galleries and extra facts scraped from the original site ── */
 let content = new Map();
+let story = {};
+const storyReady = fetch('story.json').then((r) => (r.ok ? r.json() : {})).then((j) => { story = j; }).catch(() => {});
 const contentReady = fetch('content.json').then((r) => (r.ok ? r.json() : { projects: [] }))
   .then((j) => { content = new Map((j.projects || []).map((p) => [p.id, p])); }).catch(() => {});
 
@@ -450,7 +452,7 @@ function openLightbox(g) {
 function closeLightbox() { lightbox.hidden = true; $('.lb-media', lightbox).innerHTML = ''; }
 async function openPop(id, { push = true } = {}) {
   const p = allProjects.get(id); if (!p) return;
-  await contentReady;
+  await Promise.all([contentReady, storyReady]);
   const d = details[id] || {}, c = content.get(id) || {};
   lastFocus = lastFocus || document.activeElement; popId = id;
   const body = d.body || (c.summary ? [c.summary] : []);
@@ -482,6 +484,7 @@ async function openPop(id, { push = true } = {}) {
     </div>
     <figure class="pop-hero"><div class="pop-stage">${hero ? mediaBox(hero, p.title) : ''}</div>${hero ? cap(hero) : ''}</figure>
     ${top.length ? `<div class="pop-top">${top.map((g) => `<figure><div class="box">${mediaBox(g, p.title)}</div>${cap(g)}</figure>`).join('')}</div>` : ''}
+    ${story[id] ? `<div class="pop-story">${story[id].map(([h, ps, list, after]) => `<section><h4>${esc(h)}</h4>${ps.map((t) => `<p>${esc(t)}</p>`).join('')}${list ? `<ul class="points">${list.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}${(after || []).map((t) => `<p>${esc(t)}</p>`).join('')}</section>`).join('')}</div>` : ''}
     ${rest.length ? `<div class="tiles">${rest.map((g) => tile(g, p.title)).join('')}</div>` : ''}
     ${docs.length ? `<div class="pop-docs">${docs.map((g) => `<a class="doc" href="${g.src}" target="_blank" rel="noopener"><span class="mono">PDF</span><b>${esc(g.caption || 'Report')}</b><span aria-hidden="true">↗</span></a>`).join('')}</div>` : ''}
     ${linkRow('pop-links')}`;

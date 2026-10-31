@@ -1,0 +1,230 @@
+{
+ "airbrakes": [
+  [
+   "Why airbrakes",
+   [
+    "The competition rewards hitting the apogee you declare before launch. In 2023, without active control, the team came within 1,500 ft of its 30,000 ft target: 4th closest of 32 teams and best in the hybrid and liquid category. For 2024 the team added airbrakes to steer the rocket onto its target in flight. I worked across the whole subsystem: mechanical, simulation and firmware."
+   ]
+  ],
+  [
+   "The mechanism",
+   [
+    "After researching other teams' designs and talking with mechanical engineering professors at Waterloo, I set four requirements:"
+   ],
+   [
+    "One relatively low-power servo drives everything",
+    "All three panels extend together and are always in sync",
+    "Panel extension is linear in servo rotation",
+    "As compact and light as possible"
+   ],
+   [
+    "A cam-and-slot mechanism met the first two, but a standard slot isn't linear. I modified the slot profile so extension is proportional to rotation, put three of these spirals on one spinning plate, one per panel, and designed the rest of the assembly around it. I did the mechanical design independently."
+   ]
+  ],
+  [
+   "Simulation",
+   [
+    "With a teammate I ran Ansys CFD on the panels to check that deploying them keeps the centre of pressure safely behind the centre of gravity, and to map drag coefficient against extension for the trajectory model."
+   ]
+  ],
+  [
+   "Firmware",
+   [
+    "With about ten others on the subteam I wrote embedded C on an STM32 under FreeRTOS: state estimation, fourth-order Runge-Kutta apogee prediction, and closed-loop control of panel extension to hit the target apogee."
+   ]
+  ],
+  [
+   "The flight",
+   [
+    "The rocket flew, but the propellant was underfilled by more than the airbrakes could correct for, so they correctly stayed retracted the whole flight."
+   ]
+  ],
+  [
+   "The next board",
+   [
+    "For 2025 the team moved to roll-control canards, and I designed the new 4-layer central avionics board in KiCad. It raised power efficiency from 66% to 95%, with an onboard IMU over I²C, an external AHRS over UART and a second external IMU over I²C."
+   ]
+  ]
+ ],
+ "fyelabs": [
+  [
+   "The problem",
+   [
+    "Industrial garbage trucks reversing in harsh, dirty conditions need to reliably avoid people and objects. The sensing unit on the back of the truck carries 10 LiDARs, 3 depth cameras, an infrared camera, a light sensor, an IMU and GPS, run by 3 microcontrollers and 4 mini compute units, all in a weatherproof housing that protects the sensors when the truck isn't reversing."
+   ]
+  ],
+  [
+   "The enclosure",
+   [
+    "I designed the all-metal, actuating enclosure: over 100 parts across 15 major revisions covering electronics, sensor placement and manufacturability. Redesigning most of the structure as 6 sheet-metal parts, cut, bent and welded, instead of CNC milling cut manufacturing cost by 56% and halved lead time. My gasket and geometry design kept the electronics dry in a water-spray test."
+   ]
+  ],
+  [
+   "The HMI",
+   [
+    "The dashboard HMI is the driver's link to the unit on the back of the truck. I did all of it: the plastic case, a custom 2-layer PCB with two microcontrollers (one for the wireless link; one for 4 buttons, a speaker and a 7\" display), and the firmware for both. After testing several wireless options I built a custom LoRa protocol with checksums for reliable data across 6 microcontrollers, plus a 12-zone mapping that shows the driver where a detected object is."
+   ]
+  ],
+  [
+   "LiDAR dust filtering",
+   [
+    "The LiDAR array is 10 single-beam sensors in an arc, which is robust with no moving parts but too sparse for standard point-cloud filtering, and dust was causing false positives. I collected distance and return-intensity data in clean and dusty conditions; from it, my supervisors and I developed five filters that run in parallel to ignore dust and still catch a person. I implemented them in C++ firmware on the LiDAR board."
+   ]
+  ],
+  [
+   "A visualiser for tuning",
+   [
+    "To tune the filters I wrote a Python LiDAR visualiser: first a serial interceptor, then a wireless MQTT version so the unit could be fully sealed during tests, with recording to a custom file format and real-time playback. It let the whole team help tune the filter constants."
+   ]
+  ]
+ ],
+ "magna": [
+  [
+   "In-die crack detection",
+   [
+    "A real-time integrity monitor for an industrial hydraulic press, using strain gauges embedded near the die. I built the pipeline end to end: sensor data streamed over MQTT, re-synchronized and stored in PostgreSQL, plus a web dashboard where operators and engineers compare strain profiles across batches and review anomalies."
+   ]
+  ],
+  [
+   "The detector",
+   [
+    "I designed an anomaly detection algorithm that finds the characteristic discontinuity in the strain signatures across four sensors when a part cracks during forming. Running in real time, it caught every cracked part with zero false positives over a 150-part validation run, removing defective parts from the line automatically. It recognizes when a different part is being stamped, and a moving-window average stops slow sensor drift from being flagged."
+   ]
+  ],
+  [
+   "More data from the PLC",
+   [
+    "The press's PLC had very little memory. A patent-pending buffering system I engineered, with semaphore-driven multithreading and staged data queues, let it stream far more data, raising collection from about 140 Hz to over 500 Hz for much finer analysis of each stroke."
+   ]
+  ]
+ ],
+ "ixana": [
+  [
+   "The project",
+   [
+    "A high-bandwidth video stream from smart glasses to a smartwatch over Ixana's YR22 silicon. It uses electro-quasistatic body communication, turning the wearer's body into a secure, ultra-low-power data bus that uses less power than Bluetooth or Wi-Fi."
+   ]
+  ],
+  [
+   "What I did",
+   [
+    "I worked across the whole stack, from capture on the glasses through compression, transmission and decompression to the watch display, and was primarily responsible for the watch display drivers."
+   ],
+   [
+    "Bare metal: a power-efficient core OS in C++ for Ambiq and NXP ARM MCUs, scheduling real-time video tasks",
+    "System bring-up: debugged and helped build the full path, from camera to encoding FPGA, transmitter MCU, Wi-R silicon, receiver MCU and decoding FPGA to the AMOLED display",
+    "Signal integrity: resolved timing and data-encoding issues at the display interface"
+   ]
+  ]
+ ],
+ "measurement": [
+  [
+   "What it does",
+   [
+    "A station for quality assurance on an automation line that checks part tolerances right after manufacturing with no human involved. A part goes on a rotary platform; computer vision turns it to the orientation of its critical dimension; a clamp on a rotary encoder closes on it and stops on firm contact using force sensing, and the encoder rotation becomes a length. Out-of-spec parts have their image and failing dimension logged to a remote server, with a notice on the machine's display."
+   ]
+  ],
+  [
+   "What I did",
+   [
+    "I was the lead firmware engineer: C++ on the ESP32 and the main controller for all motor control, dimension derivation and the GUI. I also worked with a teammate on the OpenCV orientation detection in Python, which sends the angle to the ESP32 over WebSockets."
+   ]
+  ],
+  [
+   "A custom 2-wire protocol",
+   [
+    "The VEX V5 brain runs proprietary firmware with no UART, I²C or SPI, only the ability to read a pin as high or low. So the ESP32 receives the angle wirelessly from the PC and sends it to the brain over two wires using a protocol we designed, loosely inspired by I²C, with a clock line and a data line. The brain decodes the binary angle into encoder ticks and turns the part to the right orientation."
+   ]
+  ]
+ ],
+ "platform": [
+  [
+   "The goal",
+   [
+    "Balance a ball on a plate. Our design is a 3RRS parallel manipulator: three degrees of freedom rather than a full Stewart platform's six, which is enough to do the same job."
+   ]
+  ],
+  [
+   "Building blocks",
+   [
+    "Forward and inverse kinematics for the servo legs; a Simulink and Simscape plant, characterized against the hardware, to tune controllers before running them; trajectory-planned feedforward compared against PID; and ball position sensed by a 3-axis force-torque sensor under the plate."
+   ]
+  ]
+ ],
+ "segway": [
+  [
+   "The goal",
+   [
+    "Analyze and model a human transporter, then tune its properties, with no active control, to travel as far as possible before tipping, and compare our Simulink model against an acausal SimulationX model."
+   ]
+  ],
+  [
+   "Method",
+   [
+    "We derived the nonlinear kinematic and kinetic equations, linearized them with a small-angle approximation, and swept thrust force and lean angle in Simulink: coarse first, then 160 to 180 N in 0.5 N steps and 0.2 to 0.8 rad in 0.05 rad steps. SimulationX needs no hand-derived equations, so it checked our derivation; Python parsed and plotted its data."
+   ]
+  ],
+  [
+   "Results",
+   [
+    "The system is very sensitive to both inputs. Simulink's best was 12.3 m at 170 N and -0.2 rad; SimulationX's was 9.15 m at 110 N and 11°. The gap shows the cost of the idealizations: Simulink suits theoretical analysis, while SimulationX captures more of the physical interactions."
+   ]
+  ]
+ ],
+ "ri3d": [
+  [
+   "The event",
+   [
+    "As team lead of UW REACT I organized a Robot in 3 Days hackathon: the challenge is unknown until the start, and you build a robot from nothing in 48 hours. With 30% of the turnout I'd planned for, four teammates and I, on about three hours of sleep, built a robot that takes rings and launches them into a goal, with plenty of trips to Canadian Tire and Home Depot despite heavy planning. It served as a reference for the high school teams who then had 6 to 8 weeks to build theirs."
+   ]
+  ]
+ ],
+ "beam-balancer": [
+  [
+   "The precursor",
+   [
+    "1-D ball balancing before the 2-D Stewart platform. I went from choosing the ideal link lengths to 3D modelling the mechanism to final code in about two weeks."
+   ]
+  ]
+ ],
+ "gantry": [
+  [
+   "The build",
+   [
+    "An STM32 controls a two-axis machine over UART and a potentiometer, with safety stops and homing. Interrupts catch the endstops so the machine never drives past a limit, and a characterized ADC lets the potentiometer set each axis precisely. The final demo showed safe stops at the limits and a race to position the machine over a target as fast and precisely as possible."
+   ]
+  ]
+ ],
+ "lidar": [
+  [
+   "The project",
+   [
+    "Manipulating, cleaning and analyzing a massive LiDAR point cloud: removing anomalies, extracting buildings, and finding the two furthest points in a set of millions of points, a good excuse to try some fun algorithms."
+   ]
+  ]
+ ],
+ "gooseminator": [
+  [
+   "The robot",
+   [
+    "A group project for our mechatronics course: the robot sweeps an area and sorts bird eggs by whether they belong to an invasive or a protected species. The name comes from the running Waterloo joke that the geese are out of control. Our design document covers the full engineering design process."
+   ]
+  ]
+ ],
+ "trashminator": [
+  [
+   "The robot",
+   [
+    "My macro surface-level aquatic cleaning robot. It autonomously navigates a body of water and collects floating trash, and a swarm of them could help fight aquatic pollution. It started as a technological design course project and became a personal one I kept improving."
+   ]
+  ]
+ ],
+ "robotic-arm": [
+  [
+   "The build",
+   [
+    "A 3-degree-of-freedom arm built in under 8 hours from a Tetrix kit for rapid prototyping. It picks up oddly shaped bones and places them in containers at different locations."
+   ]
+  ]
+ ]
+}

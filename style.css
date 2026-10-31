@@ -379,3 +379,10 @@ html:not(.rocket-fell) .crash{display:none}
 .nav .motion-toggle{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase}
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;scroll-behavior:auto!important}
 html.rm .fall-rocket{display:none}
+
+/* popup story: the old site's detail, as short titled sections */
+.pop-story{max-width:760px;margin:6px 0 40px}
+.pop-story section{margin:0 0 26px}
+.pop-story h4{font:500 22px/1.25 var(--display);margin:0 0 8px}
+.pop-story p{color:var(--fg-2);font-size:15.5px;line-height:1.65;margin:0 0 10px}
+.pop-story .points{margin:6px 0 12px}
