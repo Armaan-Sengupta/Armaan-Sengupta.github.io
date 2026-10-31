@@ -40,7 +40,7 @@ export const chapters = [
     id: 'airbrakes', flow: 'personal',
     org: 'Waterloo Rocketry · Borealis', dates: '2023 – 2024',
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
-    points: ['One servo drives three panels', 'Firmware predicts apogee and controls drag', 'Avionics PCB: 66% → 95% efficiency'],
+    points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction, PI control', 'Designed the 4-layer avionics PCB for the canards: power efficiency 66% → 95%'],
     views: [
       { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
