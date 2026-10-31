@@ -372,3 +372,10 @@ html:not(.rocket-fell) .crash{display:none}
 .rail button:hover{color:var(--fg)}
 .rail button:hover i{background:rgba(242,239,233,.7)}
 @media(max-width:860px){.rail{display:none}}
+
+/* reduce-motion toggle */
+.motion-toggle{color:var(--mute);font:inherit;letter-spacing:inherit;text-transform:inherit}
+.motion-toggle:hover{color:var(--fg)}
+.nav .motion-toggle{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;scroll-behavior:auto!important}
+html.rm .fall-rocket{display:none}

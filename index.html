@@ -3,6 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>
+/* Reduce-motion toggle: when on, the page reports prefers-reduced-motion to its own scripts, so every animation
+   takes the still path it already has for that setting. */
+(function () {
+  var on = false; try { on = localStorage.getItem('motion') === 'reduce'; } catch (e) {}
+  if (!on) return;
+  document.documentElement.classList.add('rm');
+  var mm = window.matchMedia.bind(window);
+  window.matchMedia = function (q) {
+    if (/prefers-reduced-motion:\s*reduce/.test(q)) return { matches: true, media: q, onchange: null, addListener: function () {}, removeListener: function () {}, addEventListener: function () {}, removeEventListener: function () {}, dispatchEvent: function () { return false; } };
+    return mm(q);
+  };
+})();
+</script>
 <title>Armaan Sengupta · Firmware, Controls & Mechatronics</title>
 <meta name="description" content="Armaan Sengupta: mechatronics engineer at the University of Waterloo. Implant firmware at Neuralink, vehicle firmware at Tesla, rocket active controls, robotics and embedded systems.">
 <meta name="theme-color" content="#08080a">
@@ -27,6 +41,7 @@
     <li><a href="#skills">Skills</a></li>
     <li><a href="#volunteering">Volunteering</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><button class="motion-toggle" type="button"></button></li>
     <li><a class="cta" href="media/Armaan_Sengupta_Resume.pdf" target="_blank" rel="noopener">Résumé</a></li>
   </ul>
 </header>
@@ -108,7 +123,7 @@
     <a href="media/Armaan_Sengupta_Resume.pdf" target="_blank" rel="noopener">Résumé (PDF)</a>
   </div>
 </section>
-<footer class="mono"><span>© 2026 Armaan Sengupta</span></footer>
+<footer class="mono"><span>© 2026 Armaan Sengupta</span><button class="motion-toggle" type="button"></button></footer>
 </div>
 </main>
 

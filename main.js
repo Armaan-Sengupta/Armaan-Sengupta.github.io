@@ -586,6 +586,15 @@ $$('.sk').forEach((b) => b.addEventListener('click', () => {
   b.closest('.sk-group').append(box);
 }));
 
+/* ═════════════ reduce motion ═════════════ */
+{
+  const on = document.documentElement.classList.contains('rm');
+  $$('.motion-toggle').forEach((b) => {
+    b.textContent = on ? 'Motion on' : 'Reduce motion'; b.setAttribute('aria-pressed', String(on));
+    b.addEventListener('click', () => { try { on ? localStorage.removeItem('motion') : localStorage.setItem('motion', 'reduce'); } catch (e) {} location.reload(); });
+  });
+}
+
 /* ═════════════ boot ═════════════ */
 buildRail();
 for (const ch of chapters) {
