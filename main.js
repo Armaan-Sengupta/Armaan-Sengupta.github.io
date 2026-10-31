@@ -520,7 +520,8 @@ skRoot.addEventListener('mouseleave', () => setSkill(null));
 for (const ch of chapters) {
   if (ch.seq) flows[ch.flow].append(buildSequence(ch));
   else if (ch.intro) flows[ch.flow].append(buildHead(ch), buildBeat({ ...ch, views: ch.views.slice(0, ch.intro) }), buildChapter({ ...ch, views: ch.views.slice(ch.intro) }));
-  else flows[ch.flow].append(buildChapter(ch));
+  else if (ch.hero) flows[ch.flow].append(buildChapter(ch));
+  else flows[ch.flow].append(buildHead(ch), buildChapter(ch));
 }
 chapterState.forEach((st) => chapterIO.observe(st.sec));
 layout();
