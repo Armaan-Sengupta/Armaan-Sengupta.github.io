@@ -73,6 +73,7 @@ function cfdColor(k) {
   for (let i = 1; i < CFD.length; i++) if (k <= CFD[i][0]) { const [k0, a] = CFD[i - 1], [k1, b] = CFD[i], t = (k - k0) / (k1 - k0); return a.map((v, j) => v + (b[j] - v) * t); }
   return CFD[CFD.length - 1][1];
 }
+const CFD_FREE = cfdColor(1).map((v) => v | 0).join(',');   // colour of undisturbed freestream
 class AirStream {
   constructor(canvas) { this.c = canvas; this.g = canvas.getContext('2d'); this.ps = []; this.w = 0; this.h = 0; this.mouse = null; }
   // h includes any bleed below the element; vh is the element's own height (sets the flow speed)
@@ -87,16 +88,32 @@ class AirStream {
   }
   step(dt, geo, alpha) {
     const { w, h, g } = this; if (!w || !h) return;
-    const n = Math.round(Math.min(950, Math.max(280, w * h / 2200)));
+    // streamline budget follows the frame rate: fewer when frames run slow, back up when there is headroom
+    const nMax = Math.round(Math.min(720, Math.max(220, w * h / 2600)));
+    this.budget = Math.min(nMax, this.budget ?? nMax * 0.75); this.ema = (this.ema ?? dt) * 0.95 + dt * 0.05;
+    if (this.ema > 1 / 45) this.budget = Math.max(140, this.budget * 0.985); else if (this.ema < 1 / 57) this.budget = Math.min(nMax, this.budget + 1.5);
+    const n = Math.round(this.budget);
+    if (this.ps.length > n + 20) this.ps.length = n;
     // as the rocket climbs out, its fins sweep up the screen and blast the stream off to the sides; nothing new starts
     const sweep = geo.sweep ?? null, ended = sweep != null && sweep < this.vh * 1.05;
     if (!ended) while (this.ps.length < n) this.ps.push(this.spawn(geo, false));
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,.075)'; g.fillRect(0, 0, w, h);
+    // trails fade; every fourth frame fades harder so 8-bit rounding cannot leave a faint residue behind
+    this.frame = (this.frame || 0) + 1;
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = this.frame % 4 ? 'rgba(0,0,0,.045)' : 'rgba(0,0,0,.2)'; g.fillRect(0, 0, w, h);
     g.globalCompositeOperation = 'source-over'; g.lineWidth = 1.5; g.lineCap = 'round';
     const U = this.vh * 0.5 * (this.speed ?? 1), cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
     const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
+    const near = (geo.bx1 - geo.bx0) * 0.5 + 280;
     for (const q of this.ps) {
+      // well away from the rocket and the cursor the air just falls: no collision maths
+      if (sweep == null && Math.abs(q.x - cx) > near && !(M && Math.abs(q.x - M.x) < rc * 4 + 40)) {
+        const oy = q.y; q.y += U * dt; q.life += dt;
+        const D = this.dim, inChart = D && q.x > D.x0 && q.x < D.x1 && q.y > D.y0 && q.y < D.y1 ? 1 - 0.8 * D.k : 1, col = CFD_FREE;
+        g.strokeStyle = `rgba(${col},${(0.95 * alpha * inChart).toFixed(3)})`; g.beginPath(); g.moveTo(q.x, oy); g.lineTo(q.x, q.y); g.stroke();
+        if (q.y > h + 8 || q.life > 7) Object.assign(q, this.spawn(geo, true));
+        continue;
+      }
       const side = q.x < cx ? -1 : 1, e0 = geo.edgeAt(q.y, side), free = e0 == null, edge = free ? (side < 0 ? geo.bx0 : geo.bx1) : e0, dx = free ? 999 : (q.x - edge) * side;
       let vx = 0, vy = U * (0.45 + 0.55 * smooth(dx / 30));             // thin boundary layer along the airframe
       const eA = geo.edgeAt(q.y + 40, side);                             // the surface just downstream: nose shoulder, fins
@@ -116,7 +133,7 @@ class AirStream {
         if (below > ext * 1.2 && below < ext * 9 && dx > 2 && dx < ext * 3) vx -= side * U * 0.22 * Math.exp(-(below - ext * 1.2) / (ext * 4));   // reattaches to the body downstream
         if (Math.abs(q.y - py) < 5 && dx < ext) q.x = edge + side * (ext + 2);   // never through the panel
       }
-      if (sweep != null && q.y > sweep - 40) { const f = Math.exp(-Math.max(0, q.y - sweep) / (this.vh * 0.3)); vx += side * U * 8 * f; vy *= 1 - 0.5 * f; }
+      if (sweep != null && q.y > sweep - 40) { vx += side * this.vh * 2.6; vy *= 0.5; }   // the fins blast everything below them off to the sides
       if (M) {                                                             // cursor: flow around a small cylinder
         const rx = q.x - M.x, ry = q.y - M.y, d2 = rx * rx + ry * ry, d = Math.sqrt(d2) + 0.01;
         if (d < rc * 4) { const k = (rc * rc) / Math.max(d2, rc * rc * 0.6); vx += (rx / d) * U * 1.4 * k; vy += (ry / d) * U * 0.4 * k - U * 0.3 * k; }
@@ -424,7 +441,7 @@ class ASAirbrakes extends HTMLElement {
     const bleed = this._journey ? Math.round(innerHeight * 0.55) : 0, cv = this._flow.c;
     cv.style.height = `${h + bleed}px`;
     cv.style.webkitMaskImage = cv.style.maskImage = bleed ? `linear-gradient(#000 ${h - 40}px, transparent ${h + bleed}px)` : '';
-    this._flow.resize(w, h + bleed, Math.min(2, devicePixelRatio || 1), h);
+    this._flow.resize(w, h + bleed, Math.min(1.5, devicePixelRatio || 1), h);
   }
   setExtension(f) { this._progress = null; this._target = this._ext = clamp(+f || 0); this._dirty = true; this._kick(); }
   play() { if (this.time >= this.duration) this.time = 0; this._playing = true; if (this._btn) this._btn.textContent = 'PAUSE'; this._kick(); }
