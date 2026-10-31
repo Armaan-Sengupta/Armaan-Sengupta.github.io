@@ -207,7 +207,7 @@ export const details = {
     ],
     body: ['Airbrakes for Borealis, Canada\'s first liquid-fuelled student rocket. A modified cam-slot spiral drives three panels in perfect sync, with extension linear in servo angle.',
       'Ansys CFD gave C<sub>D</sub> against extension and checked the centre-of-pressure margin. STM32 / FreeRTOS firmware estimates state with a Madgwick filter, predicts apogee with RK4 and closes the loop with a PI controller. The 4-layer KiCad flight computer raised power efficiency from 66% to 95%.'],
-    chips: ['C · FreeRTOS', 'STM32', 'KiCad', 'Ansys CFD', 'SolidWorks'], links: [['Borealis', 'https://www.waterloorocketry.com/rockets/borealis']]
+    chips: ['C · FreeRTOS', 'STM32', 'DMA · interrupts', 'KiCad', 'Ansys CFD', 'SolidWorks'], links: [['Borealis', 'https://www.waterloorocketry.com/rockets/borealis']]
   },
   measurement: { gallery: [
       { type: 'image', src: 'media/measurement-rig.webp', caption: 'The built rig: VEX brain, turntable, clamp and the camera mast' }
@@ -338,7 +338,7 @@ export const skills = {
   },
   'Embedded': {
     'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'NXP · Ambiq': ['ixana'], 'FreeRTOS': ['airbrakes'],
-    'DMA · interrupts': ['neuralink', 'gantry'], 'ASIC bring-up': ['neuralink', 'ixana'], 'FPGA': ['ixana']
+    'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'ASIC bring-up': ['neuralink', 'ixana'], 'FPGA': ['ixana']
   },
   'Protocols': {
     'I²C': ['airbrakes', 'measurement', 'fyelabs'], 'Protobuf': ['neuralink'], 'UART': ['fyelabs', 'airbrakes', 'gantry'],
