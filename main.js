@@ -171,7 +171,11 @@ async function mountChapter(st) {
           const r = document.createElement('div'); r.className = 'fall-rocket'; r.setAttribute('aria-hidden', 'true');
           r.innerHTML = '<img src="elements/airbrakes/borealis.svg" alt="">';
           document.body.append(r);
-          vid.addEventListener('timeupdate', () => { const left = vid.duration - vid.currentTime; r.classList.toggle('go', vid.duration > 0 && left < 1.5 && vid.currentTime > 0.5 && st.visible && st.active === i); });
+          vid.addEventListener('timeupdate', () => {
+            const left = vid.duration - vid.currentTime, go = vid.duration > 0 && left < 1.5 && vid.currentTime > 0.5 && st.visible && st.active === i;
+            r.classList.toggle('go', go);
+            if (go) document.documentElement.classList.add('rocket-fell');   // it only lands at the end of the page once it has fallen
+          });
         }
         if (v.once) vid.addEventListener('timeupdate', () => { const b = $$('.ch-tabs b', st.sec)[i]; if (b && st.active === i && vid.duration) b.style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
       }
