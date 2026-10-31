@@ -30,6 +30,9 @@ const VIEWS = {
   airframe:  { az: -Math.PI, el: 0.12, d: 30, ty: 0.9, shell: 1 }   // one panel points away, the other two stand out either side
 };
 export const AIRBRAKE_DURATION = 9;
+// Borealis as rendered by Waterloo Rocketry (a still of their upright turntable video): 150 x 2024 px, body 48 px
+// wide centred at x 74, airbrake ring at y 800. Used once the camera pulls back far enough to see the whole rocket.
+const BOREALIS = { src: new URL('./borealis.webp', import.meta.url).href, w: 150, h: 2024, body: 48.2, cx: 74.3, ring: 800 };
 /* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
  * loop moves the panels until the prediction meets the target. x = how far the prediction is from the target, drawn
  * short of it (panels fully out at the start of the phase),
@@ -71,8 +74,8 @@ class AirStream {
   clear() { if (this.ps.length) { this.g.setTransform(1, 0, 0, 1, 0, 0); this.g.clearRect(0, 0, this.c.width, this.c.height); this.ps = []; } }
   spawn(geo, top) {
     const { w, h } = this; let x;
-    if (Math.random() < 0.4) { const side = Math.random() < 0.5 ? -1 : 1, d = 1.5 + Math.abs(Math.random() + Math.random() - 1) * 90; x = (side < 0 ? geo.bx0 : geo.bx1) + side * d; }   // denser close to the airframe
-    else do { x = Math.random() * w; } while (x > geo.bx0 - 3 && x < geo.bx1 + 3);
+    if (geo.tail > 0 && Math.random() < 0.4) { const side = Math.random() < 0.5 ? -1 : 1, d = 1.5 + Math.abs(Math.random() + Math.random() - 1) * 90; x = (side < 0 ? geo.bx0 : geo.bx1) + side * d; }   // denser close to the airframe
+    else do { x = Math.random() * w; } while (geo.tail > 0 && x > geo.bx0 - 3 && x < geo.bx1 + 3);   // once the rocket is gone, its column fills too
     return { x, y: top ? -Math.random() * h * 0.05 : Math.random() * h, life: 0 };
   }
   step(dt, geo, alpha) {
@@ -264,7 +267,8 @@ export class AirbrakeRenderer {
     this.sliders.forEach(s => { s.position.x = k.travel; });
     return true;
   }
-  setRise(k) { this.root.position.y = 75 * k * k; }
+  setRise(k) { this.root.position.y = 260 * k * k; }
+  setShellFade(k) { this._shellFade = k; }
   setCamMix(m, zoom = 0) {
     const a = VIEWS.mechanism, b = VIEWS.airframe, e = smooth(m); for (const k of Object.keys(a)) this.cam[k] = a[k] + (b[k] - a[k]) * e; this._viewT = 1;
     this.cam.d *= 1 + 0.75 * zoom; this._shift = zoom;
@@ -283,7 +287,7 @@ export class AirbrakeRenderer {
         if (x < bx0) ext[0] = Math.max(ext[0], bx0 - x); else if (x > bx1) ext[1] = Math.max(ext[1], x - bx1);
       }
     }
-    const tail = P(new THREE.Vector3(0, -40 + this.root.position.y, 0))[1];   // below the tail the stream is free
+    const tail = P(new THREE.Vector3(0, -40 + this.root.position.y, 0))[1];   // below the tail the stream is free (overridden by the full rocket)
     return { bx0, bx1, py: (a[1] + b[1]) / 2, ext, tail };
   }
   setView(name, instant = false) {
@@ -300,7 +304,7 @@ export class AirbrakeRenderer {
     return true;
   }
   _applyCamera() {
-    const { az, el, d, ty, shell } = this.cam, asp = this._aspect || 1.6;
+    const { az, el, d, ty } = this.cam, shell = this.cam.shell * (1 - (this._shellFade || 0)), asp = this._aspect || 1.6;
     const dist = d * Math.max(1, 1.45 / asp); // keep the assembly in frame on tall/narrow hosts
     this.camera.position.set(Math.cos(el) * Math.cos(az) * dist, ty + Math.sin(el) * dist, -Math.cos(el) * Math.sin(az) * dist);
     this.camera.lookAt(0, ty, 0);
@@ -339,6 +343,7 @@ class ASAirbrakes extends HTMLElement {
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
       <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>
+      <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><img class="rocket" alt="" aria-hidden="true" src="${BOREALIS.src}" style="position:absolute;left:0;top:0;width:${BOREALIS.w}px;height:${BOREALIS.h}px;transform-origin:0 0;opacity:0;will-change:transform"></div>
       <canvas class="flow" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none"></canvas>
       <canvas class="chart" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>`;
     this._canvas = root.querySelector('canvas');
@@ -350,7 +355,7 @@ class ASAirbrakes extends HTMLElement {
     this._range.addEventListener('input', () => { this.pause(); this._progress = null; this._target = this._ext = this._range.value / 1000; this._kick(); });
     this._journey = this.view === 'journey'; this._jp = 0; this._mix = 0;
     this._flow = new AirStream(root.querySelector('.flow'));
-    this._chart = root.querySelector('.chart'); this._cg = this._chart.getContext('2d');
+    this._chart = root.querySelector('.chart'); this._cg = this._chart.getContext('2d'); this._rocket = root.querySelector('.rocket');
     this.addEventListener('pointermove', (e) => { const r = this.getBoundingClientRect(); this._flow.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; });
     this.addEventListener('pointerleave', () => { this._flow.mouse = null; });
     if (this._journey) this.r.setCamMix(0); else this.r.setView(this.view, true);
@@ -427,6 +432,7 @@ class ASAirbrakes extends HTMLElement {
         this._jp += (tgt - this._jp) * k; if (Math.abs(tgt - this._jp) > 1e-4) moving = true; else this._jp = tgt;
         const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
         if (J.exit !== this._exit) { this.r.setRise(J.exit); this._exit = J.exit; this._dirty = true; }
+        const rf = smooth((J.zoom - 0.15) / 0.6); if (rf !== this._rf) { this.r.setShellFade(rf); this._rf = rf; this._dirty = true; }
         this._flow.speed = 1.8 * (1 - 0.85 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
         if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
@@ -439,7 +445,13 @@ class ASAirbrakes extends HTMLElement {
         if (this._range && document.activeElement !== this._range) this._range.value = String(Math.round(k.fraction * 1000));
       }
       const fa = this._journey && !this._reduced.matches ? smooth((this._mix - 0.55) / 0.35) : 0;
-      if (fa > 0) { this._flow.step(dt, this.r.flowGeometry(this._w, this._h), fa); moving = true; } else this._flow.clear();
+      const geo = this._journey && (fa > 0 || this._rf > 0) ? this.r.flowGeometry(this._w, this._h) : null;
+      if (geo) {   // the full Borealis, sized and placed so its airbrake ring sits on the 3D panels
+        const k = (geo.bx1 - geo.bx0) / BOREALIS.body, x = (geo.bx0 + geo.bx1) / 2 - BOREALIS.cx * k, y = geo.py - BOREALIS.ring * k;
+        this._rocket.style.opacity = this._rf || 0; this._rocket.style.transform = `translate(${x}px,${y}px) scale(${k})`;
+        if (this._rf > 0.5) geo.tail = y + BOREALIS.h * k;
+      } else if (this._rocket) this._rocket.style.opacity = 0;
+      if (fa > 0) { this._flow.step(dt, geo, fa); moving = true; } else this._flow.clear();
       if (this._journey && this._J) this._drawChart(this._J);
     }
     if (active && (moving || this._playing)) { this._raf = requestAnimationFrame(n => this._tick(n)); }

@@ -165,12 +165,13 @@ async function mountChapter(st) {
       layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video || v.swap ? ' media' : '') + (v.color ? ' color' : '');
       if (v.video) {
         const vid = makeVideo(v.video, { loop: !v.once }); layer.append(vid);
-        // the rocket from the scroll animation, back from apogee: it nose-dives through the end of the launch clip
+        // the rocket from the scroll animation, back from apogee: the same full-size Borealis plunges nose-first down
+        // the left of the screen, where the climb left it, as the launch clip ends
         if (v.fall) {
           const r = document.createElement('div'); r.className = 'fall-rocket'; r.setAttribute('aria-hidden', 'true');
-          r.innerHTML = '<svg viewBox="0 0 40 160"><path d="M20 2 C29 16 32 34 32 52 V128 L40 150 V158 L30 150 H10 L0 158 V150 L8 128 V52 C8 34 11 16 20 2 Z" fill="#c9ccd1"/><rect x="8" y="88" width="24" height="3" fill="#8f949b"/><path d="M14 150 h12 l-3 8 h-6 z" fill="#5c6067"/></svg>';
-          layer.append(r);
-          vid.addEventListener('timeupdate', () => { const left = vid.duration - vid.currentTime; r.classList.toggle('go', vid.duration > 0 && left < 1.6 && vid.currentTime > 0.5); });
+          r.innerHTML = '<img src="elements/airbrakes/borealis.webp" alt="">';
+          document.body.append(r);
+          vid.addEventListener('timeupdate', () => { const left = vid.duration - vid.currentTime; r.classList.toggle('go', vid.duration > 0 && left < 1.5 && vid.currentTime > 0.5 && st.visible && st.active === i); });
         }
         if (v.once) vid.addEventListener('timeupdate', () => { const b = $$('.ch-tabs b', st.sec)[i]; if (b && st.active === i && vid.duration) b.style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
       }
