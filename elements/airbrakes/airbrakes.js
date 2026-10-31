@@ -30,9 +30,10 @@ const VIEWS = {
   airframe:  { az: -Math.PI, el: 0.12, d: 30, ty: 0.9, shell: 1 }   // one panel points away, the other two stand out either side
 };
 export const AIRBRAKE_DURATION = 9;
-// Borealis as rendered by Waterloo Rocketry (a still of their upright turntable video): 150 x 2024 px, body 48 px
-// wide centred at x 74, airbrake ring at y 800. Used once the camera pulls back far enough to see the whole rocket.
-const BOREALIS = { src: new URL('./borealis.webp', import.meta.url).href, w: 150, h: 2024, body: 48.2, cx: 74.3, ring: 800 };
+// Borealis, redrawn as a vector from Waterloo Rocketry's upright render (paint, markings and proportions from their
+// video): 230 x 2700 units, body 63 wide centred at x 114.5, airbrake ring at y 1080. Takes over once the camera has
+// pulled back far enough to see the whole rocket; sized directly (not scaled) so it stays sharp.
+const BOREALIS = { src: new URL('./borealis.svg', import.meta.url).href, w: 230, h: 2700, body: 63, cx: 114.5, ring: 1080 };
 /* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
  * loop moves the panels until the prediction meets the target. x = how far the prediction is from the target, drawn
  * short of it (panels fully out at the start of the phase),
@@ -343,7 +344,7 @@ class ASAirbrakes extends HTMLElement {
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
       <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>
-      <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><img class="rocket" alt="" aria-hidden="true" src="${BOREALIS.src}" style="position:absolute;left:0;top:0;width:${BOREALIS.w}px;height:${BOREALIS.h}px;transform-origin:0 0;opacity:0;will-change:transform"></div>
+      <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><img class="rocket" alt="" aria-hidden="true" src="${BOREALIS.src}" style="position:absolute;left:0;top:0;opacity:0;will-change:transform"><i class="pan" style="position:absolute;left:0;top:0;opacity:0;border-radius:1px;background:linear-gradient(#e4e6e9,#a9adb3 60%,#7d8188)"></i><i class="pan" style="position:absolute;left:0;top:0;opacity:0;border-radius:1px;background:linear-gradient(#e4e6e9,#a9adb3 60%,#7d8188)"></i></div>
       <canvas class="flow" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none"></canvas>
       <canvas class="chart" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>`;
     this._canvas = root.querySelector('canvas');
@@ -355,7 +356,7 @@ class ASAirbrakes extends HTMLElement {
     this._range.addEventListener('input', () => { this.pause(); this._progress = null; this._target = this._ext = this._range.value / 1000; this._kick(); });
     this._journey = this.view === 'journey'; this._jp = 0; this._mix = 0;
     this._flow = new AirStream(root.querySelector('.flow'));
-    this._chart = root.querySelector('.chart'); this._cg = this._chart.getContext('2d'); this._rocket = root.querySelector('.rocket');
+    this._chart = root.querySelector('.chart'); this._cg = this._chart.getContext('2d'); this._rocket = root.querySelector('.rocket'); this._pans = [...root.querySelectorAll('.pan')];
     this.addEventListener('pointermove', (e) => { const r = this.getBoundingClientRect(); this._flow.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; });
     this.addEventListener('pointerleave', () => { this._flow.mouse = null; });
     if (this._journey) this.r.setCamMix(0); else this.r.setView(this.view, true);
@@ -448,9 +449,13 @@ class ASAirbrakes extends HTMLElement {
       const geo = this._journey && (fa > 0 || this._rf > 0) ? this.r.flowGeometry(this._w, this._h) : null;
       if (geo) {   // the full Borealis, sized and placed so its airbrake ring sits on the 3D panels
         const k = (geo.bx1 - geo.bx0) / BOREALIS.body, x = (geo.bx0 + geo.bx1) / 2 - BOREALIS.cx * k, y = geo.py - BOREALIS.ring * k;
-        this._rocket.style.opacity = this._rf || 0; this._rocket.style.transform = `translate(${x}px,${y}px) scale(${k})`;
+        const rs = this._rocket.style; rs.opacity = this._rf || 0; rs.width = `${BOREALIS.w * k}px`; rs.height = `${BOREALIS.h * k}px`; rs.transform = `translate(${x}px,${y}px)`;
         if (this._rf > 0.5) geo.tail = y + BOREALIS.h * k;
-      } else if (this._rocket) this._rocket.style.opacity = 0;
+        // the two panels standing out either side, drawn over the rocket at the extension the 3D model is at
+        const t = Math.max(2, (geo.bx1 - geo.bx0) * 0.05);
+        this._pans.forEach((pn, i) => { const e = geo.ext[i], ps = pn.style; ps.opacity = this._rf || 0; ps.height = `${t}px`; ps.width = `${e + 2}px`;
+          ps.transform = `translate(${i ? geo.bx1 - 1 : geo.bx0 - e - 1}px,${geo.py - t / 2}px)`; });
+      } else if (this._rocket) { this._rocket.style.opacity = 0; this._pans.forEach((pn) => { pn.style.opacity = 0; }); }
       if (fa > 0) { this._flow.step(dt, geo, fa); moving = true; } else this._flow.clear();
       if (this._journey && this._J) this._drawChart(this._J);
     }

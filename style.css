@@ -317,8 +317,8 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 @media (prefers-reduced-motion:reduce){.flow.flow-enter > :first-child{animation:none}}
 
 /* launch tab: the full-size rocket comes back down, nose first, on the left where the climb left it.
-   Body width matches the scroll animation (about 9.5vw); the image is 3.11 body widths wide and 13.5 widths tall. */
-.fall-rocket{position:fixed;left:calc(22vw - 14.8vw);top:0;width:29.6vw;z-index:30;pointer-events:none;visibility:hidden;transform:translateY(-100%)}
+   Body width matches the scroll animation (about 9.5vw); the drawing is 3.65 body widths wide. */
+.fall-rocket{position:fixed;left:calc(22vw - 17.35vw);top:0;width:34.7vw;z-index:30;pointer-events:none;visibility:hidden;transform:translateY(-100%)}
 .fall-rocket img{display:block;width:100%;height:auto;transform:rotate(181deg)}
 .fall-rocket.go{visibility:visible;animation:noseDive 1.5s cubic-bezier(.5,0,.85,.55) forwards}
 @keyframes noseDive{from{transform:translateY(-100%) rotate(-1.5deg)}to{transform:translateY(100vh) rotate(1deg)}}

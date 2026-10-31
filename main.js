@@ -169,7 +169,7 @@ async function mountChapter(st) {
         // the left of the screen, where the climb left it, as the launch clip ends
         if (v.fall) {
           const r = document.createElement('div'); r.className = 'fall-rocket'; r.setAttribute('aria-hidden', 'true');
-          r.innerHTML = '<img src="elements/airbrakes/borealis.webp" alt="">';
+          r.innerHTML = '<img src="elements/airbrakes/borealis.svg" alt="">';
           document.body.append(r);
           vid.addEventListener('timeupdate', () => { const left = vid.duration - vid.currentTime; r.classList.toggle('go', vid.duration > 0 && left < 1.5 && vid.currentTime > 0.5 && st.visible && st.active === i); });
         }
