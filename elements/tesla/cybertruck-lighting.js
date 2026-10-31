@@ -23,7 +23,6 @@ const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const sm = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const lerp = (a, b, t) => a + (b - a) * t;
 const WHITE = new THREE.Color(1, .97, .93), AMBER = new THREE.Color(1, .62, .26), RED = new THREE.Color(1, .16, .1);
-const ACC = '#d0745c';
 // additive glow that leaves canvas alpha untouched (canvas is transparent over the page)
 function addGlow(m, premult) { m.blending = THREE.CustomBlending; m.blendEquation = THREE.AddEquation; m.blendSrc = premult ? THREE.OneFactor : THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.ZeroFactor; m.blendDstAlpha = THREE.OneFactor; m.transparent = true; m.depthWrite = false; return m; }
 
@@ -309,7 +308,7 @@ class CybertruckLighting extends HTMLElement {
   get progress() { return this._progress; }
   set progress(v) { this._progress = (v === null || v === undefined || v === '') ? null : clamp(+v || 0); this._kick(); }
   attributeChangedCallback(n, o, v) {
-    if (n === 'view') { const nv = VIEWS.includes(v) ? v : 'semi'; if (nv !== this._view) { this._view = nv; this._clock = 0; this.dispatchEvent(new CustomEvent('viewchange', { detail: { view: nv } })); } }
+    if (n === 'view') { const nv = VIEWS.includes(v) ? v : 'semi'; if (nv !== this._view) { this._view = nv; this._clock = 0; this._visible = true; /* a view change only happens on screen */ this.dispatchEvent(new CustomEvent('viewchange', { detail: { view: nv } })); } }
     if (n === 'progress') this.progress = v;
     this._kick();
   }
@@ -444,65 +443,20 @@ class CybertruckLighting extends HTMLElement {
     for (const { sp, bar } of this._spills) { let m = 0; for (let i = 0; i < bar.n; i++) m += bar.vals[i]; sp.material.opacity = .32 * m / bar.n; }
     this._r.render(this._scene, this._cam); this._drawHud(v);
     if (!this._ready) { this._ready = true; this.dispatchEvent(new Event('ready')); }
-    if (this._visible && !document.hidden && (running || this._dipping || dt === 0)) this._kick();
+    if (this._dipping || (this._visible && !document.hidden && (running || dt === 0))) this._kick();   // always finish a view swap
   }
+  // one plain caption per view that says what is happening; the lights carry the rest
   _drawHud(v) {
     const c = this._hc, d = this._dpr, W = this._w, H = this._h, S = this._hudState; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
-    const fs = W < 520 ? 9 : 10.5, pad = W < 520 ? 14 : 22, lh = fs * 1.7; c.font = `${fs}px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace`;
-    const dim = 'rgba(242,239,233,.42)', mid = 'rgba(242,239,233,.7)', hi = 'rgba(242,239,233,.94)';
-    const txt = (s, x, y, col = dim, al = 'left') => { c.fillStyle = col; c.textAlign = al; c.fillText(s, x, y); };
     if (!S) return;
-    if (S.kind === 'cab') {
-      const { run, ci, cp } = S, bad = CAB_BAD, fixed = run >= 1;
-      txt('CYBERCAB · EXTERIOR LIGHT CURRENT-SENSE SELF-TEST', pad, pad + fs, mid);
-      txt(run < 0 ? 'WAKE' : run === 0 ? 'ADC SAMPLE TIME · ORIGINAL' : run === 1 ? 'ADC SAMPLE TIME · LENGTHENED' : 'FUNCTION TEST · BRAKE / TURN', pad, pad + fs + lh, run === 1 ? hi : dim);
-      // per-light results
-      const bw = Math.min(260, W * .42), bh = fs * 4.2, bx = pad, by = H - pad - bh, y0 = by - lh * (CAB_CH.length + 1.2);
-      CAB_CH.forEach((name, k) => {
-        const done = run >= 2 || (run >= 0 && (k < ci || (k === ci && cp > .7))), act = run >= 0 && run < 2 && k === ci;
-        txt(name, pad, y0 + lh * k, done ? mid : act ? hi : 'rgba(242,239,233,.22)');
-        if (done) {
-          const isBad = k === bad;
-          txt(isBad ? (fixed ? 'OPEN · FAULT CAUGHT' : 'PASS  (FALSE: RESIDUAL CHARGE)') : 'PASS', pad + fs * 15, y0 + lh * k, isBad ? ACC : hi);
-        }
-      });
-      // sense voltage for the light under test; dashed line is the pass threshold, solid line the ADC sample point
-      c.strokeStyle = 'rgba(242,239,233,.14)'; c.strokeRect(bx + .5, by + .5, bw, bh);
-      const thY = by + bh * .55; c.setLineDash([2, 3]); c.strokeStyle = 'rgba(242,239,233,.25)'; c.beginPath(); c.moveTo(bx, thY); c.lineTo(bx + bw, thY); c.stroke(); c.setLineDash([]);
-      const su = fixed ? .55 : .12, sx = bx + 4 + (bw - 8) * su;
-      c.strokeStyle = 'rgba(242,239,233,.45)'; c.beginPath(); c.moveTo(sx, by + 3); c.lineTo(sx, by + bh - 3); c.stroke();
-      txt('SAMPLE', sx + 4, by + fs + 1, dim); txt('SENSE', bx + bw, by - 6, dim, 'right');
-      if (run >= 0 && run < 2 && ci >= 0) {
-        const open = ci === bad, prog = clamp(cp * 1.4);
-        c.strokeStyle = open ? ACC : hi; c.lineWidth = 1.3; c.beginPath();
-        for (let i = 0; i <= 80 * prog; i++) { const u = i / 80, x = bx + 4 + (bw - 8) * u, ms = u * 3.3;
-          const yv = open ? .78 * Math.exp(-ms / .9) : .82 * (1 - Math.exp(-ms / .12));   // open: only the filter cap's residual charge
-          const y = by + bh - 5 - (bh - 10) * yv; i ? c.lineTo(x, y) : c.moveTo(x, y); }
-        c.stroke(); c.lineWidth = 1;
-      }
-      return;
-    }
-    if (S.kind === 'semi') {
-      const { ci, func, blink, brake } = S;
-      txt('TESLA SEMI · ~20 EXTERIOR LIGHTS · HW LAYER TO APP LAYER', pad, pad + fs, mid);
-      txt(func ? 'FUNCTION TEST · TURN / BRAKE' : 'CURRENT-SENSE CHECK PER CHANNEL', pad, pad + fs + lh, func ? hi : dim);
-      const y0 = H - pad - lh * (SEMI_CH.length + 1);
-      SEMI_CH.forEach((n, i) => { const done = i < ci, act = i === ci && !func; txt(n, pad, y0 + lh * i, done ? mid : act ? hi : 'rgba(242,239,233,.22)'); txt(done ? 'OK' : act ? '..' : '', pad + fs * 20, y0 + lh * i, done ? hi : dim); });
-      if (func) txt('TURN ' + (blink ? 'ON ' : 'OFF') + '   BRAKE ' + (brake > .5 ? 'ON' : 'OFF'), pad, y0 + lh * SEMI_CH.length, blink ? '#f0a35a' : dim);
-      return;
-    }
-    if (S.kind === 'truck') {
-      const { cycle, l, r, pl, pr, lt } = S, delta = Math.abs(l - r);
-      txt('HEADLAMP LEVELING · STEPPER CALIBRATION', pad, pad + fs, mid);
-      txt(cycle ? 'SHARED START' : 'START OFFSET', pad, pad + fs + lh, cycle ? hi : ACC);
-      const phase = lt < 1 ? 'WAKE' : lt < 2.3 ? 'HOMING' : lt < 5.2 ? 'STEPPING TO AIM' : 'AIMED';
-      txt(phase, pad, pad + fs + lh * 2, dim);
-      const gh = Math.min(110, H * .26), gx = pad + 4, gy = H - pad - gh - fs * 1.8;
-      // stepper positions as bars only (no step counts)
-      [['L', pl], ['R', pr]].forEach(([n, p], i) => { const x = gx + i * fs * 4; c.strokeStyle = 'rgba(242,239,233,.2)'; c.strokeRect(x + .5, gy + .5, 6, gh); c.fillStyle = hi; c.fillRect(x + 1.5, gy + gh * (1 - p), 4, gh * p); txt(n, x + 2, gy + gh + fs * 1.5, mid); });
-      txt(delta > 4 ? 'OUT OF SYNC' : (lt > 2 ? 'IN SYNC' : ''), gx + fs * 9, gy + fs, delta > 4 ? ACC : hi);
-      return;
-    }
+    let line = '';
+    if (S.kind === 'semi') line = S.func ? 'Turn signal and brake test' : 'Bringing up each exterior light';
+    else if (S.kind === 'cab') line = S.run === 0 ? 'Self-test with the original ADC sample time: the disconnected turn lamp still passes'
+      : S.run === 1 ? 'Longer sample time: the disconnected lamp is caught' : S.run === 2 ? 'Brake and turn signal' : 'Rear light bar on';
+    else if (S.kind === 'truck') line = S.cycle ? 'After the fix: both headlamps calibrate together' : 'Before the fix: left and right headlamps calibrate out of sync';
+    const fs = W < 520 ? 12 : 13.5, pad = W < 520 ? 14 : 22;
+    c.font = `400 ${fs}px Inter, system-ui, sans-serif`; c.textAlign = 'left'; c.fillStyle = 'rgba(242,239,233,.78)';
+    c.fillText(line, pad, H - pad);
   }
 }
 if (!customElements.get('as-cybertruck-lighting')) customElements.define('as-cybertruck-lighting', CybertruckLighting);

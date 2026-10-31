@@ -289,9 +289,7 @@ class AsSegwayRide extends HTMLElement {
   _hud(c, f) {
     const x = 16, y = 22; c.font = MONO; c.textAlign = 'left'; c.fillStyle = INK;
     const deg = r => (r * 180 / Math.PI).toFixed(1) + '°';
-    c.globalAlpha = 0.45; c.fillText('F_T ' + P.F + ' N   β ' + deg(this.beta) + '   NO CONTROLLER', x, y);
-    c.globalAlpha = 0.8; c.fillText('x ' + this.O[0].toFixed(2).padStart(5, ' ') + ' m   ẋ ' + (this.phase === 'ride' ? this.s[1] : 0).toFixed(2) + ' m/s   θ ' + deg(this.th), x, y + 16);
-    if (this.phase === 'ready' && this.runIdx <= 2) { c.globalAlpha = 0.4 * f; c.textAlign = 'right'; c.fillText('CLICK TO PUSH', this.w - 16, y); }
+    c.font = '13px Inter, system-ui, sans-serif'; c.globalAlpha = 0.7; c.fillText('Constant thrust and lean, no controller', x, y); void deg; void f;
     c.globalAlpha = 1;
   }
 }

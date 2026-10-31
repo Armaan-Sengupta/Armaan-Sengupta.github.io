@@ -91,9 +91,6 @@ class Gantry extends HTMLElement {
     es.forEach(([x, y, h]) => { c.fillStyle = `rgba(255,255,255,${0.25 + h * 0.75})`; if (h > 0) { c.shadowColor = '#fff'; c.shadowBlur = 16 * h; } c.fillRect(x - 3, y - 3, 6, 6); c.shadowBlur = 0; });
     // labels
     c.font = MONO; c.fillStyle = 'rgba(242,239,233,0.5)';
-    c.fillText(`X ${(this.pos[0] * 300).toFixed(1).padStart(6)} mm`, f.x, f.y + f.h + 26);
-    c.fillText(`Y ${(this.pos[1] * 200).toFixed(1).padStart(6)} mm`, f.x + 130, f.y + f.h + 26);
-    c.fillText(this.phase === 'home' ? 'HOMING' : (this.target ? 'MOVING' : 'IDLE'), f.x + f.w - 50, f.y + f.h + 26);
     // UART console
     if (f.side) {
       const sx = W - f.side + 10, sy = f.y - 10;

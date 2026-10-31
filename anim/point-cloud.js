@@ -298,8 +298,6 @@ class AsPointCloud extends AnimBase {
 
     // Readouts
     const cnt = Math.round(s.n + (s.reps - s.n) * k1 - s.noiseReps * clamp(k2 * 1.25 - 0.25));
-    label(c, 'PTS ' + cnt.toLocaleString('en-US'), 12, 20, 0.85);
-    if (W > 360) label(c, 'YAW ' + String(Math.round((((this.yaw * 180) / Math.PI) % 360 + 360) % 360)).padStart(3, '0') + '°  PITCH ' + String(Math.round((this.pitch * 180) / Math.PI)).padStart(2, '0') + '°', 12, 34, 0.35);
 
     const by = H - 12, fade = ease(since / 0.45);
     // stage pips
@@ -307,9 +305,8 @@ class AsPointCloud extends AnimBase {
       c.globalAlpha = i === stage ? 0.9 : i < stage ? 0.35 : 0.14;
       c.fillStyle = '#fff'; c.fillRect(12 + i * 16, by - 16, 12, 2);
     }
-    const name = String(stage + 1).padStart(2, '0') + ' / ' + STAGES[stage];
+    const name = STAGES[stage];
     label(c, name, 12, by, 0.35 + 0.55 * fade);
-    if (W > 380) label(c, PARAMS[stage], W - 12, by, 0.45 * fade, 'right');
     c.globalAlpha = 1;
   }
 }

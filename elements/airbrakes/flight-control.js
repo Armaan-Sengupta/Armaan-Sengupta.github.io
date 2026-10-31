@@ -62,7 +62,7 @@ export class FlightControlRenderer {
       c.fillStyle = on ? INK : '#08080a'; c.fill(); c.strokeStyle = INK; c.lineWidth = 1; a(c, on ? 1 : done ? 0.7 : 0.35); c.stroke(); a(c, 1);
       txt(c, STAGES[i].name, x, y - 22, compact ? 11 : 12, on ? 1 : 0.55, 'center');
       txt(c, STAGES[i].sub[0], x, y + 30, compact ? 11 : 12, on ? 0.95 : 0.5, 'center', MONO, 400);
-      txt(c, STAGES[i].sub[1], x, y + 47, compact ? 10 : 11, on ? 0.6 : 0.3, 'center', MONO, 400);
+
     });
     // feedback return path
     const yb = y + 66; c.setLineDash([2, 4]); seg(c, xs[n - 1], y + 56, xs[n - 1], yb, 0.22); seg(c, xs[n - 1], yb, xs[0], yb, 0.22); seg(c, xs[0], yb, xs[0], y + 56, 0.22); c.setLineDash([]);
@@ -71,7 +71,7 @@ export class FlightControlRenderer {
   plot(c, t, L, T, R, B) {
     seg(c, L, B, R, B, 0.3); seg(c, L, B, L, T, 0.3);
     for (let j = 1; j < 4; j++) seg(c, L, B - (B - T) * j / 4, R, B - (B - T) * j / 4, 0.05);
-    txt(c, 'ALTITUDE', L, T - 12, 10, 0.4); txt(c, 'TIME →', R, B + 20, 10, 0.4, 'right');
+    
     const target = T + (B - T) * 0.2;
     c.setLineDash([4, 6]); seg(c, L, target, R, target, 0.45); c.setLineDash([]);
     txt(c, 'TARGET APOGEE', L + 10, target - 9, 10, 0.6);
@@ -90,7 +90,7 @@ export class FlightControlRenderer {
     }
     const ex = xAt(now), ey = curve(T + 8, now);
     c.beginPath(); c.arc(ex, ey, 4, 0, 7); c.fillStyle = INK; c.fill();
-    txt(c, 'NOW · SENSED STATE', ex + 10, ey + 16, 10, 0.55);
+    
     if (t >= 7 && t < 12.6) { const x = xAt(1) + 14, al = Math.min(ease((t - 7) / 0.5), 1 - ease((t - 12.1) / 0.5)) * 0.8; seg(c, x, apex, x, target, al, 1); seg(c, x - 4, apex, x + 4, apex, al); seg(c, x - 4, target, x + 4, target, al); txt(c, 'ERROR e', x + 8, (apex + target) / 2 + 4, 10, al); }
   }
   camView(c, t, cx, cy, s) {
@@ -103,7 +103,7 @@ export class FlightControlRenderer {
     c.fillStyle = C.alu; c.fill('evenodd'); c.strokeStyle = '#e4e6e9'; c.lineWidth = 0.8; c.stroke();
     for (const al of G.ALPHA) { const x = cx + Math.cos(al) * k.pinR * s, y = cy - Math.sin(al) * k.pinR * s; c.beginPath(); c.arc(x, y, 0.3 * s, 0, 7); c.fillStyle = C.brass; c.fill(); c.beginPath(); c.arc(x, y, 0.15 * s, 0, 7); c.fillStyle = '#26272a'; c.fill(); }
     c.restore();
-    txt(c, `CAM ${(k.rot * 180 / Math.PI).toFixed(0).padStart(3, ' ')}°   TRAVEL ${(k.travel * 25.4).toFixed(1)} mm`, cx, cy + (G.AIRFRAME_R + 1.4) * s, 10, 0.55, 'center');
+    
   }
   lockouts(c, t, x0, x1, y) {
     // flight phases from slide 44: boost locked out, coast actuated, recovery locked out
@@ -113,7 +113,7 @@ export class FlightControlRenderer {
       const w = W * f, on = i === 1;
       c.fillStyle = on ? INK : C.warn; a(c, on ? 0.1 : 0.14); c.fillRect(x + 1, y, w - 2, 22); a(c, 1);
       seg(c, x + 1, y, x + w - 1, y, on ? 0.5 : 0.25);
-      txt(c, n, x + 8, y + 15, 10, on ? 0.85 : 0.5); txt(c, d, x + w - 8, y + 15, 9, on ? 0.6 : 0.4, 'right', MONO, 400);
+      txt(c, n, x + 8, y + 15, 10, on ? 0.85 : 0.5); 
       x += w;
     });
     const mx = x0 + W * (0.22 + 0.56 * clamp((t - 1) / 12)); seg(c, mx, y - 6, mx, y + 28, 0.8, 1);
@@ -136,7 +136,7 @@ export class FlightControlRenderer {
         c.beginPath(); c.arc(x, y, on ? 7 : 5, 0, 7); c.fillStyle = on ? INK : '#08080a'; c.fill(); c.strokeStyle = INK; a(c, on ? 1 : 0.4); c.stroke(); a(c, 1);
         txt(c, STAGES[si].name, x, y - 20, 13, on ? 1 : 0.55, 'center');
         txt(c, STAGES[si].sub[0], x, y + 30, 13, on ? 0.95 : 0.5, 'center', MONO, 400);
-        txt(c, STAGES[si].sub[1], x, y + 48, 11, on ? 0.6 : 0.3, 'center', MONO, 400);
+
       });
     });
     this.plot(c, t, 50, 330, 600, 590);

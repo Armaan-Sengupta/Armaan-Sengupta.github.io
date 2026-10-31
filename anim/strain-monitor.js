@@ -228,7 +228,6 @@ class AsStrainMonitor extends AnimBase {
       const x = xOf(now - i * 0.5); if (x < x0 + 12) break;
       const xr = Math.round(x) + 0.5;
       c.globalAlpha = 0.25; c.beginPath(); c.moveTo(xr, H - bot); c.lineTo(xr, H - bot + (i % 2 ? 3 : 5)); c.stroke();
-      if (i % 2 === 0) label(c, i === 0 ? '0 s' : '−' + (i * 0.5).toFixed(0) + ' s', x, H - 8, 0.42, i === 0 ? 'right' : 'center');
     }
 
     // Envelope bands
@@ -285,9 +284,7 @@ class AsStrainMonitor extends AnimBase {
     for (let ch = 0; ch < CH; ch++) {
       const yl = top + lh * ch;
       label(c, 'CH' + (ch + 1), 8, yl + Math.min(lh * 0.5, 16), 0.5);
-      if (lh > 30) label(c, String(Math.max(0, Math.round(head[ch] * UE[ch]))).padStart(3, ' '), 8, yl + Math.min(lh * 0.5, 16) + 13, 0.85);
     }
-    if (lh > 44 && W > 380) label(c, 'µε', x0 - 8, top + lh * CH - 6, 0.3, 'right');
 
     // Anomaly events
     for (let s = Math.floor(tL / P) - 1; s <= sNow; s++) {
@@ -337,22 +334,6 @@ class AsStrainMonitor extends AnimBase {
       label(c, ts, clamp(x, x0 + tw / 2, x1 - tw / 2), H - 8, 0.9, 'center');
     }
 
-    // Header readouts
-    const cracks = this.crackCount(now), since = this.lastDetection(now);
-    const sTxt = String(sNow).padStart(4, '0'), cTxt = String(cracks);
-    const parts = W < 470 ? ['STK ' + sTxt, ' · CRK ', cTxt, ' · FP 0'] : ['STROKE ' + sTxt, ' · CRACKS ', cTxt, ' · FALSE POS 0'];
-    let xr = x1; const yh = 16;
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const wpt = c.measureText(parts[i]).width; xr -= wpt;
-      if (i === 2 && since < 1.4) {
-        c.save(); c.shadowColor = GLOW; c.shadowBlur = 10 * Math.exp(-since * 2); label(c, parts[i], xr, yh, 1); c.restore();
-      } else label(c, parts[i], xr, yh, i === 2 ? 0.9 : 0.5);
-    }
-    if (this.queued >= 0 && this.queued > sNow - 1 && !this.reduced) {
-      label(c, (W < 470 ? 'INJECT → ' : 'CRACK QUEUED → STROKE ') + String(this.queued).padStart(4, '0'), x0, yh, 0.85);
-    } else {
-      label(c, W < 470 ? '500 Hz' : 'SAMPLE RATE 500 Hz', x0, yh, 0.5);
-    }
   }
 }
 

@@ -272,3 +272,13 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 
 /* professional chapters: white company logo in place of the name */
 .ch-copy h3 .logo{display:block;width:auto;max-width:100%;filter:brightness(0) invert(1);margin:.12em 0 .18em}
+
+/* quieter chrome: spacing instead of hairlines and outlines */
+.meta{border-bottom:0;padding-bottom:0;margin-bottom:10px}
+.points li{border-top:0;padding:5px 0 5px 20px}
+.frame,.pop-stage,.box,.tile button{border:0}
+.chapter.hero[data-view="demo"] .frame{border:0}
+.card{border:0}
+.sec-head{border-bottom:0;padding-bottom:0}
+.chip{font:400 13px var(--body,inherit);letter-spacing:0;border:0;background:var(--bg-3);color:var(--fg-2);padding:6px 11px}
+.pop-links{border-top:0}

@@ -40,7 +40,7 @@ export const chapters = [
     id: 'airbrakes', flow: 'personal',
     org: 'Waterloo Rocketry · Borealis', dates: '2023 – 2024',
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
-    points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction, PI control', 'Designed the 4-layer avionics PCB for the canards: power efficiency 66% → 95%'],
+    points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction and PI control', 'Designed the 4-layer avionics PCB for the canards, raising power efficiency from 66% to 95%'],
     views: [
       { id: 'mechanism', label: 'Mechanism', el: withAttrs(EL.airbrakes, { view: 'mechanism' }), progress: 'view', len: 0.7 },
       { id: 'airframe', label: 'In the airframe', el: withAttrs(EL.airbrakes, { view: 'airframe' }), progress: 'view' },
@@ -54,7 +54,7 @@ export const chapters = [
     id: 'measurement', flow: 'personal',
     org: 'Team of 3', dates: 'Sep – Dec 2023',
     title: 'Automated Measurement System', role: '',
-    points: ['OpenCV orients the part', 'Custom 2-wire ESP32 ↔ VEX protocol', 'Within 0.3 mm, every time'],
+    points: ['Used OpenCV to turn each part to its critical dimension', 'Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain', 'Measured parts to within 0.3 mm'],
     views: [
       { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
       { id: 'protocol', label: '2-wire protocol', el: EL.wire },
@@ -68,7 +68,7 @@ export const chapters = [
     id: 'neuralink', flow: 'professional', mono: true,
     org: 'California', logo: ['media/logos/neuralink.svg', 1.0], dates: 'Jan – Aug 2026',
     title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern',
-    points: ['Stimulation implant firmware across thousands of electrodes', 'App-to-ASIC stack for Blindsight', 'Cut registration time per trial by ~97%'],
+    points: ['Wrote stimulation implant firmware across thousands of electrodes', 'Architected the app-to-ASIC stack for Blindsight', 'Cut registration time per trial by about 97%'],
     views: [
       { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },
       { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter' },
@@ -80,7 +80,7 @@ export const chapters = [
     id: 'tesla', flow: 'professional',
     org: 'California', logo: ['media/logos/tesla.svg', 0.42], dates: 'May – Aug 2025',
     title: 'Tesla', role: 'Vehicle Firmware Intern · Body Controls',
-    points: ['Brought up ~20 Semi exterior lights', 'Cybercab light self-tests', 'Cybertruck headlamp calibration fix'],
+    points: ['Brought up about 20 exterior lights on the Semi', 'Wrote current-sense self-tests for the Cybercab lights', 'Fixed out-of-sync Cybertruck headlamp calibration'],
     views: [
       { id: 'semi', label: 'Semi', el: withAttrs(EL.tesla, { view: 'semi' }) },
       { id: 'cybercab', label: 'Cybercab', el: withAttrs(EL.tesla, { view: 'cybercab' }) },
@@ -91,7 +91,7 @@ export const chapters = [
     id: 'ixana', flow: 'professional',
     org: 'Indiana', logo: ['media/logos/ixana.svg', 0.62], dates: 'Aug – Dec 2024',
     title: 'Ixana', role: 'Embedded Firmware Intern',
-    points: ['Glasses to watch, through the body', 'Frame rate 4 → 13 fps', 'MIPI-DSI display drivers'],
+    points: ['Streamed video from smart glasses to a watch through the body', 'Raised the frame rate from 4 to 13 fps', 'Owned the MIPI-DSI display drivers'],
     views: [
       { id: 'capture', label: 'Capture', el: withAttrs(EL.ixana, { view: 'capture' }) },
       { id: 'link', label: 'Through the body', el: withAttrs(EL.ixana, { view: 'link' }) },
@@ -103,7 +103,7 @@ export const chapters = [
     id: 'magna', flow: 'professional', mono: true,
     org: 'Ontario', logo: ['media/logos/magna.svg', 0.62], dates: 'Jan – Apr 2024',
     title: 'Magna', role: 'Crack detection in a stamping die',
-    points: ['Strain gauges → MQTT → live dashboard', 'Every cracked part caught, zero false alarms', 'Patent-pending PLC buffer: 142 → 500 Hz'],
+    points: ['Streamed strain-gauge data over MQTT to a live dashboard', 'Caught every cracked part with no false alarms', 'Built a patent-pending PLC buffer that raised sampling from 142 to 500 Hz'],
     views: [
       { id: 'detector', label: 'Live detector', el: EL.strain },
       { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
@@ -113,7 +113,7 @@ export const chapters = [
     id: 'fyelabs', flow: 'professional',
     org: 'Ontario', logo: ['media/logos/fyelabs.png', 0.58], dates: 'May – Sep 2023',
     title: 'FYELABS', role: 'Robotics & Embedded Intern',
-    points: ['Back-up safety for garbage trucks', 'LiDAR dust filter that still sees people', '100+ part enclosure, cost cut 56%'],
+    points: ['Built back-up safety sensing for garbage trucks', 'Designed a LiDAR dust filter that still detects people', 'Designed the 100+ part enclosure and cut its cost by 56%'],
     views: [
       { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view' },
       { id: 'built', label: 'As built', img: 'media/fyelabs/case-photo.webp' },
@@ -251,10 +251,10 @@ export const details = {
   },
   ixana: { gallery: [
       { type: 'video', src: 'media/ixana/ixana-wir-demo-full.mp4', poster: 'media/ixana/ixana-wir-demo-full.jpg', caption: 'CES demo: video sent through the body over Wi-R (full length, with audio)' },
-      { type: 'image', src: 'elements/ixana/assets/original-wearable-pipeline.png', caption: 'Camera → FPGA → MCU → Wi-R → MCU → FPGA → display' }
+      { type: 'image', src: 'elements/ixana/assets/original-wearable-pipeline.png', caption: 'The video path: camera, FPGA, MCU, Wi-R, MCU, FPGA, display' }
     ],
     body: ['Built video streaming from smart glasses to a smartwatch over Ixana\'s Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.',
-      'Raised frame rate from 4 to 13 fps and cut power by 8% with a bare-metal C++ core OS on Ambiq and NXP MCUs. Debugged the whole path (camera → FPGA encode → MCU → Wi-R → MCU → FPGA decode → AMOLED), owned the MIPI-DSI display drivers, and wrote a Python driver for a Rigol waveform generator for HIL testing.'],
+      'Raised frame rate from 4 to 13 fps and cut power by 8% with a bare-metal C++ core OS on Ambiq and NXP MCUs. Debugged the whole path (camera, FPGA encode, MCU, Wi-R, MCU, FPGA decode, AMOLED), owned the MIPI-DSI display drivers, and wrote a Python driver for a Rigol waveform generator for HIL testing.'],
     chips: ['C++', 'Bare metal', 'MIPI DSI', 'FPGA · Verilog', 'HIL'], links: [['CES demo', 'https://youtube.com/shorts/He_goadObV0']]
   },
   magna: {

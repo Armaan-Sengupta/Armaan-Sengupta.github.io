@@ -282,7 +282,6 @@ class AsWireProtocol extends AnimBase {
       c.moveTo(cx + s * r, cy + co * r); c.lineTo(cx + s * (r + l), cy + co * (r + l));
     }
     c.globalAlpha = 0.3; c.stroke(); c.globalAlpha = 1;
-    if (r > 44) for (const d of [0, 90, 180, 270]) { const a = (d * Math.PI) / 180; label(c, String(d), cx + Math.sin(a) * (r + 24), cy - Math.cos(a) * (r + 24) + 3.5, 0.4, 'center'); }
 
     // rotating table + part
     const th = (this.table * Math.PI) / 180;
@@ -317,16 +316,12 @@ class AsWireProtocol extends AnimBase {
     // readouts
     const pos = (((Math.round(this.table) % 360) + 360) % 360);
     const lines = [['POS', pad3(pos) + '°', 0.9]];
-    if (this.queued != null) lines.push(['NEXT', pad3(this.queued) + '°', 0.9]);
-    else if (g.r > 40 || g.stacked) lines.push(['CMD', pad3(this.angle) + '°', 0.6]);
     if (g.stacked) {
       let y = cy - (lines.length - 1) * 8 + 3.5; const lx = cx + r + 26;
       for (const [k, v, a] of lines) { label(c, k, lx, y, 0.45); label(c, v, lx + 44, y, a); y += 16; }
-      label(c, 'ESP32 → V5', this.w - 12, cy + 3.5 + (lines.length - 1) * 8, 0.3, 'right');
     } else {
       let y = cy + r + (r > 44 ? 52 : 30);
       for (const [k, v, a] of lines) { label(c, k, cx - 34, y, 0.45); label(c, v, cx + 34, y, a, 'right'); y += 16; }
-      if (y < this.h - 4) label(c, 'ESP32 → V5', cx, y + 6, 0.3, 'center');
     }
   }
 }

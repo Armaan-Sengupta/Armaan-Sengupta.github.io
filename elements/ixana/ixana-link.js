@@ -118,7 +118,7 @@ class IxanaLink extends HTMLElement{
    c.restore();c.strokeStyle='rgba(242,239,233,.5)';c.stroke();
    // viewfinder corners + HUD
    const k=Math.min(14,fw*.08);c.strokeStyle='rgba(242,239,233,.85)';c.lineWidth=1.2;c.beginPath();for(const [x,y,dx,dy] of [[a[0],a[1],1,1],[b[0],a[1],-1,1],[a[0],b[1],1,-1],[b[0],b[1],-1,-1]]){c.moveTo(x+dx*k,y+dy*4);c.lineTo(x+dx*4,y+dy*4);c.lineTo(x+dx*4,y+dy*k)}c.stroke();
-   if(fw>90){this._hud(c,'CAM · 30 FPS',a[0],a[1]-8,'left',.75);const rec=(Math.floor(t*2)%2)?.9:.35;c.fillStyle='rgba(242,239,233,'+rec+')';c.beginPath();c.arc(b[0]-10,a[1]-11,2.5,0,TAU);c.fill()}
+   if(fw>90){this._hud(c,'CAM',a[0],a[1]-8,'left',.75);const rec=(Math.floor(t*2)%2)?.9:.35;c.fillStyle='rgba(242,239,233,'+rec+')';c.beginPath();c.arc(b[0]-10,a[1]-11,2.5,0,TAU);c.fill()}
    c.restore()}
   // the link: frame bursts leave the lens at the selected rate and travel the body to the watch
   const linkA=.35+.65*ease(1-Math.abs(p-.5)*1.6);
@@ -137,9 +137,9 @@ class IxanaLink extends HTMLElement{
   // receive HUD beside the watch
   const rxA=ease((p-.55)/.35);if(rxA>0){const s=S(WATCH.x,WATCH.y),rr=Math.max(WATCH.rx,WATCH.ry)*z,side=s[0]+rr+28+170<W-8;let x=side?s[0]+rr+28:Math.max(14,s[0]-80),y=side?s[1]-rr*.55:s[1]+rr+34;c.save();c.globalAlpha=rxA;
    c.strokeStyle='rgba(242,239,233,.35)';c.lineWidth=1;c.beginPath();if(side){c.moveTo(s[0]+rr+8,s[1]-rr*.2);c.lineTo(x-6,y+10)}else{c.moveTo(s[0],s[1]+rr+8);c.lineTo(x+4,y-14)}c.stroke();
-   this._hud(c,'RX · '+fps+' FPS',x,y,'left',.9,12);
+   this._hud(c,fps+' fps',x,y,'left',.9,12);
    const cells=13,cw=Math.min(9,Math.max(5,rr*.06)),gap=3,fi=Math.floor(Math.max(0,t-LATENCY)*fps);for(let i=0;i<cells;i++){const on=i<fps;c.fillStyle=on?(i===fi%fps?'rgba(242,239,233,.95)':'rgba(242,239,233,.35)'):'rgba(242,239,233,.08)';c.fillRect(x+i*(cw+gap),y+10,cw,14)}
-   this._hud(c,this._mode==='baseline'?'BEFORE':'AFTER · −8% POWER',x,y+42,'left',.55,10);c.restore()}
+   c.restore()}
  }
  _hud(c,s,x,y,align='left',a=.7,size=10){c.font=size+'px "JetBrains Mono",ui-monospace,Consolas,monospace';c.textAlign=align;c.fillStyle='rgba(242,239,233,'+a.toFixed(3)+')';c.fillText(s,x,y)}
 }

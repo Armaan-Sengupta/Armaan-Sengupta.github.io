@@ -532,37 +532,16 @@ class FyelabsSystem extends HTMLElement {
     }
     g.attributes.position.needsUpdate = g.attributes.bt.needsUpdate = true;
   }
+  // one plain caption per view
   _drawHud(v, t) {
     const c = this._hc, d = this._dpr, W = this._w, H = this._h; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
-    const fs = W < 520 ? 9 : 10.5, pad = W < 520 ? 14 : 22; c.font = `${fs}px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace`; c.textBaseline = 'alphabetic';
-    const dim = 'rgba(242,239,233,.42)', mid = 'rgba(242,239,233,.68)', hi = 'rgba(242,239,233,.92)', ac = '#d0745c';
-    const txt = (s, x, y, col = dim, al = 'left') => { c.fillStyle = col; c.textAlign = al; c.fillText(s, x, y); };
-    const st = this._st, lh = fs * 1.65;
-    if (v === 'case') {
-      const mm = lerp(0, COVER_HIGH - COVER_LOW, st.cover), state = st.explode > .5 ? 'EXPLODED' : st.cover > .95 ? 'OPEN · SENSING' : st.cover < .05 ? 'SEALED' : (this._caseDir(t) > 0 ? 'COVER RAISING' : 'COVER LOWERING');
-      txt('PROTECTIVE COVER', pad, H - pad - lh * 2); txt(`${mm.toFixed(1).padStart(4, ' ')} mm`, pad, H - pad - lh, hi); txt(state, pad, H - pad, st.explode > .5 ? mid : (st.cover > .95 ? ac : mid));
-      // travel gauge
-      const gx = pad + fs * 11, gy0 = H - pad - lh * 2.6, gy1 = H - pad - 2; c.strokeStyle = 'rgba(242,239,233,.16)'; c.lineWidth = 1; c.beginPath(); c.moveTo(gx, gy0); c.lineTo(gx, gy1); c.stroke();
-      const gy = lerp(gy1, gy0, st.cover); c.fillStyle = hi; c.fillRect(gx - 3, gy - 1, 6, 2);
-      txt('BLACK POWDER-COAT · SHEET METAL', W - pad, H - pad, dim, 'right');
-      return;
-    }
-    const S = this._sim;
-    // readouts column
-    const x0 = W - pad, y0 = pad + fs;
-    txt('RANGE  m', x0, y0, dim, 'right');
-    for (let i = 0; i < 10; i++) { const b = 9 - i, dm = S.hits[b] / WS, al = S.alerts[b] > .5; txt(`L${String(b + 1).padStart(2, '0')}  ${dm > RMAX / WS - .1 ? ' -- ' : dm.toFixed(2)}`, x0, y0 + lh * (i + 1.2), al ? ac : mid, 'right'); }
-    txt('10 × 1-D LIDAR · 180° ARC', pad, pad + fs, mid);
-    if (v === 'lidar') { txt('NO MOVING PARTS', pad, pad + fs + lh, dim); return; }
-    const filt = S.filter;
-    // strip chart beam 5: distance + flux
-    const cw = Math.min(260, W * .38), ch = Math.min(70, H * .15), cx = pad, cy = H - pad - ch;
-    c.strokeStyle = 'rgba(242,239,233,.12)'; c.lineWidth = 1; c.strokeRect(cx + .5, cy + .5, cw, ch);
-    txt('L05  DISTANCE', cx, cy - 6, mid); txt('FLUX', cx + cw, cy - 6, dim, 'right');
-    const hs = S.hist; if (hs.length > 2) {
-      const draw = (fn, col, lw) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); hs.forEach((p, i) => { const x = cx + cw * i / 179, y = cy + ch - 4 - (ch - 8) * fn(p); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke(); };
-      draw(p => clamp(p.f * 1.1), 'rgba(242,239,233,.32)', 1); draw(p => clamp(p.d / RMAX), hi, 1.2);
-    }
+    const st = this._st, S = this._sim;
+    const line = v === 'case' ? (st.explode > .5 ? 'Exploded view of the enclosure' : 'The protective cover lifts to expose the sensors')
+      : v === 'lidar' ? 'Ten single-beam LiDARs cover a 180° arc behind the truck'
+      : S.filter ? 'Filtered: dust is rejected and the person is still tracked' : 'Raw returns: dust triggers false detections';
+    const fs = W < 520 ? 12 : 13.5, pad = W < 520 ? 14 : 22;
+    c.font = `400 ${fs}px Inter, system-ui, sans-serif`; c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillStyle = 'rgba(242,239,233,.78)';
+    c.fillText(line, pad, H - pad);
   }
   _caseDir(t) { return t < 7 ? 1 : -1; }
 }

@@ -225,7 +225,7 @@ class ASAirbrakes extends HTMLElement {
       .controls input{flex:1;accent-color:#f2efe9}</style>
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
-      <div class="hud">CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>`;
+      <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>`;
     this._canvas = root.querySelector('canvas');
     try { this.r = new AirbrakeRenderer(this._canvas); }
     catch (e) { root.querySelector('.stage').innerHTML = '<div style="padding:24px;font:12px monospace;color:#999">WebGL unavailable</div>'; return; }

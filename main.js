@@ -79,7 +79,7 @@ function buildChapter(ch) {
   sec.innerHTML = `
     <div class="pin">
       <div class="ch-copy">
-        <div class="meta mono"><span>${esc(ch.org)}</span><span>${esc(ch.dates)}</span></div>
+        <div class="meta mono"><span>${esc(ch.org)}</span></div>
         <h3>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h3>
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
@@ -289,7 +289,6 @@ grid.innerHTML = cards.map((c) => `
   <a class="card" href="#${c.id}" data-open="${c.id}">
     <div class="thumb"></div>
     <div class="body">
-      <div class="k mono"><span>${esc(c.kicker)}</span></div>
       <h4>${esc(c.title)}</h4>
       <p>${esc(c.blurb)}</p>
     </div>
@@ -380,7 +379,7 @@ async function openPop(id, { push = true } = {}) {
     </div>
     <figure class="pop-hero"><div class="pop-stage">${hero ? mediaBox(hero, p.title) : ''}</div>${hero ? cap(hero) : ''}</figure>
     ${top.length ? `<div class="pop-top">${top.map((g) => `<figure><div class="box">${mediaBox(g, p.title)}</div>${cap(g)}</figure>`).join('')}</div>` : ''}
-    ${rest.length ? `<h4 class="pop-h mono">More media · ${rest.length}</h4><div class="tiles">${rest.map((g) => tile(g, p.title)).join('')}</div>` : ''}
+    ${rest.length ? `<div class="tiles">${rest.map((g) => tile(g, p.title)).join('')}</div>` : ''}
     ${docs.length ? `<div class="pop-docs">${docs.map((g) => `<a class="doc" href="${g.src}" target="_blank" rel="noopener"><span class="mono">PDF</span><b>${esc(g.caption || 'Report')}</b><span aria-hidden="true">↗</span></a>`).join('')}</div>` : ''}
     ${linkRow('pop-links')}`;
   if (!hero) {

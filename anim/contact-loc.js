@@ -243,9 +243,8 @@ class ContactLoc extends HTMLElement {
     }
         // HUD
     ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(242,239,233,.5)';
-    const txt = active && this.est ? (this.ct > 2.2 ? `contact est. · err ${Math.round(this.err * 1000)} mm` : 'localizing…') : 'awaiting contact · tap the arm';
+    const txt = active && this.est ? (this.ct > 2.2 ? 'Contact located from joint torques' : 'Locating contact…') : 'An external force is applied to the arm';
     ctx.fillText(txt, 12, 15);
-    ctx.fillStyle = 'rgba(242,239,233,.32)'; ctx.fillText('joint torque · ±12 N·m', 12, 28);
   }
 }
 if (!customElements.get('as-contact-loc')) customElements.define('as-contact-loc', ContactLoc);

@@ -228,7 +228,7 @@ function stateAt(t) {
   return { grip, mix: smooth(grip * 1.35), az: Math.sin(TAU * t / LOOP) };
 }
 
-const HUD = '<div class="hud"><div class="bar"></div><div class="lab"><span>0</span><span class="mx">193 MPa</span></div><div class="k">von Mises · deflection exaggerated</div></div>';
+const HUD = '<div class="hud"><div class="bar"></div><div class="lab"><span>0</span><span class="mx">193 MPa</span></div><div class="k">Deflection exaggerated</div></div>';
 
 class ASClampingHub extends HTMLElement {
   static get observedAttributes() { return ['progress']; }
