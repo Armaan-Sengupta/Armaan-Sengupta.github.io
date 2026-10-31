@@ -71,7 +71,7 @@ const chapterState = [];
 function buildChapter(ch) {
   const sec = document.createElement('section');
   sec.className = 'chapter' + (ch.hero ? ' hero' : '') + (ch.mono ? ' mono-ch' : '');
-  sec.id = `ch-${ch.id}`;
+  sec.id = `ch-${ch.id}`; sec.dataset.ch = ch.id;
   sec.setAttribute('aria-label', ch.title);
   const lens = ch.views.map((v) => v.len ?? 0.5);
   const total = lens.reduce((a, b) => a + b, 0);
@@ -79,7 +79,7 @@ function buildChapter(ch) {
   sec.innerHTML = `
     <div class="pin">
       <div class="ch-copy">
-        <div class="meta mono"><span>${esc(ch.org)}</span></div>
+        ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
         <h3>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h3>
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
@@ -113,7 +113,7 @@ function buildSequence(ch) {
   wrap.id = `ch-${ch.id}`; wrap.dataset.ch = ch.id; wrap.setAttribute('aria-label', ch.title);
   wrap.innerHTML = `
     <header class="seq-head">
-      <div class="meta mono"><span>${esc(ch.org)}</span></div>
+      ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
       <h3>${titleHTML(ch)}</h3>
       ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
     </header>`;
@@ -201,6 +201,7 @@ function updateChapter(st, force) {
     if (k === i && ch.views[i].once) return;   // follows its video instead
     b.querySelector('b').style.transform = `scaleX(${k < i ? 1 : k === i ? local : 0})`;
   });
+  if (ch.views[i].captions) { const cap = $('.cap', st.sec), c = ch.views[i].captions.filter(([, f]) => local >= f).pop(); if (cap && c && cap.textContent !== c[0]) cap.textContent = c[0]; }
   if (st.mounted && ch.views[i].swap) { const b = $('.swap-b', st.layers[i]); if (b) b.style.opacity = smooth(clamp((local - 0.3) / 0.4)); }
   if (i !== st.active || force) setView(st, i);
   if (!st.mounted) return;
@@ -232,7 +233,7 @@ function setView(st, i) {
   if (!v.compare) st.sec.classList.remove('demo-done');
   $$('.ch-tabs button', st.sec).forEach((b, k) => b.setAttribute('aria-selected', k === i));
   const hint = $('.hint', st.sec); hint.textContent = v.hint || ''; hint.classList.toggle('on', !!v.hint);
-  const cap = $('.cap', st.sec); if (cap) cap.textContent = v.caption || '';
+  const cap = $('.cap', st.sec); if (cap) cap.textContent = v.caption || (v.captions ? v.captions[0][0] : '');
   if (!st.mounted) return;
   // element layers: visible if this view uses them; apply this view's attributes
   for (const [tag, e] of st.els) {
@@ -508,7 +509,11 @@ $$('.sk').forEach((b) => {
 skRoot.addEventListener('mouseleave', () => setSkill(null));
 
 /* ═════════════ boot ═════════════ */
-for (const ch of chapters) flows[ch.flow].append(ch.hero ? buildChapter(ch) : buildSequence(ch));
+for (const ch of chapters) {
+  if (ch.seq) flows[ch.flow].append(buildSequence(ch));
+  else if (ch.intro) flows[ch.flow].append(buildBeat({ ...ch, views: ch.views.slice(0, ch.intro) }), buildChapter({ ...ch, views: ch.views.slice(ch.intro) }));
+  else flows[ch.flow].append(buildChapter(ch));
+}
 chapterState.forEach((st) => chapterIO.observe(st.sec));
 layout();
 initHero($('#hero-canvas'));

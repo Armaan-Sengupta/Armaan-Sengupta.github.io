@@ -47,7 +47,8 @@ function cfdColor(k) {
 }
 class AirStream {
   constructor(canvas) { this.c = canvas; this.g = canvas.getContext('2d'); this.ps = []; this.w = 0; this.h = 0; this.mouse = null; }
-  resize(w, h, dpr) { this.w = w; this.h = h; this.dpr = dpr; this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr); this.ps = []; }
+  // h includes any bleed below the element; vh is the element's own height (sets the flow speed)
+  resize(w, h, dpr, vh = h) { this.w = w; this.h = h; this.vh = vh; this.dpr = dpr; this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr); this.ps = []; }
   clear() { if (this.ps.length) { this.g.setTransform(1, 0, 0, 1, 0, 0); this.g.clearRect(0, 0, this.c.width, this.c.height); this.ps = []; } }
   spawn(geo, top) {
     const { w, h } = this; let x;
@@ -61,7 +62,7 @@ class AirStream {
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,.075)'; g.fillRect(0, 0, w, h);
     g.globalCompositeOperation = 'source-over'; g.lineWidth = 1.5; g.lineCap = 'round';
-    const U = h * 0.5, cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
+    const U = this.vh * 0.5, cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
     const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
     for (const q of this.ps) {
       const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, dx = (q.x - edge) * side;
@@ -307,7 +308,7 @@ class ASAirbrakes extends HTMLElement {
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
       <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>
-      <canvas class="flow" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>`;
+      <canvas class="flow" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none"></canvas>`;
     this._canvas = root.querySelector('canvas');
     try { this.r = new AirbrakeRenderer(this._canvas); }
     catch (e) { root.querySelector('.stage').innerHTML = '<div style="padding:24px;font:12px monospace;color:#999">WebGL unavailable</div>'; return; }
@@ -322,7 +323,7 @@ class ASAirbrakes extends HTMLElement {
     if (this._journey) this.r.setCamMix(0); else this.r.setView(this.view, true);
     if (this.hasAttribute('progress')) this.progress = this.getAttribute('progress');
     else if (this.hasAttribute('extension')) this._target = this._ext = clamp(+this.getAttribute('extension') || 0);
-    this._ro = new ResizeObserver(es => { const c = es[0].contentRect; this.r.resize(c.width, c.height); this._flow.resize(c.width, c.height, Math.min(2, devicePixelRatio || 1)); this._w = c.width; this._h = c.height; this._dirty = true; this._kick(); });
+    this._ro = new ResizeObserver(es => { const c = es[0].contentRect; this.r.resize(c.width, c.height); this._sizeFlow(c.width, c.height); this._w = c.width; this._h = c.height; this._dirty = true; this._kick(); });
     this._ro.observe(root.querySelector('.stage'));
     this._io = new IntersectionObserver(es => { this._visible = es[es.length - 1].isIntersecting; this._kick(); }, { rootMargin: '64px' });
     this._io.observe(this);
@@ -336,6 +337,13 @@ class ASAirbrakes extends HTMLElement {
     if (n === 'view') { this._journey = v === 'journey'; if (!this._journey) { this._flow?.clear(); this.r.setView(v || 'mechanism', this._reduced?.matches); } this._dirty = true; this._kick(); }
     else if (n === 'progress' && v !== null) this.progress = v;
     else if (n === 'extension' && v !== null) { this._progress = null; this._target = this._ext = clamp(+v || 0); this._dirty = true; this._kick(); }
+  }
+  // in the journey the stream runs on past the bottom of the element and fades out, so it bleeds into what follows
+  _sizeFlow(w, h) {
+    const bleed = this._journey ? Math.round(innerHeight * 0.55) : 0, cv = this._flow.c;
+    cv.style.height = `${h + bleed}px`;
+    cv.style.webkitMaskImage = cv.style.maskImage = bleed ? `linear-gradient(#000 ${h - 40}px, transparent ${h + bleed}px)` : '';
+    this._flow.resize(w, h + bleed, Math.min(2, devicePixelRatio || 1), h);
   }
   setExtension(f) { this._progress = null; this._target = this._ext = clamp(+f || 0); this._dirty = true; this._kick(); }
   play() { if (this.time >= this.duration) this.time = 0; this._playing = true; if (this._btn) this._btn.textContent = 'PAUSE'; this._kick(); }

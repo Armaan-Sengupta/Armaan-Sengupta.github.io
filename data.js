@@ -37,12 +37,12 @@ export const chapters = [
     ]
   },
   {
-    id: 'airbrakes', flow: 'personal',
+    id: 'airbrakes', flow: 'personal', intro: 1,
     org: 'Waterloo Rocketry · Borealis', dates: '2023 – 2024',
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
     points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction and PI control', 'Designed the 4-layer avionics PCB for the canards, raising power efficiency from 66% to 95%'],
     views: [
-      { id: 'mechanism', label: 'Mechanism', caption: 'One servo turns the cam plate, which drives all three panels out together and through the airframe', el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 2.4 },
+      { id: 'mechanism', label: 'Mechanism', captions: [['One servo turns the cam plate, which drives all three panels out together', 0], ['As the panels extend out of the rocket body, the drag force on the rocket increases', 0.6]], el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 4.8 },
       { id: 'flight', label: 'Control loop', caption: 'Every few milliseconds the firmware estimates its state, predicts apogee and sets how far to deploy', el: EL.flight },
       { id: 'pcb', label: 'Flight computer', caption: 'The Canard-ian avionics board, from render to the assembled board', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
       { id: 'hardware', label: 'Hardware', caption: 'The machined airbrakes, from CAD to the real part', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
@@ -50,12 +50,12 @@ export const chapters = [
     ]
   },
   {
-    id: 'measurement', flow: 'personal',
-    org: 'Team of 3', dates: 'Sep – Dec 2023',
+    id: 'measurement', flow: 'personal', intro: 1,
+    org: '', dates: 'Sep – Dec 2023',
     title: 'Automated Measurement System', role: '',
     points: ['Used OpenCV to turn each part to its critical dimension', 'Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain', 'Measured parts to within 0.3 mm'],
     views: [
-      { id: 'machine', label: 'Machine', caption: 'The measurement rig', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
+      { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 1.8 },
       { id: 'protocol', label: '2-wire protocol', caption: 'Two wires carry each angle from the ESP32 to the VEX brain', el: EL.wire },
       { id: 'real', label: 'Real run', caption: 'A full run: find the orientation, turn the part, measure', video: 'media/gallery/measurement/demo-loop.mp4' }
     ]
@@ -64,9 +64,9 @@ export const chapters = [
 
   /* ─────────── professional ─────────── */
   {
-    id: 'neuralink', flow: 'professional', mono: true,
+    id: 'neuralink', flow: 'professional', mono: true, seq: true,
     org: 'California', logo: ['media/logos/neuralink.svg', 1.0], dates: 'Jan – Aug 2026',
-    title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern',
+    title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern · Stimulation – Blindsight',
     points: ['Wrote stimulation implant firmware across thousands of electrodes', 'Architected the app-to-ASIC stack for Blindsight', 'Cut registration time per trial by about 97%'],
     views: [
       { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },

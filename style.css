@@ -302,3 +302,6 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 .beat .frame{top:var(--nav);bottom:74px}
 .beat .cap{bottom:16px}
 .beat .hint{bottom:16px;left:auto;right:var(--gutter)}
+
+/* the airbrakes stream runs on below its frame and fades into the next section */
+.beat .frame,.beat .layers,.beat .el-layer{overflow:visible}
