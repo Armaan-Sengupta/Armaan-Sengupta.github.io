@@ -284,7 +284,7 @@ function setView(st, i) {
     const on = k === i; l.classList.toggle('on', on);
     if (!l.classList.contains('lottie')) $$('video', l).forEach((vid) => {
       if (on && k !== prev && st.ch.views[k].once) vid.currentTime = 0;
-      on && st.visible && !reduce ? vid.play().catch(() => {}) : vid.pause();
+      on && st.visible ? vid.play().catch(() => {}) : vid.pause();
     });
     l.player?.then((pl) => (on ? pl.play() : pl.pause()));
   });
@@ -408,7 +408,7 @@ const cardIO = new IntersectionObserver((es) => es.forEach(async (e) => {
   cardScrub();
 }), { rootMargin: '300px 0px' });
 $$('.card', grid).forEach((c) => cardIO.observe(c));
-const vidIO = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting && !reduce ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.2 });
+const vidIO = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.2 });
 function cardScrub() {
   scrubbers.forEach((s) => {
     const r = s.card.getBoundingClientRect();
