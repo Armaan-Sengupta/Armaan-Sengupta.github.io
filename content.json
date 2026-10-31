@@ -399,9 +399,9 @@
    "kind": "chapter",
    "summary": "Firmware for a first-generation neural stimulation implant and the app-to-ASIC stack for Blindsight, the visual prosthesis.",
    "bullets": [
-    "Led firmware for the 1st-gen stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling for 3k+ electrodes (Rust & C)",
+    "Led firmware for the 1st-gen stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling for thousands of electrodes (Rust & C)",
     "Architected the full app-to-ASIC stack for Blindsight",
-    "Cut registration time from 8 min to 15 s per trial, enabling ~40M pulses per electrode in 13 weeks: made the safety study feasible and hit the FDA submission deadline (Rust)",
+    "Cut registration time per trial by ~97%: made the safety study feasible and hit the FDA submission deadline (Rust)",
     "Brought up impedance and calibration, enabling chip self-test and unblocking the production line"
    ],
    "links": [

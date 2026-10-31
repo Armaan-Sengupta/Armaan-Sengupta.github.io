@@ -498,9 +498,9 @@ class CybertruckLighting extends HTMLElement {
       const phase = lt < 1 ? 'WAKE' : lt < 2.3 ? 'HOMING' : lt < 5.2 ? 'STEPPING TO AIM' : 'AIMED';
       txt(phase, pad, pad + fs + lh * 2, dim);
       const gh = Math.min(110, H * .26), gx = pad + 4, gy = H - pad - gh - fs * 1.8;
-      [['L', pl, l], ['R', pr, r]].forEach(([n, p, st], i) => { const x = gx + i * fs * 7; c.strokeStyle = 'rgba(242,239,233,.2)'; c.strokeRect(x + .5, gy + .5, 6, gh); c.fillStyle = hi; c.fillRect(x + 1.5, gy + gh * (1 - p), 4, gh * p); txt(n, x + 2, gy + gh + fs * 1.5, mid); txt(String(st).padStart(4, ' '), x + 12, gy + gh * (1 - p) + 4, mid); });
-      txt('Δ STEPS', gx + fs * 15, gy + fs, dim); txt(String(delta), gx + fs * 15, gy + fs + lh, delta > 4 ? ACC : hi);
-      txt(delta > 4 ? 'OUT OF SYNC' : (lt > 2 ? 'IN SYNC' : ''), gx + fs * 15, gy + fs + lh * 2, delta > 4 ? ACC : hi);
+      // stepper positions as bars only (no step counts)
+      [['L', pl], ['R', pr]].forEach(([n, p], i) => { const x = gx + i * fs * 4; c.strokeStyle = 'rgba(242,239,233,.2)'; c.strokeRect(x + .5, gy + .5, 6, gh); c.fillStyle = hi; c.fillRect(x + 1.5, gy + gh * (1 - p), 4, gh * p); txt(n, x + 2, gy + gh + fs * 1.5, mid); });
+      txt(delta > 4 ? 'OUT OF SYNC' : (lt > 2 ? 'IN SYNC' : ''), gx + fs * 9, gy + fs, delta > 4 ? ACC : hi);
       return;
     }
   }

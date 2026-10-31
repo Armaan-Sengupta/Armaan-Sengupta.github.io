@@ -53,31 +53,22 @@ export const chapters = [
   {
     id: 'measurement', flow: 'personal',
     org: 'Team of 3', dates: 'Sep – Dec 2023',
-    title: 'Automated Tolerance Inspection', role: 'Hands-off part measurement',
+    title: 'Automated Measurement System', role: '',
     points: ['OpenCV orients the part', 'Custom 2-wire ESP32 ↔ VEX protocol', 'Within 0.3 mm, every time'],
     views: [
       { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 0.9 },
-      { id: 'protocol', label: '2-wire protocol', el: EL.wire, hint: 'Drag the turntable' },
+      { id: 'protocol', label: '2-wire protocol', el: EL.wire },
       { id: 'real', label: 'Real run', video: 'media/gallery/measurement/demo-loop.mp4' }
     ]
   },
-  {
-    id: 'segway', flow: 'personal',
-    org: 'Dynamics modelling', dates: 'Jan – Apr 2025',
-    title: 'Segway Dynamics', role: 'Equations of motion to simulation',
-    points: ['Hand-derived nonlinear model', 'Simulink parameter sweep', 'Cross-checked in SimulationX'],
-    views: [
-      { id: 'ride', label: 'Ride', el: EL.segRide, hint: 'Click to push' },
-      { id: 'sweep', label: 'Parameter sweep', el: EL.segSweep }
-    ]
-  },
+
 
   /* ─────────── professional ─────────── */
   {
     id: 'neuralink', flow: 'professional', mono: true,
-    org: 'Neuralink · California', dates: 'Jan – Aug 2026',
+    org: 'California', logo: ['media/logos/neuralink.svg', 1.0], dates: 'Jan – Aug 2026',
     title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern',
-    points: ['Stimulation implant firmware, 3,000+ electrodes', 'App-to-ASIC stack for Blindsight', 'Registration: 8 min → 15 s per trial'],
+    points: ['Stimulation implant firmware across thousands of electrodes', 'App-to-ASIC stack for Blindsight', 'Cut registration time per trial by ~97%'],
     views: [
       { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },
       { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter' },
@@ -87,7 +78,7 @@ export const chapters = [
   },
   {
     id: 'tesla', flow: 'professional',
-    org: 'Tesla · California', dates: 'May – Aug 2025',
+    org: 'California', logo: ['media/logos/tesla.svg', 0.42], dates: 'May – Aug 2025',
     title: 'Tesla', role: 'Vehicle Firmware Intern · Body Controls',
     points: ['Brought up ~20 Semi exterior lights', 'Cybercab light self-tests', 'Cybertruck headlamp calibration fix'],
     views: [
@@ -98,7 +89,7 @@ export const chapters = [
   },
   {
     id: 'ixana', flow: 'professional',
-    org: 'Ixana · Indiana', dates: 'Aug – Dec 2024',
+    org: 'Indiana', logo: ['media/logos/ixana.svg', 0.62], dates: 'Aug – Dec 2024',
     title: 'Ixana', role: 'Embedded Firmware Intern',
     points: ['Glasses to watch, through the body', 'Frame rate 4 → 13 fps', 'MIPI-DSI display drivers'],
     views: [
@@ -110,17 +101,17 @@ export const chapters = [
   },
   {
     id: 'magna', flow: 'professional', mono: true,
-    org: 'Magna · Ontario', dates: 'Jan – Apr 2024',
+    org: 'Ontario', logo: ['media/logos/magna.svg', 0.62], dates: 'Jan – Apr 2024',
     title: 'Magna', role: 'Crack detection in a stamping die',
     points: ['Strain gauges → MQTT → live dashboard', 'Every cracked part caught, zero false alarms', 'Patent-pending PLC buffer: 142 → 500 Hz'],
     views: [
-      { id: 'detector', label: 'Live detector', el: EL.strain, hint: 'Click to inject a crack' },
+      { id: 'detector', label: 'Live detector', el: EL.strain },
       { id: 'dashboard', label: 'Dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
     ]
   },
   {
     id: 'fyelabs', flow: 'professional',
-    org: 'FYELABS · Ontario', dates: 'May – Sep 2023',
+    org: 'Ontario', logo: ['media/logos/fyelabs.png', 0.58], dates: 'May – Sep 2023',
     title: 'FYELABS', role: 'Robotics & Embedded Intern',
     points: ['Back-up safety for garbage trucks', 'LiDAR dust filter that still sees people', '100+ part enclosure, cost cut 56%'],
     views: [
@@ -141,6 +132,7 @@ export const cards = [
   { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
   { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
   { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
+  { id: 'segway', title: 'Segway Dynamics', kicker: 'Year 3 · Modelling', blurb: 'A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.', media: { el: EL.segRide } },
   { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
   { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
   { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
@@ -243,8 +235,8 @@ export const details = {
       { type: 'image', src: 'elements/neuralink/media/neural-implant-cutaway.jpg', caption: 'Cut-away implant and thread exit. This is an artistic rendering, not official Neuralink material, and does not indicate product fidelity.' },
       { type: 'image', src: 'elements/neuralink/media/neural-signals.jpg', caption: 'Stimulation pulses travelling to the electrode contacts. This is an artistic rendering, not official Neuralink material, and does not indicate product fidelity.' }
     ],
-    body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across 3,000+ electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
-      'Cut registration from 8 min to 15 s per trial, enabling ~40M pulses per electrode in 13 weeks, which made the safety study feasible and met the FDA submission deadline. Brought up impedance and calibration so chips could self-test, unblocking the production line.'],
+    body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across thousands of electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
+      'Cut registration time per trial by ~97%, which made the stimulation safety study feasible on schedule and met the FDA submission deadline. Brought up impedance and calibration so chips could self-test, unblocking the production line.'],
     chips: ['Rust', 'C', 'DMA', 'Interrupts', 'ASIC bring-up', 'Protobuf'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
   },
   tesla: { gallery: [

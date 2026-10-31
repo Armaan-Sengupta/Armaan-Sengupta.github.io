@@ -267,8 +267,8 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 }
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
 
-/* on phones these demos would trap the scroll: show them, but let touches pass through to the page */
-@media (max-width:860px),(pointer:coarse){
-  #ch-measurement .el-layer,#ch-segway .el-layer,#ch-magna .el-layer{pointer-events:none}
-  #ch-measurement .hint,#ch-segway .hint,#ch-magna .hint{display:none}
-}
+/* the protocol and crack-detector demos run on their own; no interaction */
+#ch-measurement .el-layer,#ch-magna .el-layer{pointer-events:none}
+
+/* professional chapters: white company logo in place of the name */
+.ch-copy h3 .logo{display:block;width:auto;max-width:100%;filter:brightness(0) invert(1);margin:.12em 0 .18em}

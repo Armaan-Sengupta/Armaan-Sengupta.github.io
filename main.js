@@ -80,8 +80,8 @@ function buildChapter(ch) {
     <div class="pin">
       <div class="ch-copy">
         <div class="meta mono"><span>${esc(ch.org)}</span><span>${esc(ch.dates)}</span></div>
-        <h3>${esc(ch.title)}</h3>
-        <p class="role">${esc(ch.role)}</p>
+        <h3>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h3>
+        ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
         <div class="ch-actions">
           <button class="btn" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>
