@@ -324,8 +324,8 @@ export const details = {
 export const uses = [
   ['neuralink', 'Neuralink · implant firmware'], ['tesla', 'Tesla · vehicle lighting'], ['ixana', 'Ixana · wearable video'], ['magna', 'Magna · crack detection'],
   ['fyelabs', 'FYELABS · truck safety'], ['airbrakes', 'Waterloo Rocketry · airbrakes'], ['ripl', 'RIPL · contact localization'], ['platform', 'Stewart platform'],
-  ['measurement', 'Tolerance inspection'], ['beam-balancer', 'Beam balancer'], ['segway', 'Segway dynamics'], ['lidar', 'LiDAR point clouds'],
-  ['gantry', 'Two-axis gantry'], ['clamping-hub', 'Clamping hub'], ['ftc', 'FTC 16397']
+  ['measurement', 'Automated measurement system'], ['beam-balancer', 'Beam balancer'], ['segway', 'Segway dynamics'], ['lidar', 'LiDAR point clouds'],
+  ['gantry', 'Two-axis gantry'], ['clamping-hub', 'Clamping hub'], ['ftc', 'FTC 16397'], ['trashminator', 'Trashminator'], ['radial-engine', 'Radial engine']
 ];
 
 export const skills = {
@@ -333,27 +333,33 @@ export const skills = {
     'C': ['neuralink', 'tesla', 'airbrakes', 'platform', 'measurement', 'beam-balancer', 'gantry'],
     'C++': ['ixana', 'fyelabs', 'measurement'],
     'Rust': ['neuralink'],
-    'Python': ['tesla', 'magna', 'fyelabs', 'ripl', 'platform', 'measurement', 'beam-balancer', 'segway', 'lidar'],
+    'Python': ['tesla', 'magna', 'fyelabs', 'ixana', 'ripl', 'platform', 'measurement', 'beam-balancer', 'segway', 'lidar'],
     'Java': ['ftc'], 'Verilog': ['ixana'], 'MATLAB': ['segway', 'platform']
   },
   'Embedded': {
-    'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'Nordic': ['neuralink', 'ixana'], 'ARM': ['neuralink'], 'NXP · Ambiq': ['ixana'], 'FreeRTOS': ['airbrakes'],
-    'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'ASIC bring-up': ['neuralink', 'ixana'], 'FPGA': ['ixana']
+    'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'Nordic': ['neuralink', 'ixana'], 'ARM': ['neuralink', 'ixana'], 'NXP · Ambiq': ['ixana'], 'Arduino': ['trashminator'],
+    'FreeRTOS': ['airbrakes'], 'Bare metal': ['ixana', 'gantry'], 'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'Device drivers': ['tesla', 'ixana', 'neuralink'],
+    'Hardware bring-up': ['tesla', 'neuralink', 'ixana'], 'ASIC bring-up': ['neuralink', 'ixana'], 'ADC · current sense': ['tesla', 'gantry'], 'RF · gain control': ['ixana'],
+    'FPGA': ['ixana'], 'Beckhoff PLC': ['magna'], 'Multithreading': ['magna']
   },
   'Protocols': {
-    'I²C': ['airbrakes', 'measurement', 'fyelabs'], 'Protobuf': ['neuralink'], 'UART': ['fyelabs', 'airbrakes', 'gantry'],
-    'MIPI DSI': ['ixana'], 'LoRa': ['fyelabs'], 'MQTT': ['magna', 'fyelabs'], 'WebSockets': ['measurement']
+    'I²C': ['airbrakes', 'measurement', 'fyelabs', 'ixana'], 'SPI': ['ixana'], 'UART': ['fyelabs', 'airbrakes', 'gantry'], 'CAN': ['airbrakes'],
+    'MIPI DSI': ['ixana'], 'Protobuf': ['neuralink'], 'LoRa': ['fyelabs'], 'MQTT': ['magna', 'fyelabs'], 'WebSockets': ['measurement']
   },
   'Hardware & CAD': {
-    'KiCad': ['airbrakes'], 'Altium': ['tesla'], 'EasyEDA': ['fyelabs'], 'SolidWorks': ['airbrakes', 'fyelabs', 'beam-balancer', 'clamping-hub', 'platform'],
-    'Ansys · FEA': ['airbrakes', 'clamping-hub'], 'Sheet-metal DFM': ['fyelabs']
+    'PCB design': ['airbrakes', 'fyelabs'], 'KiCad': ['airbrakes'], 'Altium': ['tesla'], 'EasyEDA': ['fyelabs'],
+    'SolidWorks': ['airbrakes', 'fyelabs', 'beam-balancer', 'clamping-hub', 'platform'], 'Fusion 360': ['trashminator', 'radial-engine'], 'Inventor': ['radial-engine'],
+    'Ansys · FEA · CFD': ['airbrakes', 'clamping-hub'], 'Sheet-metal DFM': ['fyelabs']
   },
   'Controls & Robotics': {
     'PID · PIDF': ['airbrakes', 'platform', 'beam-balancer', 'ftc'], 'State estimation': ['airbrakes', 'platform'], 'Kinematics': ['platform', 'ripl'],
     'Trajectory planning': ['platform', 'airbrakes'], 'Simulink · Simscape': ['platform', 'segway'], 'SimulationX': ['segway'],
-    'ROS 2': ['ripl'], 'MuJoCo': ['ripl'], 'OpenCV': ['platform', 'measurement', 'beam-balancer'], 'LiDAR': ['fyelabs', 'lidar']
+    'ROS 2': ['ripl'], 'MuJoCo': ['ripl'], 'OpenCV': ['platform', 'measurement', 'beam-balancer'], 'TensorFlow': ['ftc'], 'LiDAR': ['fyelabs', 'lidar']
+  },
+  'Data & signals': {
+    'Signal processing': ['magna', 'fyelabs'], 'Anomaly detection': ['magna'], 'Open3D · NumPy': ['lidar'], 'PostgreSQL': ['magna']
   },
   'Tooling': {
-    'Git': ['neuralink', 'tesla', 'ixana', 'platform'], 'Pytest · SIL / HIL': ['tesla', 'ixana', 'fyelabs'], 'PostgreSQL': ['magna']
+    'Git': ['neuralink', 'tesla', 'ixana', 'platform'], 'Pytest · SIL / HIL': ['tesla', 'ixana', 'fyelabs'], 'C unit tests': ['tesla']
   }
 };
