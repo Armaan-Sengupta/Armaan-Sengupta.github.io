@@ -45,7 +45,7 @@ export const chapters = [
       { id: 'mechanism', label: 'Mechanism', captions: [['One servo turns the cam plate, which drives all three panels out together', 0], ['As the panels extend out of the rocket body, the drag force on the rocket increases', 0.47], ['In flight, the computer predicts apogee and moves the airbrakes in and out until the prediction meets the target', 0.66]], el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 7 },
       { id: 'pcb', label: 'Flight computer', caption: 'The Canard-ian avionics board, from render to the assembled board', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
       { id: 'hardware', label: 'Hardware', caption: 'The machined airbrakes, from CAD to the real part', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
-      { id: 'launch', label: 'Launch', caption: 'Borealis lifting off at Launch Canada, August 2024', video: 'media/airbrakes/launch-scrub.mp4', once: true }
+      { id: 'launch', label: 'Launch', fall: true, caption: 'Borealis lifting off at Launch Canada, August 2024', video: 'media/airbrakes/launch-scrub.mp4', once: true }
     ]
   },
   {

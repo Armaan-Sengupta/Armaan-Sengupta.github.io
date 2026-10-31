@@ -165,6 +165,13 @@ async function mountChapter(st) {
       layer = document.createElement('div'); layer.className = 'layer' + (v.img || v.video || v.swap ? ' media' : '') + (v.color ? ' color' : '');
       if (v.video) {
         const vid = makeVideo(v.video, { loop: !v.once }); layer.append(vid);
+        // the rocket from the scroll animation, back from apogee: it nose-dives through the end of the launch clip
+        if (v.fall) {
+          const r = document.createElement('div'); r.className = 'fall-rocket'; r.setAttribute('aria-hidden', 'true');
+          r.innerHTML = '<svg viewBox="0 0 40 160"><path d="M20 2 C29 16 32 34 32 52 V128 L40 150 V158 L30 150 H10 L0 158 V150 L8 128 V52 C8 34 11 16 20 2 Z" fill="#c9ccd1"/><rect x="8" y="88" width="24" height="3" fill="#8f949b"/><path d="M14 150 h12 l-3 8 h-6 z" fill="#5c6067"/></svg>';
+          layer.append(r);
+          vid.addEventListener('timeupdate', () => { const left = vid.duration - vid.currentTime; r.classList.toggle('go', vid.duration > 0 && left < 1.6 && vid.currentTime > 0.5); });
+        }
         if (v.once) vid.addEventListener('timeupdate', () => { const b = $$('.ch-tabs b', st.sec)[i]; if (b && st.active === i && vid.duration) b.style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
       }
       if (v.swap) v.swap.forEach((src, k) => { const im = new Image(); im.src = src; im.alt = `${st.ch.title}: ${v.label}${k ? ' (real)' : ' (render)'}`; im.className = 'fit' + (k ? ' swap-b' : ''); im.loading = 'lazy'; layer.append(im); });
@@ -245,7 +252,7 @@ function setView(st, i) {
   if (!st.mounted) return;
   // element layers: visible if this view uses them; apply this view's attributes
   for (const [tag, e] of st.els) {
-    const on = v.el && v.el.tag === tag;
+    const on = !!(v.el && v.el.tag === tag);   // a bare undefined would make toggle() flip the class
     e.layer.classList.toggle('on', on);
     if (on) e.ready.then((n) => {
       if (!n || st.active !== i) return;
@@ -309,8 +316,9 @@ function swapWithVeil(name, opts) {
   setTimeout(() => {
     showFlow(name, opts);
     const f = flows[name]; f.classList.remove('flow-enter'); void f.offsetWidth; f.classList.add('flow-enter');
-    setTimeout(() => { veil.classList.remove('on'); flowSwitch.classList.remove('swapping'); }, reduce ? 0 : 160);
-  }, reduce ? 0 : 480);
+    setTimeout(() => veil.classList.remove('on'), reduce ? 0 : 250);
+    setTimeout(() => flowSwitch.classList.remove('swapping'), reduce ? 0 : 900);
+  }, reduce ? 0 : 1000);
 }
 flowSwitch.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) swapWithVeil(b.dataset.flow); });
 $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {

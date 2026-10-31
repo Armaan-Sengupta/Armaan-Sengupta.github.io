@@ -48,10 +48,11 @@ const controlAt = (q) => CONTROL[Math.round(clamp(q) * (CONTROL.length - 1))];
 // journey: deploy on the bench, retract while the camera pulls back into the airframe, deploy into the flow,
 // then pull back further: the rocket moves aside, flies through the stream, and the control loop plays out
 function journeyAt(p) {
-  const zoom = smooth((p - 0.6) / 0.12), q = clamp((p - 0.7) / 0.3);
+  // ...and finally the rocket carries on up and out of frame, on its way to apogee
+  const zoom = smooth((p - 0.6) / 0.12), q = clamp((p - 0.7) / 0.22), exit = smooth((p - 0.9) / 0.1);
   const ext = p < 0.2 ? smooth(p / 0.2) : p < 0.26 ? 1 : p < 0.4 ? 1 - smooth((p - 0.26) / 0.14) : p < 0.44 ? 0
     : p < 0.6 ? smooth((p - 0.44) / 0.14) : p < 0.7 ? 1 : controlAt(q).e;
-  return { ext, cam: smooth((p - 0.25) / 0.17), zoom, q };
+  return { ext, cam: smooth((p - 0.25) / 0.17), zoom, q, exit };
 }
 
 /* Screen-space air stream, coloured by speed like a CFD velocity plot. Freestream falls from the top of the
@@ -84,7 +85,7 @@ class AirStream {
     const U = this.vh * 0.5 * (this.speed ?? 1), cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
     const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
     for (const q of this.ps) {
-      const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, dx = (q.x - edge) * side;
+      const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, free = q.y > geo.tail, dx = free ? 999 : (q.x - edge) * side;
       let vx = 0, vy = U * (0.45 + 0.55 * smooth(dx / 30));             // thin boundary layer along the airframe
       if (dx > 2 && dx < 120 && q.y < geo.py - 200) vx -= side * U * 0.05 * (1 - dx / 120);   // upstream, drawn in close to the body
       const ext = geo.ext[side < 0 ? 0 : 1], py = geo.py;
@@ -106,7 +107,7 @@ class AirStream {
         if (d < rc * 4) { const k = (rc * rc) / Math.max(d2, rc * rc * 0.6); vx += (rx / d) * U * 1.4 * k; vy += (ry / d) * U * 0.4 * k - U * 0.3 * k; }
       }
       const ox = q.x, oy = q.y; q.x += vx * dt; q.y += vy * dt; q.life += dt;
-      const nd = (q.x - edge) * side; if (nd < 1.5) q.x = edge + side * 1.5;
+      const nd = (q.x - edge) * side; if (!free && nd < 1.5) q.x = edge + side * 1.5;
       const sp = Math.hypot(vx, vy) / U, col = cfdColor(sp);
       const D = this.dim, inChart = D && q.x > D.x0 && q.x < D.x1 && q.y > D.y0 && q.y < D.y1 ? 1 - 0.8 * D.k : 1;   // quieter behind the chart
       g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha * inChart).toFixed(3)})`;
@@ -263,6 +264,7 @@ export class AirbrakeRenderer {
     this.sliders.forEach(s => { s.position.x = k.travel; });
     return true;
   }
+  setRise(k) { this.root.position.y = 75 * k * k; }
   setCamMix(m, zoom = 0) {
     const a = VIEWS.mechanism, b = VIEWS.airframe, e = smooth(m); for (const k of Object.keys(a)) this.cam[k] = a[k] + (b[k] - a[k]) * e; this._viewT = 1;
     this.cam.d *= 1 + 0.75 * zoom; this._shift = zoom;
@@ -272,7 +274,7 @@ export class AirbrakeRenderer {
     this._applyCamera(); this.camera.updateMatrixWorld(); this.root.updateMatrixWorld(true);
     const P = (v) => { v.project(this.camera); return [(v.x + 1) / 2 * w, (1 - v.y) / 2 * h]; };
     const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0); right.y = 0; right.normalize();
-    const y = this.Y.panel + 0.12, R = G.AIRFRAME_R;
+    const y = this.Y.panel + 0.12 + this.root.position.y, R = G.AIRFRAME_R;
     const a = P(right.clone().multiplyScalar(-R).setY(y)), b = P(right.clone().multiplyScalar(R).setY(y));
     const bx0 = Math.min(a[0], b[0]), bx1 = Math.max(a[0], b[0]), ext = [0, 0];
     for (const s of this.sliders) {
@@ -281,7 +283,8 @@ export class AirbrakeRenderer {
         if (x < bx0) ext[0] = Math.max(ext[0], bx0 - x); else if (x > bx1) ext[1] = Math.max(ext[1], x - bx1);
       }
     }
-    return { bx0, bx1, py: (a[1] + b[1]) / 2, ext };
+    const tail = P(new THREE.Vector3(0, -40 + this.root.position.y, 0))[1];   // below the tail the stream is free
+    return { bx0, bx1, py: (a[1] + b[1]) / 2, ext, tail };
   }
   setView(name, instant = false) {
     const v = VIEWS[name] || VIEWS.mechanism;
@@ -374,7 +377,7 @@ class ASAirbrakes extends HTMLElement {
     const cv = this._chart, g = this._cg, w = this._w, h = this._h, dpr = Math.min(2, devicePixelRatio || 1);
     if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-    const al = smooth((J.zoom - 0.5) / 0.5); if (al <= 0) { this._flow.dim = null; return; }
+    const al = smooth((J.zoom - 0.5) / 0.5) * (1 - smooth(J.exit / 0.6)); if (al <= 0) { this._flow.dim = null; return; }
     const narrow = w < 700, x0 = narrow ? w * 0.08 : w * 0.55, x1 = narrow ? w * 0.92 : Math.min(w * 0.93, x0 + 560);
     const top = narrow ? h * 0.34 : h * 0.2, mid = top + (narrow ? h * 0.17 : h * 0.3), bot = narrow ? h * 0.74 : h * 0.78, n = Math.round(J.q * (CONTROL.length - 1));
     // target apogee at the top: with the panels out the prediction starts short of it, and rises onto it as they ease back in;
@@ -423,6 +426,7 @@ class ASAirbrakes extends HTMLElement {
         const tgt = this._progress ?? 0, k = this._reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
         this._jp += (tgt - this._jp) * k; if (Math.abs(tgt - this._jp) > 1e-4) moving = true; else this._jp = tgt;
         const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
+        if (J.exit !== this._exit) { this.r.setRise(J.exit); this._exit = J.exit; this._dirty = true; }
         this._flow.speed = 1.8 * (1 - 0.85 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
         if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
