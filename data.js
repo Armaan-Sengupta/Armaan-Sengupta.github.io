@@ -28,7 +28,7 @@ export const chapters = [
   {
     id: 'platform', flow: 'personal', hero: true,
     org: '3RRS parallel manipulator', dates: 'Sep – Dec 2025',
-    title: 'Stewart Platform', role: 'Ball-on-plate balancing robot',
+    title: 'Stewart Platform', role: 'Ball balancing robot',
     points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],
     views: [
       { id: 'assemble', label: 'Assembly', el: EL.platform, progress: 'view', len: 1.3 },
@@ -231,7 +231,7 @@ export const details = {
       { type: 'image', src: 'media/segway/simulink-sweep-narrow.webp', caption: 'Narrow sweep near 170 N' },
       { type: 'image', src: 'media/segway/simulink-distance-traces.webp', caption: 'Position traces' },
       { type: 'image', src: 'media/segway/simulationx-optimization.webp', caption: 'SimulationX optimum: 110 N, 11°, 9.15 m' },
-      { type: 'pdf', src: 'media/segway/syde351-human-transporter-report.pdf', caption: 'SYDE 351 technical report: human transporter' }
+      { type: 'pdf', src: 'media/segway/syde351-human-transporter-report.pdf', caption: 'Technical report: human transporter' }
     ],
     body: ['We derived the nonlinear kinematic and kinetic equations of a human transporter, then linearized them with a small-angle approximation into a state-space model.',
       'A Simulink model swept thrust force and lean angle, coarse first and then finely. SimulationX models the system acausally without hand-derived equations; the gap between the two is the cost of the idealizations.'],
