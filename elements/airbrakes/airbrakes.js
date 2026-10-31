@@ -69,21 +69,23 @@ class AirStream {
   clear() { if (this.ps.length) { this.g.setTransform(1, 0, 0, 1, 0, 0); this.g.clearRect(0, 0, this.c.width, this.c.height); this.ps = []; } }
   spawn(geo, top) {
     const { w, h } = this; let x;
-    do { x = Math.random() * w; } while (x > geo.bx0 - 3 && x < geo.bx1 + 3);
+    if (Math.random() < 0.4) { const side = Math.random() < 0.5 ? -1 : 1, d = 1.5 + Math.abs(Math.random() + Math.random() - 1) * 90; x = (side < 0 ? geo.bx0 : geo.bx1) + side * d; }   // denser close to the airframe
+    else do { x = Math.random() * w; } while (x > geo.bx0 - 3 && x < geo.bx1 + 3);
     return { x, y: top ? -Math.random() * h * 0.05 : Math.random() * h, life: 0 };
   }
   step(dt, geo, alpha) {
     const { w, h, g } = this; if (!w || !h) return;
-    const n = Math.round(Math.min(650, Math.max(200, w * h / 3200)));
+    const n = Math.round(Math.min(950, Math.max(280, w * h / 2200)));
     while (this.ps.length < n) this.ps.push(this.spawn(geo, false));
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,.075)'; g.fillRect(0, 0, w, h);
     g.globalCompositeOperation = 'source-over'; g.lineWidth = 1.5; g.lineCap = 'round';
-    const U = this.vh * 0.5, cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
+    const U = this.vh * 0.5 * (this.speed ?? 1), cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
     const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
     for (const q of this.ps) {
       const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, dx = (q.x - edge) * side;
-      let vx = 0, vy = U * (0.35 + 0.65 * smooth(dx / 46));             // boundary layer along the airframe
+      let vx = 0, vy = U * (0.45 + 0.55 * smooth(dx / 30));             // thin boundary layer along the airframe
+      if (dx > 2 && dx < 120 && q.y < geo.py - 200) vx -= side * U * 0.05 * (1 - dx / 120);   // upstream, drawn in close to the body
       const ext = geo.ext[side < 0 ? 0 : 1], py = geo.py;
       if (ext > 3) {
         const above = py - q.y, below = q.y - py, k = 1 - clamp((dx - ext) / (ext * 0.6 + 20));
@@ -95,6 +97,7 @@ class AirStream {
           const sw = U * 1.3 * Math.exp(-r / (ext * 0.9 + 12));
           vx += (-ry / r) * sw * side; vy = vy * 0.35 + (rx / r) * sw * side;
         } else if (below >= 0 && below < ext * 4 && dx < ext * 1.6) vy *= 0.6 + 0.4 * below / (ext * 4);
+        if (below > ext * 1.2 && below < ext * 9 && dx > 2 && dx < ext * 3) vx -= side * U * 0.22 * Math.exp(-(below - ext * 1.2) / (ext * 4));   // reattaches to the body downstream
         if (Math.abs(q.y - py) < 5 && dx < ext) q.x = edge + side * (ext + 2);   // never through the panel
       }
       if (M) {                                                             // cursor: flow around a small cylinder
@@ -373,22 +376,28 @@ class ASAirbrakes extends HTMLElement {
     const al = smooth((J.zoom - 0.5) / 0.5); if (al <= 0) { this._flow.dim = null; return; }
     const narrow = w < 700, x0 = narrow ? w * 0.08 : w * 0.55, x1 = narrow ? w * 0.92 : Math.min(w * 0.93, x0 + 560);
     const top = narrow ? h * 0.34 : h * 0.2, mid = top + (narrow ? h * 0.17 : h * 0.3), bot = narrow ? h * 0.74 : h * 0.78, n = Math.round(J.q * (CONTROL.length - 1));
-    const X = (i) => x0 + (x1 - x0) * i / (CONTROL.length - 1), Yp = (x) => mid - (mid - top) * 0.85 * x, Ye = (e) => bot - (bot - mid - 56) * e;
+    // altitude climbs toward apogee with the target near the top; the prediction starts above the target and is pulled down onto it
+    const N = CONTROL.length - 1, yT = top + (mid - top) * 0.34;
+    const X = (i) => x0 + (x1 - x0) * i / N, Yp = (x) => yT - (yT - top) * 0.9 * x, Ye = (e) => bot - (bot - mid - 56) * e;
+    const Ya = (i) => { const t = i / N; return mid - 4 + (Yp(CONTROL[i].x) - mid + 4) * (1 - (1 - t) * (1 - t)); };
     this._flow.dim = { x0: x0 - 18, x1: x1 + 18, y0: top - 34, y1: bot + 18, k: al };
     g.globalAlpha = al; g.font = `400 ${narrow ? 12 : 13}px Inter, system-ui, sans-serif`; g.textBaseline = 'alphabetic';
     g.fillStyle = 'rgba(8,8,10,.55)'; g.fillRect(x0 - 18, top - 34, x1 - x0 + 36, bot - top + 52);
     // target apogee
-    g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, mid); g.lineTo(x1, mid); g.stroke(); g.setLineDash([]);
-    g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, mid - 8);
-    g.textAlign = 'left'; g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Predicted apogee', x0, top - 12);
+    g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, yT); g.lineTo(x1, yT); g.stroke(); g.setLineDash([]);
+    g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, yT + 18);
+    g.textAlign = 'left'; g.fillStyle = '#f0a040'; g.fillText('Predicted apogee', x0, top - 12);
+    g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0 + g.measureText('Predicted apogee').width + 18, top - 12);
     g.strokeStyle = '#f0a040'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Yp(CONTROL[i].x); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    g.strokeStyle = 'rgba(242,239,233,.9)'; g.lineWidth = 2; g.beginPath();
+    for (let i = 0; i <= n; i++) { const y = Ya(i); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
     // extension
     g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Airbrake extension', x0, mid + 36);
     g.strokeStyle = 'rgba(242,239,233,.15)'; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x1, bot); g.stroke();
     g.strokeStyle = '#8fb4ff'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Ye(CONTROL[i].e); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
-    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f0a040'; g.beginPath(); g.arc(X(n), Yp(c.x), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
+    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f2efe9'; g.beginPath(); g.arc(X(n), Ya(n), 3.5, 0, 7); g.fill(); g.fillStyle = '#f0a040'; g.beginPath(); g.arc(X(n), Yp(c.x), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
     g.globalAlpha = 1;
   }
   _sizeFlow(w, h) {
@@ -415,6 +424,7 @@ class ASAirbrakes extends HTMLElement {
         const tgt = this._progress ?? 0, k = this._reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
         this._jp += (tgt - this._jp) * k; if (Math.abs(tgt - this._jp) > 1e-4) moving = true; else this._jp = tgt;
         const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
+        this._flow.speed = 1.8 * (1 - 0.85 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
         if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
       else if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }

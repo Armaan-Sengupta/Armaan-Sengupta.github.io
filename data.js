@@ -55,8 +55,9 @@ export const chapters = [
     points: ['Used OpenCV to turn each part to its critical dimension', 'Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain', 'Measured parts to within 0.3 mm'],
     views: [
       { id: 'machine', label: 'Machine', scrub: 'media/lottie/measurement-device.mp4', progress: 'view', len: 1.8 },
-      { id: 'protocol', label: '2-wire protocol', caption: 'Two wires carry each angle from the ESP32 to the VEX brain', el: EL.wire },
-      { id: 'real', label: 'Real run', caption: 'A full run: find the orientation, turn the part, measure', video: 'media/gallery/measurement/demo-loop.mp4' }
+      { id: 'rig', label: 'The rig', img: 'media/measurement-rig.webp' },
+      { id: 'real', label: 'Real run', caption: 'A full run: find the orientation, turn the part, measure', video: 'media/gallery/measurement/demo-loop.mp4' },
+      { id: 'protocol', label: '2-wire protocol', caption: 'Two wires carry each angle from the ESP32 to the VEX brain', el: EL.wire }
     ]
   },
 
@@ -208,7 +209,9 @@ export const details = {
       'Ansys CFD gave C<sub>D</sub> against extension and checked the centre-of-pressure margin. STM32 / FreeRTOS firmware estimates state with a Madgwick filter, predicts apogee with RK4 and closes the loop with a PI controller. The 4-layer KiCad flight computer raised power efficiency from 66% to 95%.'],
     chips: ['C · FreeRTOS', 'STM32', 'KiCad', 'Ansys CFD', 'SolidWorks'], links: [['Borealis', 'https://www.waterloorocketry.com/rockets/borealis']]
   },
-  measurement: {
+  measurement: { gallery: [
+      { type: 'image', src: 'media/measurement-rig.webp', caption: 'The built rig: VEX brain, turntable, clamp and the camera mast' }
+    ],
     body: ['Owned all firmware: both motors, encoder-to-dimension mapping, the GUI, and a custom 2-wire clocked protocol so an ESP32 could talk to a VEX brain that only exposes digital reads.',
       'OpenCV finds part orientation, angles stream over WebSockets, and the part turns to its critical dimension. Out-of-spec parts are logged to a server.'],
     chips: ['C++', 'ESP32', 'Protocol design', 'OpenCV'],

@@ -297,10 +297,20 @@ function showFlow(name, { restore = true } = {}) {
   scrollTo({ top: top + (first || !restore ? 0 : flowState.offsets[name]), behavior: 'auto' });
   onScroll();
 }
+// the switch stays in front, grows and slides its selection across while the page fades out under it;
+// the other flow then rises in as the fade lifts
 function swapWithVeil(name, opts) {
-  veil.querySelector('span').textContent = name === 'professional' ? 'Next · Professional work' : 'Personal projects';
+  if (name === flowState.current) return;
+  $$('button', flowSwitch).forEach((b) => b.setAttribute('aria-checked', b.dataset.flow === name));
+  flowSwitch.dataset.flow = name;
+  flowSwitch.classList.add('swapping');
+  veil.querySelector('span').textContent = '';
   veil.classList.add('on');
-  setTimeout(() => { showFlow(name, opts); setTimeout(() => veil.classList.remove('on'), 120); }, reduce ? 0 : 320);
+  setTimeout(() => {
+    showFlow(name, opts);
+    const f = flows[name]; f.classList.remove('flow-enter'); void f.offsetWidth; f.classList.add('flow-enter');
+    setTimeout(() => { veil.classList.remove('on'); flowSwitch.classList.remove('swapping'); }, reduce ? 0 : 160);
+  }, reduce ? 0 : 480);
 }
 flowSwitch.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) swapWithVeil(b.dataset.flow); });
 $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {

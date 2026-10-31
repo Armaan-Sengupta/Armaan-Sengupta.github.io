@@ -305,3 +305,12 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 
 /* the airbrakes stream runs on below its frame and fades into the next section */
 .beat .frame,.beat .layers,.beat .el-layer{overflow:visible}
+
+/* switching flows */
+.flow-veil{transition:opacity .45s var(--ease)}
+.flow-switch{transition:opacity .4s,transform .5s var(--ease),box-shadow .5s var(--ease)}
+.flow-switch.swapping{z-index:50;transform:translate(-50%,0) scale(1.14);box-shadow:0 0 0 1px rgba(242,239,233,.18),0 12px 48px rgba(242,239,233,.12)}
+.flow-switch.swapping .thumb{transition:transform .5s var(--ease)}
+@keyframes flowEnter{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.flow.flow-enter > :first-child{animation:flowEnter .8s var(--ease) both}
+@media (prefers-reduced-motion:reduce){.flow.flow-enter > :first-child{animation:none}}
