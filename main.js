@@ -535,6 +535,20 @@ $$('.sk').forEach((b) => {
   b.addEventListener('click', () => setSkill(skActive === b ? null : b));
 });
 skRoot.addEventListener('mouseleave', () => setSkill(null));
+// touch screens: no hover and no room for the lines, so a tap lists the skill's projects right under its group
+const touchSkills = matchMedia('(hover: none), (max-width: 860px)');
+const useLabel = new Map(uses);
+if (touchSkills.matches) $('#sk-hint').textContent = 'Tap one to see where it was used.';
+$$('.sk').forEach((b) => b.addEventListener('click', () => {
+  if (!touchSkills.matches) return;
+  const again = b.classList.contains('tapped');
+  $$('.sk-tap').forEach((e) => e.remove()); $$('.sk.tapped').forEach((x) => x.classList.remove('tapped'));
+  if (again) return;
+  b.classList.add('tapped');
+  const box = document.createElement('div'); box.className = 'sk-tap';
+  box.innerHTML = skills[b.dataset.g][b.textContent].map((id) => `<button data-open="${id}">${esc(useLabel.get(id) || id)} <span aria-hidden="true">→</span></button>`).join('');
+  b.closest('.sk-group').append(box);
+}));
 
 /* ═════════════ boot ═════════════ */
 for (const ch of chapters) {

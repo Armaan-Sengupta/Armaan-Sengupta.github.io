@@ -33,6 +33,11 @@ export const AIRBRAKE_DURATION = 9;
 // Borealis, redrawn as a vector from Waterloo Rocketry's upright render (paint, markings and proportions from their
 // video): 230 x 2700 units, body 63 wide centred at x 114.5, airbrake ring at y 1080. Takes over once the camera has
 // pulled back far enough to see the whole rocket; sized directly (not scaled) so it stays sharp.
+// half-widths (left, right of the centre line) of the rocket's silhouette every 10 units from y 300, measured from the
+// render's alpha: the ogive nose, the 32-unit body and the fins at the bottom. The air stream flows around this solid.
+const BOREALIS_PROFILE = { y0: 300, step: 10,
+  l: [0, 0, 1, 4, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 18, 19, 20, 21, 22, 22, 23, 24, 24, 25, 25, 26, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 44, 54, 64, 74, 84, 93, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 30, 29, 28, -1, 0],
+  r: [0, 0, 1, 4, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 18, 19, 20, 21, 22, 22, 23, 24, 24, 25, 25, 26, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 43, 53, 63, 73, 82, 92, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 30, 29, 28, 3, 0] };
 const BOREALIS = { src: new URL('./borealis.svg', import.meta.url).href, w: 230, h: 2700, body: 63, cx: 114.5, ring: 1080 };
 /* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
  * loop moves the panels until the prediction meets the target. x = how far the prediction is from the target, drawn
@@ -74,10 +79,11 @@ class AirStream {
   resize(w, h, dpr, vh = h) { this.w = w; this.h = h; this.vh = vh; this.dpr = dpr; this.c.width = Math.round(w * dpr); this.c.height = Math.round(h * dpr); this.ps = []; }
   clear() { if (this.ps.length) { this.g.setTransform(1, 0, 0, 1, 0, 0); this.g.clearRect(0, 0, this.c.width, this.c.height); this.ps = []; } }
   spawn(geo, top) {
-    const { w, h } = this; let x;
-    if (geo.tail > 0 && Math.random() < 0.4) { const side = Math.random() < 0.5 ? -1 : 1, d = 1.5 + Math.abs(Math.random() + Math.random() - 1) * 90; x = (side < 0 ? geo.bx0 : geo.bx1) + side * d; }   // denser close to the airframe
-    else do { x = Math.random() * w; } while (geo.tail > 0 && x > geo.bx0 - 3 && x < geo.bx1 + 3);   // once the rocket is gone, its column fills too
-    return { x, y: top ? -Math.random() * h * 0.05 : Math.random() * h, life: 0 };
+    const { w, h } = this, y = top ? -Math.random() * h * 0.05 : Math.random() * h;
+    const eL = geo.edgeAt(y, -1), eR = geo.edgeAt(y, 1); let x;
+    if (eL != null && Math.random() < 0.4) { const side = Math.random() < 0.5 ? -1 : 1, d = 1.5 + Math.abs(Math.random() + Math.random() - 1) * 90; x = (side < 0 ? eL : eR) + side * d; }   // denser close to the airframe
+    else do { x = Math.random() * w; } while (eL != null && x > eL - 3 && x < eR + 3);   // where there is no rocket (above the nose, once it has gone) the column fills
+    return { x, y, life: 0 };
   }
   step(dt, geo, alpha) {
     const { w, h, g } = this; if (!w || !h) return;
@@ -89,8 +95,10 @@ class AirStream {
     const U = this.vh * 0.5 * (this.speed ?? 1), cx = (geo.bx0 + geo.bx1) / 2, M = this.mouse;
     const rc = Math.max(8, 0.22 * Math.max(geo.ext[0], geo.ext[1], 30));
     for (const q of this.ps) {
-      const side = q.x < cx ? -1 : 1, edge = side < 0 ? geo.bx0 : geo.bx1, free = q.y > geo.tail, dx = free ? 999 : (q.x - edge) * side;
+      const side = q.x < cx ? -1 : 1, e0 = geo.edgeAt(q.y, side), free = e0 == null, edge = free ? (side < 0 ? geo.bx0 : geo.bx1) : e0, dx = free ? 999 : (q.x - edge) * side;
       let vx = 0, vy = U * (0.45 + 0.55 * smooth(dx / 30));             // thin boundary layer along the airframe
+      const eA = geo.edgeAt(q.y + 40, side);                             // the surface just downstream: nose shoulder, fins
+      if (eA != null) { const dA = (q.x - eA) * side; if (dA < 26) vx += side * U * 1.7 * clamp((26 - dA) / 26); }
       if (dx > 2 && dx < 120 && q.y < geo.py - 200) vx -= side * U * 0.05 * (1 - dx / 120);   // upstream, drawn in close to the body
       const ext = geo.ext[side < 0 ? 0 : 1], py = geo.py;
       if (ext > 3) {
@@ -111,7 +119,7 @@ class AirStream {
         if (d < rc * 4) { const k = (rc * rc) / Math.max(d2, rc * rc * 0.6); vx += (rx / d) * U * 1.4 * k; vy += (ry / d) * U * 0.4 * k - U * 0.3 * k; }
       }
       const ox = q.x, oy = q.y; q.x += vx * dt; q.y += vy * dt; q.life += dt;
-      const nd = (q.x - edge) * side; if (!free && nd < 1.5) q.x = edge + side * 1.5;
+      const e1 = geo.edgeAt(q.y, side); if (e1 != null && (q.x - e1) * side < 1.5) q.x = e1 + side * 1.5;   // never inside the solid
       const sp = Math.hypot(vx, vy) / U, col = cfdColor(sp);
       const D = this.dim, inChart = D && q.x > D.x0 && q.x < D.x1 && q.y > D.y0 && q.y < D.y1 ? 1 - 0.8 * D.k : 1;   // quieter behind the chart
       g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha * inChart).toFixed(3)})`;
@@ -289,7 +297,7 @@ export class AirbrakeRenderer {
       }
     }
     const tail = P(new THREE.Vector3(0, -40 + this.root.position.y, 0))[1];   // below the tail the stream is free (overridden by the full rocket)
-    return { bx0, bx1, py: (a[1] + b[1]) / 2, ext, tail };
+    return { bx0, bx1, py: (a[1] + b[1]) / 2, ext, tail, edgeAt: (yy, side) => (yy <= tail ? (side < 0 ? bx0 : bx1) : null) };
   }
   setView(name, instant = false) {
     const v = VIEWS[name] || VIEWS.mechanism;
@@ -434,7 +442,7 @@ class ASAirbrakes extends HTMLElement {
         const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
         if (J.exit !== this._exit) { this.r.setRise(J.exit); this._exit = J.exit; this._dirty = true; }
         const rf = smooth((J.zoom - 0.15) / 0.6); if (rf !== this._rf) { this.r.setShellFade(rf); this._rf = rf; this._dirty = true; }
-        this._flow.speed = 1.8 * (1 - 0.85 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
+        this._flow.speed = 1.8 * (1 - 0.82 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
         if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
       else if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }
@@ -450,7 +458,11 @@ class ASAirbrakes extends HTMLElement {
       if (geo) {   // the full Borealis, sized and placed so its airbrake ring sits on the 3D panels
         const k = (geo.bx1 - geo.bx0) / BOREALIS.body, x = (geo.bx0 + geo.bx1) / 2 - BOREALIS.cx * k, y = geo.py - BOREALIS.ring * k;
         const rs = this._rocket.style; rs.opacity = this._rf || 0; rs.width = `${BOREALIS.w * k}px`; rs.height = `${BOREALIS.h * k}px`; rs.transform = `translate(${x}px,${y}px)`;
-        if (this._rf > 0.5) geo.tail = y + BOREALIS.h * k;
+        if (this._rf > 0.5) {
+          const P = BOREALIS_PROFILE, cxs = (geo.bx0 + geo.bx1) / 2;
+          geo.tail = y + BOREALIS.h * k;
+          geo.edgeAt = (yy, side) => { const i = Math.round(((yy - y) / k + 300 - P.y0) / P.step); if (i < 0 || i >= P.l.length) return null; const hw = side < 0 ? P.l[i] : P.r[i]; return hw ? cxs + side * hw * k : null; };
+        }
         // the two panels standing out either side, drawn over the rocket at the extension the 3D model is at
         const t = Math.max(2, (geo.bx1 - geo.bx0) * 0.05);
         this._pans.forEach((pn, i) => { const e = geo.ext[i], ps = pn.style; ps.opacity = this._rf || 0; ps.height = `${t}px`; ps.width = `${e + 2}px`;

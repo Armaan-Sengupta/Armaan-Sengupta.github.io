@@ -323,3 +323,20 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 .fall-rocket.go{visibility:visible;animation:noseDive 1.5s cubic-bezier(.5,0,.85,.55) forwards}
 @keyframes noseDive{from{transform:translateY(-100%) rotate(-1.5deg)}to{transform:translateY(100vh) rotate(1deg)}}
 @media (prefers-reduced-motion:reduce){.fall-rocket.go{animation:none;visibility:hidden}}
+
+/* contact: the link reads as a link */
+.contact h2 .arr{font-size:.42em;vertical-align:.95em;margin-left:.06em;color:var(--fg-2)}
+/* skills on touch screens: tap a skill, its projects list under the group */
+@media (hover:none),(max-width:860px){
+  #sk-uses{display:none}
+  .skills canvas{display:none}
+  .sk.dim{opacity:1}
+  .sk.tapped{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+  .sk-tap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:12px;border-radius:14px;background:var(--bg-3)}
+  .sk-tap button{padding:9px 13px;border-radius:999px;background:var(--bg);color:var(--fg);font-size:14px}
+}
+/* the end of the page: Borealis, nose first, at the same scale it flew (body about 9.5vw), on the left where it fell */
+.crash{position:relative;height:92vh;overflow:hidden;pointer-events:none}
+.crash-rocket{position:absolute;left:calc(22vw - 17.35vw);bottom:-2.6vw;width:34.7vw;transform:rotate(7deg);transform-origin:50% 100%}
+.crash-rocket img{display:block;width:100%;height:auto;transform:rotate(180deg)}
+.crash-cracks{position:absolute;left:calc(22vw - 21vw);bottom:0;width:42vw;height:60px}
