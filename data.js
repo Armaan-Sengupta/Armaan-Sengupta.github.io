@@ -42,8 +42,7 @@ export const chapters = [
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
     points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction and PI control', 'Designed the 4-layer avionics PCB for the canards, raising power efficiency from 66% to 95%'],
     views: [
-      { id: 'mechanism', label: 'Mechanism', captions: [['One servo turns the cam plate, which drives all three panels out together', 0], ['As the panels extend out of the rocket body, the drag force on the rocket increases', 0.6]], el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 4.8 },
-      { id: 'flight', label: 'Control loop', caption: 'Every few milliseconds the firmware estimates its state, predicts apogee and sets how far to deploy', el: EL.flight },
+      { id: 'mechanism', label: 'Mechanism', captions: [['One servo turns the cam plate, which drives all three panels out together', 0], ['As the panels extend out of the rocket body, the drag force on the rocket increases', 0.47], ['In flight, the computer predicts apogee and moves the airbrakes in and out until the prediction meets the target', 0.66]], el: withAttrs(EL.airbrakes, { view: 'journey' }), progress: 'view', len: 7 },
       { id: 'pcb', label: 'Flight computer', caption: 'The Canard-ian avionics board, from render to the assembled board', swap: ['media/airbrakes/canardian-render.webp', 'media/airbrakes/canardian-board.webp'], len: 0.7 },
       { id: 'hardware', label: 'Hardware', caption: 'The machined airbrakes, from CAD to the real part', swap: ['media/airbrakes/render-deployed-transparent.webp', 'media/airbrakes/irl/airbrake-07.webp'], len: 0.7 },
       { id: 'launch', label: 'Launch', caption: 'Borealis lifting off at Launch Canada, August 2024', video: 'media/airbrakes/launch-scrub.mp4', once: true }

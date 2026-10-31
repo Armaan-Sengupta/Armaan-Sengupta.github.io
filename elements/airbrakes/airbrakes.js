@@ -30,10 +30,27 @@ const VIEWS = {
   airframe:  { az: -Math.PI, el: 0.12, d: 30, ty: 0.9, shell: 1 }   // one panel points away, the other two stand out either side
 };
 export const AIRBRAKE_DURATION = 9;
-// journey: deploy on the bench, retract while the camera pulls back into the airframe, deploy into the flow
+/* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
+ * loop moves the panels until the prediction meets the target. x = predicted minus target (1 at the start of coast),
+ * e = extension. eq is the extension that exactly hits the target. Saturates out, eases back in, settles. */
+const CONTROL = (() => {
+  const N = 400, dt = 1 / N, a = 4.5, eq = 0.45, Kp = 1.4, Ki = 7, out = []; let x = 1, I = 0;
+  for (let i = 0; i <= N; i++) {
+    const e = clamp(eq + Kp * x + Ki * I);
+    out.push({ x, e });
+    if (!(e >= 1 && x > 0) && !(e <= 0 && x < 0)) I += x * dt;   // anti-windup
+    x += -a * (e - eq) * dt;
+  }
+  return out;
+})();
+const controlAt = (q) => CONTROL[Math.round(clamp(q) * (CONTROL.length - 1))];
+// journey: deploy on the bench, retract while the camera pulls back into the airframe, deploy into the flow,
+// then pull back further: the rocket moves aside, flies through the stream, and the control loop plays out
 function journeyAt(p) {
-  const ext = p < 0.3 ? smooth(p / 0.3) : p < 0.4 ? 1 : p < 0.6 ? 1 - smooth((p - 0.4) / 0.2) : p < 0.68 ? 0 : smooth((p - 0.68) / 0.26);
-  return { ext, cam: smooth((p - 0.38) / 0.28) };
+  const zoom = smooth((p - 0.6) / 0.12), q = clamp((p - 0.7) / 0.3);
+  const ext = p < 0.2 ? smooth(p / 0.2) : p < 0.26 ? 1 : p < 0.4 ? 1 - smooth((p - 0.26) / 0.14) : p < 0.44 ? 0
+    : p < 0.6 ? smooth((p - 0.44) / 0.14) : p < 0.7 ? 1 : controlAt(q).e;
+  return { ext, cam: smooth((p - 0.25) / 0.17), zoom, q };
 }
 
 /* Screen-space air stream, coloured by speed like a CFD velocity plot. Freestream falls from the top of the
@@ -87,7 +104,8 @@ class AirStream {
       const ox = q.x, oy = q.y; q.x += vx * dt; q.y += vy * dt; q.life += dt;
       const nd = (q.x - edge) * side; if (nd < 1.5) q.x = edge + side * 1.5;
       const sp = Math.hypot(vx, vy) / U, col = cfdColor(sp);
-      g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha).toFixed(3)})`;
+      const D = this.dim, inChart = D && q.x > D.x0 && q.x < D.x1 && q.y > D.y0 && q.y < D.y1 ? 1 - 0.8 * D.k : 1;   // quieter behind the chart
+      g.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${(0.95 * alpha * inChart).toFixed(3)})`;
       g.beginPath(); g.moveTo(ox, oy); g.lineTo(q.x, q.y); g.stroke();
       if (q.y > h + 8 || q.x < -8 || q.x > w + 8 || q.life > 7) Object.assign(q, this.spawn(geo, true));
     }
@@ -213,7 +231,7 @@ export class AirbrakeRenderer {
     this.cyl(0.12, 0.02, mat.oxide, 0, 1.585, 0, this.camGroup, 20);
     /* Airframe shell with three panel windows (only visible in the airframe view). */
     this.shell = new THREE.Group(); this.root.add(this.shell);
-    const R = G.AIRFRAME_R, Ri = R - 0.1, y0 = -7, y1 = 8, w0 = this.Y.panel - 0.06, w1 = this.Y.panel + 0.31;
+    const R = G.AIRFRAME_R, Ri = R - 0.1, y0 = -40, y1 = 40, w0 = this.Y.panel - 0.06, w1 = this.Y.panel + 0.31;
     const win = Math.asin((R * Math.sin(G.PANEL_HALF) + 0.04) / R);
     const seg = (r, a0, a1, ya, yb, inward) => {
       const geo = new THREE.CylinderGeometry(r, r, yb - ya, 48, 1, true, a0, a1 - a0);
@@ -241,7 +259,10 @@ export class AirbrakeRenderer {
     this.sliders.forEach(s => { s.position.x = k.travel; });
     return true;
   }
-  setCamMix(m) { const a = VIEWS.mechanism, b = VIEWS.airframe, e = smooth(m); for (const k of Object.keys(a)) this.cam[k] = a[k] + (b[k] - a[k]) * e; this._viewT = 1; }
+  setCamMix(m, zoom = 0) {
+    const a = VIEWS.mechanism, b = VIEWS.airframe, e = smooth(m); for (const k of Object.keys(a)) this.cam[k] = a[k] + (b[k] - a[k]) * e; this._viewT = 1;
+    this.cam.d *= 1 + 0.75 * zoom; this._shift = zoom;
+  }
   // the airframe silhouette and how far each side's panels reach beyond it, in CSS px (for the air stream)
   flowGeometry(w, h) {
     this._applyCamera(); this.camera.updateMatrixWorld(); this.root.updateMatrixWorld(true);
@@ -276,11 +297,14 @@ export class AirbrakeRenderer {
     const dist = d * Math.max(1, 1.45 / asp); // keep the assembly in frame on tall/narrow hosts
     this.camera.position.set(Math.cos(el) * Math.cos(az) * dist, ty + Math.sin(el) * dist, -Math.cos(el) * Math.sin(az) * dist);
     this.camera.lookAt(0, ty, 0);
+    // push the rocket toward the left so the chart has room on the right
+    const sw = this._w || 800, sh = this._h || 500;
+    if (this._shift > 0.001) this.camera.setViewOffset(sw, sh, sw * 0.24 * smooth(this._shift), 0, sw, sh); else this.camera.clearViewOffset();
     this.shell.visible = shell > 0.01;
     this.mat.shell.opacity = shell; this.mat.shellCap.opacity = shell;
     this.mat.shell.depthWrite = this.mat.shellCap.depthWrite = shell > 0.98;
   }
-  resize(w, h) { this._aspect = w / Math.max(1, h); this.renderer.setSize(Math.max(1, w), Math.max(1, h), false); this.camera.aspect = this._aspect; this.camera.updateProjectionMatrix(); }
+  resize(w, h) { this._w = w; this._h = h; this._aspect = w / Math.max(1, h); this.renderer.setSize(Math.max(1, w), Math.max(1, h), false); this.camera.aspect = this._aspect; this.camera.updateProjectionMatrix(); }
   render() { this._applyCamera(); this.renderer.render(this.scene, this.camera); }
   dispose() { this.scene.traverse(o => { o.geometry?.dispose(); }); Object.values(this.mat).forEach(m => m.dispose()); this._env.dispose(); this.renderer.dispose(); }
 }
@@ -308,7 +332,8 @@ class ASAirbrakes extends HTMLElement {
       <div class="stage"><canvas aria-label="Airbrake cam mechanism: one servo turns a slotted cam that drives three panels outward together."></canvas></div>
       <div class="controls"><button type="button">PLAY</button><input type="range" min="0" max="1000" value="0" aria-label="Airbrake extension"></div>
       <div class="hud" hidden>CAM <b class="a">0.0°</b> &nbsp; TRAVEL <b class="t">0.0 mm</b></div>
-      <canvas class="flow" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none"></canvas>`;
+      <canvas class="flow" aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none"></canvas>
+      <canvas class="chart" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>`;
     this._canvas = root.querySelector('canvas');
     try { this.r = new AirbrakeRenderer(this._canvas); }
     catch (e) { root.querySelector('.stage').innerHTML = '<div style="padding:24px;font:12px monospace;color:#999">WebGL unavailable</div>'; return; }
@@ -318,6 +343,7 @@ class ASAirbrakes extends HTMLElement {
     this._range.addEventListener('input', () => { this.pause(); this._progress = null; this._target = this._ext = this._range.value / 1000; this._kick(); });
     this._journey = this.view === 'journey'; this._jp = 0; this._mix = 0;
     this._flow = new AirStream(root.querySelector('.flow'));
+    this._chart = root.querySelector('.chart'); this._cg = this._chart.getContext('2d');
     this.addEventListener('pointermove', (e) => { const r = this.getBoundingClientRect(); this._flow.mouse = { x: e.clientX - r.left, y: e.clientY - r.top }; });
     this.addEventListener('pointerleave', () => { this._flow.mouse = null; });
     if (this._journey) this.r.setCamMix(0); else this.r.setView(this.view, true);
@@ -339,6 +365,32 @@ class ASAirbrakes extends HTMLElement {
     else if (n === 'extension' && v !== null) { this._progress = null; this._target = this._ext = clamp(+v || 0); this._dirty = true; this._kick(); }
   }
   // in the journey the stream runs on past the bottom of the element and fades out, so it bleeds into what follows
+  // predicted apogee against the target, and the extension that gets it there, revealed as the loop runs
+  _drawChart(J) {
+    const cv = this._chart, g = this._cg, w = this._w, h = this._h, dpr = Math.min(2, devicePixelRatio || 1);
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    const al = smooth((J.zoom - 0.5) / 0.5); if (al <= 0) { this._flow.dim = null; return; }
+    const narrow = w < 700, x0 = narrow ? w * 0.08 : w * 0.55, x1 = narrow ? w * 0.92 : Math.min(w * 0.93, x0 + 560);
+    const top = narrow ? h * 0.34 : h * 0.2, mid = top + (narrow ? h * 0.17 : h * 0.3), bot = narrow ? h * 0.74 : h * 0.78, n = Math.round(J.q * (CONTROL.length - 1));
+    const X = (i) => x0 + (x1 - x0) * i / (CONTROL.length - 1), Yp = (x) => mid - (mid - top) * 0.85 * x, Ye = (e) => bot - (bot - mid - 56) * e;
+    this._flow.dim = { x0: x0 - 18, x1: x1 + 18, y0: top - 34, y1: bot + 18, k: al };
+    g.globalAlpha = al; g.font = `400 ${narrow ? 12 : 13}px Inter, system-ui, sans-serif`; g.textBaseline = 'alphabetic';
+    g.fillStyle = 'rgba(8,8,10,.55)'; g.fillRect(x0 - 18, top - 34, x1 - x0 + 36, bot - top + 52);
+    // target apogee
+    g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, mid); g.lineTo(x1, mid); g.stroke(); g.setLineDash([]);
+    g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, mid - 8);
+    g.textAlign = 'left'; g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Predicted apogee', x0, top - 12);
+    g.strokeStyle = '#f0a040'; g.lineWidth = 2; g.beginPath();
+    for (let i = 0; i <= n; i++) { const y = Yp(CONTROL[i].x); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    // extension
+    g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Airbrake extension', x0, mid + 36);
+    g.strokeStyle = 'rgba(242,239,233,.15)'; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x1, bot); g.stroke();
+    g.strokeStyle = '#8fb4ff'; g.lineWidth = 2; g.beginPath();
+    for (let i = 0; i <= n; i++) { const y = Ye(CONTROL[i].e); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f0a040'; g.beginPath(); g.arc(X(n), Yp(c.x), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
+    g.globalAlpha = 1;
+  }
   _sizeFlow(w, h) {
     const bleed = this._journey ? Math.round(innerHeight * 0.55) : 0, cv = this._flow.c;
     cv.style.height = `${h + bleed}px`;
@@ -362,7 +414,8 @@ class ASAirbrakes extends HTMLElement {
       if (this._journey) {
         const tgt = this._progress ?? 0, k = this._reduced.matches ? 1 : 1 - Math.exp(-dt * 10);
         this._jp += (tgt - this._jp) * k; if (Math.abs(tgt - this._jp) > 1e-4) moving = true; else this._jp = tgt;
-        const J = journeyAt(this._jp); this._target = this._ext = J.ext; if (J.cam !== this._mix) { this.r.setCamMix(J.cam); this._mix = J.cam; this._dirty = true; }
+        const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
+        if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
       else if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }
       else this._ext = this._target;
@@ -374,6 +427,7 @@ class ASAirbrakes extends HTMLElement {
       }
       const fa = this._journey && !this._reduced.matches ? smooth((this._mix - 0.55) / 0.35) : 0;
       if (fa > 0) { this._flow.step(dt, this.r.flowGeometry(this._w, this._h), fa); moving = true; } else this._flow.clear();
+      if (this._journey && this._J) this._drawChart(this._J);
     }
     if (active && (moving || this._playing)) { this._raf = requestAnimationFrame(n => this._tick(n)); }
   }
