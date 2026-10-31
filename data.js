@@ -27,7 +27,7 @@ export const chapters = [
   /* ─────────── personal ─────────── */
   {
     id: 'platform', flow: 'personal', hero: true,
-    org: '3RRS parallel manipulator', dates: 'Sep – Dec 2025',
+    org: '3RRS parallel manipulator', dates: 'Dec 2025',
     title: 'Stewart Platform', role: 'Ball balancing robot',
     points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],
     views: [
@@ -38,7 +38,7 @@ export const chapters = [
   },
   {
     id: 'airbrakes', flow: 'personal', intro: 1,
-    org: 'Waterloo Rocketry · Borealis', dates: '2023 – 2024',
+    org: 'Waterloo Rocketry · Borealis', dates: 'Dec 2024',
     title: 'Rocket Airbrakes', role: 'Active drag control for Borealis',
     points: ['Designed the cam-slot mechanism that drives all three panels from one servo', 'Co-wrote the STM32 firmware: state estimation, apogee prediction and PI control', 'Designed the 4-layer avionics PCB for the canards, raising power efficiency from 66% to 95%'],
     views: [
@@ -50,7 +50,7 @@ export const chapters = [
   },
   {
     id: 'measurement', flow: 'personal', intro: 1,
-    org: '', dates: 'Sep – Dec 2023',
+    org: '', dates: 'Dec 2023',
     title: 'Automated Measurement System', role: '',
     points: ['Used OpenCV to turn each part to its critical dimension', 'Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain', 'Measured parts to within 0.3 mm'],
     views: [
@@ -126,19 +126,19 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
-  { id: 'trashminator', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
-  { id: 'radial-engine', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
+  { id: 'trashminator', date: '2022', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
+  { id: 'radial-engine', date: '2021', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
   { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
-  { id: 'ripl', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
-  { id: 'beam-balancer', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
-  { id: 'segway', title: 'Segway Dynamics', kicker: 'Year 3 · Modelling', blurb: 'A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.', media: { el: EL.segRide } },
-  { id: 'gantry', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
-  { id: 'lidar', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
-  { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
-  { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
+  { id: 'ripl', date: 'Sep 2025 – Jan 2026', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
+  { id: 'beam-balancer', date: '2025', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
+  { id: 'segway', date: 'Apr 2025', title: 'Segway Dynamics', kicker: 'Year 3 · Modelling', blurb: 'A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.', media: { el: EL.segRide } },
+  { id: 'gantry', date: '2025', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
+  { id: 'lidar', date: '2023', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
+  { id: 'ftc', date: '2022', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
+  { id: 'ri3d', date: 'Jan 2024', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
   { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
-  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · Team design', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
-  { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
+  { id: 'gooseminator', date: '2022', title: 'The Gooseminator', kicker: 'First year · Team design', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
+  { id: 'robotic-arm', date: '2022', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
 
 // details shown in the popup for any project (chapters and cards). Gallery comes from content.json too.

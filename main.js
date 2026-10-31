@@ -79,7 +79,7 @@ function buildChapter(ch) {
   sec.innerHTML = `
     <div class="pin">
       <div class="ch-copy">
-        ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
+        <div class="meta mono"><span>${esc(ch.org || '')}</span><span>${esc(ch.dates || '')}</span></div>
         <h3>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h3>
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
@@ -113,7 +113,7 @@ function buildSequence(ch) {
   wrap.id = `ch-${ch.id}`; wrap.dataset.ch = ch.id; wrap.setAttribute('aria-label', ch.title);
   wrap.innerHTML = `
     <header class="seq-head">
-      ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
+      <div class="meta mono"><span>${esc([ch.org, ch.dates].filter(Boolean).join(' · '))}</span></div>
       <h3>${titleHTML(ch)}</h3>
       ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
     </header>`;
@@ -133,7 +133,7 @@ function buildSequence(ch) {
 function buildHead(ch) {
   const head = document.createElement('header'); head.className = 'seq-head';
   head.innerHTML = `
-    ${ch.org ? `<div class="meta mono"><span>${esc(ch.org)}</span></div>` : ''}
+    <div class="meta mono"><span>${esc([ch.org, ch.dates].filter(Boolean).join(' · '))}</span></div>
     <h3>${titleHTML(ch)}</h3>
     ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}`;
   return head;
@@ -346,6 +346,7 @@ grid.innerHTML = cards.map((c) => `
   <a class="card" href="#${c.id}" data-open="${c.id}">
     <div class="thumb"></div>
     <div class="body">
+      ${c.date ? `<div class="k mono"><span>${esc(c.date)}</span></div>` : ''}
       <h4>${esc(c.title)}</h4>
       <p>${esc(c.blurb)}</p>
     </div>
@@ -422,7 +423,7 @@ async function openPop(id, { push = true } = {}) {
   const linkRow = (cls) => (links.length ? `<div class="${cls}">${links.map(([t, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join('')}</div>` : '');
   popBody.innerHTML = `
     <header>
-      <div class="meta mono"><span>${esc(p.org || p.kicker)}</span><span>${esc(p.dates || c.dates || '')}</span></div>
+      <div class="meta mono"><span>${esc(p.org || p.kicker)}</span><span>${esc(p.dates || p.date || c.dates || '')}</span></div>
       <h3 id="pop-title">${esc(p.title)}</h3>
       ${p.role ? `<p class="role">${esc(p.role)}</p>` : ''}
     </header>
