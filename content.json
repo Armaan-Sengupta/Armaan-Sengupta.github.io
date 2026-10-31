@@ -494,7 +494,7 @@
     "End-to-end pipeline: strain gauges streamed over MQTT, re-synchronized and stored in PostgreSQL",
     "Anomaly detector over four strain sensors spots the discontinuity of a cracking part; 100% detection with zero false positives in validation",
     "Adapts to new part profiles and uses a moving-window average so sensor drift is not flagged",
-    "Patent-pending PLC buffering on a Beckhoff controller: semaphore-driven threads + staged queues lifted collection from ~140 Hz to 500+ Hz",
+    "Patent-pending PLC buffering: semaphore-driven threads + staged queues lifted collection from ~140 Hz to 500+ Hz",
     "Web dashboard for operators to compare strain profiles across batches and review anomalies"
    ],
    "links": [],

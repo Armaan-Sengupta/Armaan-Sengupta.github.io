@@ -261,7 +261,7 @@ export const details = {
   },
   magna: {
     body: ['Streamed strain-gauge data from a hydraulic press over MQTT into PostgreSQL, with a live web dashboard for operators.',
-      'An anomaly detector learns each part\'s normal stroke envelope; it caught 100% of cracked parts with zero false positives across a 150-part production run. A patent-pending, semaphore-driven multithreaded buffer on a memory-limited Beckhoff PLC raised the data rate from 142 Hz to 500 Hz.'],
+      'An anomaly detector learns each part\'s normal stroke envelope; it caught 100% of cracked parts with zero false positives across a 150-part production run. A patent-pending, semaphore-driven multithreaded buffer on a memory-limited PLC raised the data rate from 142 Hz to 500 Hz.'],
     chips: ['Python', 'MQTT', 'PostgreSQL', 'PLC · multithreading', 'Signal processing']
   },
   fyelabs: { gallery: [
@@ -325,7 +325,7 @@ export const uses = [
   ['neuralink', 'Neuralink · implant firmware'], ['tesla', 'Tesla · vehicle lighting'], ['ixana', 'Ixana · wearable video'], ['magna', 'Magna · crack detection'],
   ['fyelabs', 'FYELABS · truck safety'], ['airbrakes', 'Waterloo Rocketry · airbrakes'], ['ripl', 'RIPL · contact localization'], ['platform', 'Stewart platform'],
   ['measurement', 'Automated measurement system'], ['beam-balancer', 'Beam balancer'], ['segway', 'Segway dynamics'], ['lidar', 'LiDAR point clouds'],
-  ['gantry', 'Two-axis gantry'], ['clamping-hub', 'Clamping hub'], ['ftc', 'FTC 16397'], ['trashminator', 'Trashminator'], ['radial-engine', 'Radial engine']
+  ['gantry', 'Two-axis gantry'], ['clamping-hub', 'Clamping hub'], ['ftc', 'FTC 16397']
 ];
 
 export const skills = {
@@ -334,32 +334,26 @@ export const skills = {
     'C++': ['ixana', 'fyelabs', 'measurement'],
     'Rust': ['neuralink'],
     'Python': ['tesla', 'magna', 'fyelabs', 'ixana', 'ripl', 'platform', 'measurement', 'beam-balancer', 'segway', 'lidar'],
-    'Java': ['ftc'], 'Verilog': ['ixana'], 'MATLAB': ['segway', 'platform']
+    'MATLAB': ['segway', 'platform'], 'Java': ['ftc']
   },
   'Embedded': {
-    'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'Nordic': ['neuralink', 'ixana'], 'ARM': ['neuralink', 'ixana'], 'NXP · Ambiq': ['ixana'], 'Arduino': ['trashminator'],
-    'FreeRTOS': ['airbrakes'], 'Bare metal': ['ixana', 'gantry'], 'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'Device drivers': ['tesla', 'ixana', 'neuralink'],
-    'Hardware bring-up': ['tesla', 'neuralink', 'ixana'], 'ASIC bring-up': ['neuralink', 'ixana'], 'ADC · current sense': ['tesla', 'gantry'], 'RF · gain control': ['ixana'],
-    'FPGA': ['ixana'], 'Beckhoff PLC': ['magna'], 'Multithreading': ['magna']
+    'ARM Cortex-M': ['neuralink', 'ixana', 'airbrakes', 'gantry'], 'STM32': ['airbrakes', 'gantry'], 'Nordic': ['neuralink', 'ixana'], 'ESP32': ['measurement'],
+    'RTOS': ['airbrakes'], 'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'Device drivers': ['tesla', 'ixana', 'neuralink'],
+    'Hardware bring-up': ['tesla', 'neuralink', 'ixana'], 'FPGA': ['ixana']
   },
   'Protocols': {
     'I²C': ['airbrakes', 'measurement', 'fyelabs', 'ixana'], 'SPI': ['ixana'], 'UART': ['fyelabs', 'airbrakes', 'gantry'], 'CAN': ['airbrakes'],
-    'MIPI DSI': ['ixana'], 'Protobuf': ['neuralink'], 'LoRa': ['fyelabs'], 'MQTT': ['magna', 'fyelabs'], 'WebSockets': ['measurement']
+    'MIPI DSI': ['ixana'], 'MQTT': ['magna', 'fyelabs'], 'Protobuf': ['neuralink']
   },
   'Hardware & CAD': {
-    'PCB design': ['airbrakes', 'fyelabs'], 'KiCad': ['airbrakes'], 'Altium': ['tesla'], 'EasyEDA': ['fyelabs'],
-    'SolidWorks': ['airbrakes', 'fyelabs', 'beam-balancer', 'clamping-hub', 'platform'], 'Fusion 360': ['trashminator', 'radial-engine'], 'Inventor': ['radial-engine'],
-    'Ansys · FEA · CFD': ['airbrakes', 'clamping-hub'], 'Sheet-metal DFM': ['fyelabs']
+    'PCB design': ['airbrakes', 'fyelabs', 'tesla'], 'SolidWorks': ['airbrakes', 'fyelabs', 'beam-balancer', 'clamping-hub', 'platform'],
+    'FEA · CFD': ['airbrakes', 'clamping-hub']
   },
   'Controls & Robotics': {
-    'PID · PIDF': ['airbrakes', 'platform', 'beam-balancer', 'ftc'], 'State estimation': ['airbrakes', 'platform'], 'Kinematics': ['platform', 'ripl'],
-    'Trajectory planning': ['platform', 'airbrakes'], 'Simulink · Simscape': ['platform', 'segway'], 'SimulationX': ['segway'],
-    'ROS 2': ['ripl'], 'MuJoCo': ['ripl'], 'OpenCV': ['platform', 'measurement', 'beam-balancer'], 'TensorFlow': ['ftc'], 'LiDAR': ['fyelabs', 'lidar']
+    'PID control': ['airbrakes', 'platform', 'beam-balancer', 'ftc'], 'State estimation': ['airbrakes', 'platform'], 'Kinematics': ['platform', 'ripl'],
+    'Simulink': ['platform', 'segway'], 'ROS 2': ['ripl'], 'Computer vision': ['platform', 'measurement', 'beam-balancer'], 'Signal processing': ['magna', 'fyelabs']
   },
-  'Data & signals': {
-    'Signal processing': ['magna', 'fyelabs'], 'Anomaly detection': ['magna'], 'Open3D · NumPy': ['lidar'], 'PostgreSQL': ['magna']
-  },
-  'Tooling': {
-    'Git': ['neuralink', 'tesla', 'ixana', 'platform'], 'Pytest · SIL / HIL': ['tesla', 'ixana', 'fyelabs'], 'C unit tests': ['tesla']
+  'Testing & tools': {
+    'Git': ['neuralink', 'tesla', 'ixana', 'platform'], 'SIL · HIL testing': ['tesla', 'ixana', 'fyelabs'], 'SQL': ['magna']
   }
 };

@@ -337,9 +337,10 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 }
 /* the end of the page: Borealis nose first into the bottom edge, behind the contact text, leaning off the side so
    only the nose cone shows; same scale it flew at (body about 9.5vw) */
-.endzone{position:relative;overflow:hidden}
+.endzone{position:relative;clip-path:inset(-140vh 0 0 0)}   /* the rocket may reach up past the section, never sideways or below */
+#skills{position:relative;z-index:1}
 .endzone > :not(.crash){position:relative;z-index:1}
-.crash{position:absolute;inset:0;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(transparent,#000 22%);mask-image:linear-gradient(transparent,#000 22%)}
+.crash{position:absolute;left:0;right:0;bottom:0;top:-140vh;pointer-events:none;z-index:0}
 .crash-rocket{position:absolute;left:calc(24vw - 17.35vw);bottom:-2.6vw;width:34.7vw;transform:rotate(-22deg);transform-origin:50% 100%;opacity:.55}
 .crash-rocket img{display:block;width:100%;height:auto;transform:rotate(180deg)}
 .crash-cracks{position:absolute;left:calc(24vw - 21vw);bottom:0;width:42vw;height:60px;opacity:.8}
