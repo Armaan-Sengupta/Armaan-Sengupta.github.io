@@ -335,8 +335,12 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
   .sk-tap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:12px;border-radius:14px;background:var(--bg-3)}
   .sk-tap button{padding:9px 13px;border-radius:999px;background:var(--bg);color:var(--fg);font-size:14px}
 }
-/* the end of the page: Borealis, nose first, at the same scale it flew (body about 9.5vw), on the left where it fell */
-.crash{position:relative;height:92vh;overflow:hidden;pointer-events:none}
-.crash-rocket{position:absolute;left:calc(22vw - 17.35vw);bottom:-2.6vw;width:34.7vw;transform:rotate(7deg);transform-origin:50% 100%}
+/* the end of the page: Borealis nose first into the bottom edge, behind the contact text, leaning off the side so
+   only the nose cone shows; same scale it flew at (body about 9.5vw) */
+.endzone{position:relative;overflow:hidden}
+.endzone > :not(.crash){position:relative;z-index:1}
+.crash{position:absolute;inset:0;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(transparent,#000 22%);mask-image:linear-gradient(transparent,#000 22%)}
+.crash-rocket{position:absolute;left:calc(13vw - 17.35vw);bottom:-2.6vw;width:34.7vw;transform:rotate(-22deg);transform-origin:50% 100%;opacity:.55}
 .crash-rocket img{display:block;width:100%;height:auto;transform:rotate(180deg)}
-.crash-cracks{position:absolute;left:calc(22vw - 21vw);bottom:0;width:42vw;height:60px}
+.crash-cracks{position:absolute;left:calc(13vw - 21vw);bottom:0;width:42vw;height:60px;opacity:.8}
+@media (max-width:860px){.crash-rocket{left:calc(22vw - 34vw);width:68vw;bottom:-5vw}.crash-cracks{left:calc(22vw - 40vw);width:80vw}}
