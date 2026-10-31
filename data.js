@@ -239,7 +239,7 @@ export const details = {
     ],
     body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across thousands of electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
       'Cut registration time per trial by ~97%, which made the stimulation safety study feasible on schedule and met the FDA submission deadline. Brought up impedance and calibration so chips could self-test, unblocking the production line.'],
-    chips: ['Rust', 'C', 'DMA', 'Interrupts', 'ASIC bring-up', 'Protobuf'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
+    chips: ['Rust', 'C', 'ARM', 'Nordic', 'DMA', 'Interrupts', 'ASIC bring-up', 'Protobuf'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
   },
   tesla: { gallery: [
       { type: 'image', src: 'media/img/tesla_lighting_vehicles.webp', caption: 'Semi and Cybercab lighting locations (render)' },
@@ -257,7 +257,7 @@ export const details = {
     ],
     body: ['Built video streaming from smart glasses to a smartwatch over Ixana\'s Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.',
       'Raised frame rate from 4 to 13 fps and cut power by 8% with a bare-metal C++ core OS on Ambiq and NXP MCUs. Debugged the whole path (camera, FPGA encode, MCU, Wi-R, MCU, FPGA decode, AMOLED), owned the MIPI-DSI display drivers, and wrote a Python driver for a Rigol waveform generator for HIL testing.'],
-    chips: ['C++', 'Bare metal', 'MIPI DSI', 'FPGA · Verilog', 'HIL'], links: [['CES demo', 'https://youtube.com/shorts/He_goadObV0']]
+    chips: ['C++', 'Bare metal', 'Nordic', 'MIPI DSI', 'FPGA · Verilog', 'HIL'], links: [['CES demo', 'https://youtube.com/shorts/He_goadObV0']]
   },
   magna: {
     body: ['Streamed strain-gauge data from a hydraulic press over MQTT into PostgreSQL, with a live web dashboard for operators.',
@@ -337,7 +337,7 @@ export const skills = {
     'Java': ['ftc'], 'Verilog': ['ixana'], 'MATLAB': ['segway', 'platform']
   },
   'Embedded': {
-    'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'NXP · Ambiq': ['ixana'], 'FreeRTOS': ['airbrakes'],
+    'STM32': ['airbrakes', 'gantry'], 'ESP32': ['measurement'], 'Nordic': ['neuralink', 'ixana'], 'ARM': ['neuralink'], 'NXP · Ambiq': ['ixana'], 'FreeRTOS': ['airbrakes'],
     'DMA · interrupts': ['neuralink', 'airbrakes', 'gantry'], 'ASIC bring-up': ['neuralink', 'ixana'], 'FPGA': ['ixana']
   },
   'Protocols': {
