@@ -27,7 +27,7 @@ export const chapters = [
   /* ─────────── personal ─────────── */
   {
     id: 'platform', flow: 'personal', hero: true,
-    org: 'MTE 380 · 3RRS parallel manipulator', dates: 'Sep – Dec 2025',
+    org: '3RRS parallel manipulator', dates: 'Sep – Dec 2025',
     title: 'Stewart Platform', role: 'Ball-on-plate balancing robot',
     points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],
     views: [
@@ -52,7 +52,7 @@ export const chapters = [
   },
   {
     id: 'measurement', flow: 'personal',
-    org: 'MTE 201 · Team of 3', dates: 'Sep – Dec 2023',
+    org: 'Team of 3', dates: 'Sep – Dec 2023',
     title: 'Automated Tolerance Inspection', role: 'Hands-off part measurement',
     points: ['OpenCV orients the part', 'Custom 2-wire ESP32 ↔ VEX protocol', 'Within 0.3 mm, every time'],
     views: [
@@ -63,7 +63,7 @@ export const chapters = [
   },
   {
     id: 'segway', flow: 'personal',
-    org: 'SYDE 351 · Modelling', dates: 'Jan – Apr 2025',
+    org: 'Dynamics modelling', dates: 'Jan – Apr 2025',
     title: 'Segway Dynamics', role: 'Equations of motion to simulation',
     points: ['Hand-derived nonlinear model', 'Simulink parameter sweep', 'Cross-checked in SimulationX'],
     views: [
@@ -146,7 +146,7 @@ export const cards = [
   { id: 'ftc', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
   { id: 'ri3d', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
   { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
-  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · MTE 100', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
+  { id: 'gooseminator', title: 'The Gooseminator', kicker: 'First year · Team design', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
   { id: 'robotic-arm', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
 
