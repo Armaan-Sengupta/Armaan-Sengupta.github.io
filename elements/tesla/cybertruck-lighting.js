@@ -70,21 +70,6 @@ function loft(rings, cls, { flat = false, capStart = true, capEnd = true, capCls
   if (flat) { const gs = geo.groups.slice(); geo = geo.toNonIndexed(); geo.clearGroups(); gs.forEach(g => geo.addGroup(g.start, g.count, g.materialIndex)); }
   geo.computeVertexNormals(); return geo;
 }
-const se = (c, n) => Math.sign(c) * Math.pow(Math.abs(c), 2 / n);
-function curve1D(keys) { // monotone-ish smooth interpolation through [x,y] keys sorted by x
-  return x => { if (x <= keys[0][0]) return keys[0][1]; for (let i = 0; i < keys.length - 1; i++) { const [x0, y0] = keys[i], [x1, y1] = keys[i + 1]; if (x <= x1) { const t = (x - x0) / (x1 - x0), s = t * t * (3 - 2 * t); return y0 + (y1 - y0) * s; } } return keys[keys.length - 1][1]; };
-}
-function arch(z, zc, R, yc) { const d = z - zc; return Math.abs(d) < R ? yc + Math.sqrt(R * R - d * d) : -1; }
-function wheel(mats, r, w, coverStyle) {
-  const g = new THREE.Group();
-  const tire = new THREE.Mesh(new THREE.CylinderGeometry(r, r, w, 48, 1, false), mats.tire); tire.rotation.z = Math.PI / 2; g.add(tire);
-  const side = new THREE.Mesh(new THREE.TorusGeometry(r * .86, r * .13, 12, 48), mats.tire); side.rotation.y = Math.PI / 2; side.position.x = w / 2 - .02; g.add(side);
-  const cover = new THREE.Mesh(new THREE.CylinderGeometry(r * .74, r * .76, .02, 48), coverStyle === 'body' ? mats.paint : mats.hub); cover.rotation.z = Math.PI / 2; cover.position.x = w / 2 + .002; g.add(cover);
-  if (coverStyle === 'aero') for (let k = 0; k < 6; k++) { const sp = new THREE.Mesh(new THREE.BoxGeometry(.012, r * .62, r * .12), mats.trim); sp.position.set(w / 2 + .012, 0, 0); sp.rotation.x = k * Math.PI / 3; sp.translateY(r * .36); g.add(sp); }
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(r * .14, r * .14, .02, 24), mats.trim); cap.rotation.z = Math.PI / 2; cap.position.x = w / 2 + .014; g.add(cap);
-  return g;
-}
-
 /* ---------------- light bars ---------------- */
 const barVS = `attribute float side; attribute vec3 tang; attribute float u; uniform float uW; varying float vS; varying float vU;
 void main(){ vU = u; vS = side; vec4 c = modelViewMatrix*vec4(position,1.); vec3 t = normalize((modelViewMatrix*vec4(tang,0.)).xyz);
@@ -119,102 +104,154 @@ class Lamp { // small discrete lamp: emissive lens + camera-facing glow sprite
 
 /* ---------------- vehicles (metres; +z forward, y up) ---------------- */
 function mats(paintColor, opts = {}) {
+  const flat = !!opts.flat, off = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, side: THREE.DoubleSide };
   return {
-    paint: new THREE.MeshPhysicalMaterial({ color: paintColor, metalness: opts.metal ?? .85, roughness: opts.rough ?? .3, clearcoat: opts.coat ?? .8, clearcoatRoughness: .12, envMapIntensity: opts.env ?? 1.3, flatShading: !!opts.flat }),
-    glass: new THREE.MeshPhysicalMaterial({ color: 0x060708, metalness: .1, roughness: .04, clearcoat: 1, envMapIntensity: 1.6, flatShading: !!opts.flat }),
-    trim: new THREE.MeshStandardMaterial({ color: 0x0c0c0d, metalness: .1, roughness: .7, flatShading: !!opts.flat }),
-    tire: new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: .85, metalness: 0 }),
-    hub: new THREE.MeshStandardMaterial({ color: 0x1c1d1f, roughness: .45, metalness: .5 })
+    paint: new THREE.MeshPhysicalMaterial({ color: paintColor, metalness: opts.metal ?? .85, roughness: opts.rough ?? .3, clearcoat: opts.coat ?? .8, clearcoatRoughness: .08, envMapIntensity: opts.env ?? 1.3, flatShading: flat, side: flat ? THREE.FrontSide : THREE.DoubleSide }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0x040506, metalness: .3, roughness: .04, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 2.2, flatShading: flat, ...off }),
+    trim: new THREE.MeshStandardMaterial({ color: 0x0e0e0f, metalness: .15, roughness: .7, flatShading: flat, ...off }),
+    seam: new THREE.MeshBasicMaterial({ color: 0x040404, ...off, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }),
+    tire: new THREE.MeshStandardMaterial({ color: 0x0d0d0d, roughness: .88, metalness: 0, side: THREE.DoubleSide }),
+    hub: new THREE.MeshPhysicalMaterial({ color: opts.hub ?? 0x6f7276, roughness: .3, metalness: .9, clearcoat: .6, envMapIntensity: 1.3, side: THREE.DoubleSide }),
+    well: new THREE.MeshBasicMaterial({ color: 0x030303, side: THREE.DoubleSide })
   };
 }
-/* smooth vehicle section: right half bottom-centre -> top-centre, mirrored. Tags: 0 under, 1 well, 2 side, 3 greenhouse */
-function halfSection(q) {
-  const h = [], yb = q.yb, ya = Math.max(yb, q.ya), w = q.w, wl = q.well, g0 = 1 - q.inset;
-  h.push([0, yb, 0], [w * .55, yb, 0], [w - wl, yb, 1], [w - wl, ya, 1], [w - .04, ya, 1]);
-  for (let i = 0; i <= 5; i++) { const s2 = i / 5; h.push([w - .045 * Math.pow(1 - s2, 2), lerp(ya + .015, q.ys, s2), 2]); }
-  for (let i = 0; i <= q.nU; i++) { const t = i / q.nU * Math.PI / 2; h.push([w * g0 * se(Math.cos(t), q.n), q.ys + (q.yt - q.ys) * se(Math.sin(t), q.n), 3]); }
-  h[h.length - 1][0] = 0; return h;
+// rounded tyre (lathe) with a shallow aero cover dish and a dark inner face
+function wheel(M, r, w, style) {
+  const g = new THREE.Group(), q = .12 * r, prof = [new THREE.Vector2(r * .68, -w / 2)];
+  for (let i = 0; i <= 6; i++) { const a = -Math.PI / 2 + i * Math.PI / 12; prof.push(new THREE.Vector2(r - q + q * Math.cos(a), -w / 2 + q + q * Math.sin(a))); }
+  for (let i = 0; i <= 6; i++) { const a = i * Math.PI / 12; prof.push(new THREE.Vector2(r - q + q * Math.cos(a), w / 2 - q + q * Math.sin(a))); }
+  prof.push(new THREE.Vector2(r * .68, w / 2));
+  const tire = new THREE.Mesh(new THREE.LatheGeometry(prof, 56), M.tire); tire.rotation.z = -Math.PI / 2; g.add(tire);
+  const dish = [[0, .022], [r * .25, .02], [r * .5, .012], [r * .66, 0], [r * .69, -.012]].map(([a, b]) => new THREE.Vector2(a, b));
+  const cover = new THREE.Mesh(new THREE.LatheGeometry(dish, 56), style === 'body' ? M.paint : M.hub); cover.rotation.z = -Math.PI / 2; cover.position.x = w / 2 - .01; g.add(cover);
+  if (style === 'aero') for (let k = 0; k < 6; k++) { const sp = new THREE.Mesh(new THREE.BoxGeometry(.006, r * .3, r * .05), M.seam); sp.position.set(w / 2 + .008, 0, 0); sp.rotation.x = k * Math.PI / 3; sp.translateY(r * .45); g.add(sp); }
+  const inner = new THREE.Mesh(new THREE.CircleGeometry(r * .7, 40), M.tire); inner.rotation.y = -Math.PI / 2; inner.position.x = -w / 2; g.add(inner);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(r * .1, r * .1, .02, 24), M.trim); cap.rotation.z = Math.PI / 2; cap.position.x = w / 2 + .012; g.add(cap);
+  return g;
 }
-function smoothBody(zs, paramsAt, clsFn, warp = (x, y, z) => z) {
-  const rings = [], tags = [];
-  for (const z of zs) {
-    const q = paramsAt(z), half = halfSection(q), yc = (q.yb + q.yt) / 2, k = q.k ?? 1;
-    const P = half.map(([x, y]) => [x * k, yc + (y - yc) * (q.ky ?? 1)]);
-    const ring = [], tg = [];
-    for (let i = 0; i < P.length; i++) { ring.push([P[i][0], P[i][1], z]); tg.push(half[i][2]); }
-    for (let i = P.length - 2; i >= 1; i--) { ring.push([-P[i][0], P[i][1], z]); tg.push(half[i][2]); }
-    rings.push(ring); tags.push(tg);
+function curve1D(keys) { // monotone cubic (Fritsch-Carlson) through [x,y] keys sorted by x: smooth, no overshoot
+  const n = keys.length, d = [], m = [];
+  for (let i = 0; i < n - 1; i++) d.push((keys[i + 1][1] - keys[i][1]) / (keys[i + 1][0] - keys[i][0]));
+  for (let i = 0; i < n; i++) m.push(i === 0 ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2);
+  for (let i = 0; i < n - 1; i++) { if (d[i] === 0) { m[i] = m[i + 1] = 0; continue; } const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b; if (s > 9) { const t = 3 / Math.sqrt(s); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; } }
+  return x => { if (x <= keys[0][0]) return keys[0][1]; if (x >= keys[n - 1][0]) return keys[n - 1][1];
+    let i = 0; while (x > keys[i + 1][0]) i++; const [x0, y0] = keys[i], [x1, y1] = keys[i + 1], h = x1 - x0, t = (x - x0) / h, t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m[i] + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m[i + 1]; };
+}
+const archBot = (z, base, arches) => { let y = base; for (const [zc, yc, R] of arches) { const d = Math.abs(z - zc); if (d <= R) y = Math.max(y, yc + Math.sqrt(R * R - d * d)); } return y; };
+function zSamples(z0, z1, extra = [], step = .05) {
+  const s = new Set(), n = Math.ceil((z1 - z0) / step); for (let i = 0; i <= n; i++) s.add(+(z0 + (z1 - z0) * i / n).toFixed(4));
+  extra.forEach(z => { if (z >= z0 && z <= z1) s.add(+z.toFixed(4)); }); return [...s].sort((a, b) => a - b);
+}
+
+/* Smooth bodies (Semi, Cybercab): a loft of vertical sections. At each z the body spans bot(z)..top(z) with half-width
+   X(z, y) and rounded edges, so wheel arches are just bot(z) rising over each wheel. Glass, trim and seams are patches
+   laid on the same surface in (z, k) coordinates, k running along the half section from the floor to the roof centre. */
+const NB = 4, NCB = 4, NS = 10, NCT = 6, NR = 6, K = NB + NCB + NS + NCT + NR;
+function halfAt(P, z) {
+  const b = P.bot(z), T = P.top(z), h = Math.max(.02, T - b), rb = Math.min(P.rB, h * .3), rt = Math.min(P.rT(z), h * .45);
+  const xb = Math.max(rb * 1.2, P.X(z, b + rb)), xt = Math.max(rt * 1.2, P.X(z, T - rt)), cr = P.crown ?? .03, o = [];
+  for (let i = 0; i < NB; i++) o.push([(xb - rb) * i / (NB - 1), b]);
+  for (let i = 1; i <= NCB; i++) { const a = -Math.PI / 2 + i * Math.PI / 2 / NCB; o.push([xb - rb + rb * Math.cos(a), b + rb + rb * Math.sin(a)]); }
+  for (let i = 1; i <= NS; i++) { const y = lerp(b + rb, T - rt, i / NS); o.push([Math.max(rt, P.X(z, y)), y]); }
+  for (let i = 1; i <= NCT; i++) { const a = i * Math.PI / 2 / NCT; o.push([xt - rt + rt * Math.cos(a), T - rt + rt * Math.sin(a)]); }
+  for (let i = 1; i <= NR; i++) { const x = (xt - rt) * (1 - i / NR); o.push([x, T + cr * (1 - (x / (xt - rt)) ** 2)]); }
+  return o;
+}
+const kAtY = (h, y) => { for (let k = 0; k < K - 1; k++) { const a = h[k][1], b = h[k + 1][1]; if (b > a && y >= a && y <= b) return k + (y - a) / (b - a); } return y < h[0][1] ? 0 : K - 1; };
+function smoothBody(P) {
+  const pos = [], idx = [], R = 2 * K - 2;
+  const ring = z => { const h = halfAt(P, z); return [...h, ...h.slice(1, -1).reverse().map(([x, y]) => [-x, y])]; };
+  P.zs.forEach(z => ring(z).forEach(([x, y]) => pos.push(x, y, z)));
+  for (let i = 0; i < P.zs.length - 1; i++) for (let j = 0; j < R; j++) { const a = i * R + j, b = i * R + (j + 1) % R, c = a + R, d = b + R; idx.push(a, c, b, b, c, d); }
+  for (const zi of [0, P.zs.length - 1]) {                              // flat end caps on their own vertices
+    const z = P.zs[zi], r = ring(z), base = pos.length / 3, cy = r.reduce((s, p) => s + p[1], 0) / R;
+    pos.push(0, cy, z); r.forEach(([x, y]) => pos.push(x, y, z));
+    for (let j = 0; j < R; j++) idx.push(base, base + 1 + j, base + 1 + (j + 1) % R);
   }
-  const warped = rings.map(r => r.map(([x, y, z]) => [x, y, warp(x, y, z)]));
-  const geo = loft(warped, (i, j) => clsFn(zs[i], tags[i][j], rings[i][j], rings[i][(j + 1) % rings[i].length]));
-  return { geo, rings, zs };
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals(); return geo;
 }
-function surfZ(rings, zs, x, y, front) {
-  for (let k = 0; k < zs.length; k++) { const i = front ? zs.length - 1 - k : k, r = rings[i]; let ins = false;
-    for (let a = 0, b = r.length - 1; a < r.length; b = a++) { const [xa, ya] = r[a], [xb, yb] = r[b]; if ((ya > y) !== (yb > y) && x < (xb - xa) * (y - ya) / (yb - ya) + xa) ins = !ins; }
-    if (ins) return zs[i]; }
-  return front ? zs[zs.length - 1] : zs[0];
+// a patch on both sides of a smooth body: z0..z1, and kLo(z, h)..kHi(z, h) along the section
+function patch(P, z0, z1, kLo, kHi, mat, { nz = 36, nk = 12, eps = .006 } = {}) {
+  const pos = [], idx = [];
+  for (const s of [-1, 1]) { const base = pos.length / 3;
+    for (let i = 0; i <= nz; i++) { const z = lerp(z0, z1, i / nz), h = halfAt(P, z), lo = kLo(z, h), hi = Math.max(lo, kHi(z, h));
+      for (let j = 0; j <= nk; j++) { const k = lerp(lo, hi, j / nk), k0 = Math.min(K - 2, Math.floor(k)), f = k - k0, [xa, ya] = h[k0], [xb, yb] = h[k0 + 1];
+        const dx = xb - xa, dy = yb - ya, l = Math.hypot(dx, dy) || 1; pos.push(s * (lerp(xa, xb, f) + eps * dy / l), lerp(ya, yb, f) - eps * dx / l, z); } }
+    for (let i = 0; i < nz; i++) for (let j = 0; j < nk; j++) { const a = base + i * (nk + 1) + j, b = a + 1, c = a + nk + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+  }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+  return new THREE.Mesh(geo, mat);
 }
-// faceted section loft shared by the Cybercab and Semi (same flat-shaded language as the Cybertruck)
-// half section: [x, y] points from the bottom edge up to the roof centre line; mirrored for the left side
-function facetBody(zs, halfAt, cls) {
-  const rings = zs.map(z => { const h = halfAt(z); return [...h.map(([x, y]) => [x, y, z]), ...h.slice().reverse().map(([x, y]) => [-x, y, z])]; });
-  const n = rings[0].length / 2;
-  return loft(rings, (i, j) => cls((zs[i] + zs[i + 1]) / 2, j < n ? j : 2 * n - 2 - j, j === 2 * n - 1), { flat: true });
+const yBand = (ylo, yhi) => [(z, h) => kAtY(h, ylo), (z, h) => kAtY(h, yhi)];
+// front-most (or rear-most) z where the body surface passes through (x, y)
+function endZ(P, x, y, front) {
+  const z0 = P.zs[0], z1 = P.zs[P.zs.length - 1]; let z = front ? z1 : z0; const st = front ? -.004 : .004;
+  for (let i = 0; i < 1500; i++, z += st) if (y >= P.bot(z) && y <= P.top(z) + (P.crown ?? 0) && Math.abs(x) <= P.X(z, y)) return z;
+  return z;
 }
-const archLift = (z, zc, r, lo, hi) => { const d = Math.abs(z - zc); return d < r ? hi : d < r + .3 ? lerp(hi, lo, (d - r) / .3) : lo; };
-function sideLamps(g, glowTex, list) { return list.map(([x, y, z, col, size]) => { const l = new Lamp([x, y, z], col, size, glowTex); g.add(l.group); return l; }); }
+function wellLiner(g, M, zc, yc, R, len) {
+  const c = new THREE.Mesh(new THREE.CylinderGeometry(R - .01, R - .01, len, 36, 1, true, 0, Math.PI), M.well); c.rotation.z = Math.PI / 2; c.position.set(0, yc, zc); g.add(c);
+}
+const sideLamps = (g, glowTex, list) => list.map(([x, y, z, col, size]) => { const l = new Lamp([x, y, z], col, size, glowTex); g.add(l.group); return l; });
 
 function buildCybercab(glowTex) {
-  const M = mats(new THREE.Color('#bfa575'), { metal: .82, rough: .42, coat: .3, env: 1.0, flat: true });
-  const ZF = 2.17, ZR = -2.17, WB = 1.42, WR = .37;
-  const roof = curve1D([[ZR, .93], [-2.0, 1.02], [-1.55, 1.16], [-.9, 1.33], [-.2, 1.41], [.4, 1.38], [.95, 1.18], [1.45, .97], [1.95, .87], [ZF, .8]]);
-  const belt = curve1D([[ZR, .88], [-1.6, .96], [.9, .97], [1.6, .9], [ZF, .76]]);
-  const half = curve1D([[ZR, .8], [-1.9, .93], [-1.3, .97], [1.2, .97], [1.85, .92], [ZF, .8]]);
-  const zs = [ZR, -2.05, -1.86, -1.55, -1.06, -.6, -.2, .4, .95, 1.06, 1.45, 1.78, 1.95, 2.08, ZF];
-  const geo = facetBody(zs, z => {
-    const yb = Math.max(archLift(z, WB, .4, .26, .74), archLift(z, -WB, .4, .26, .74)), w = half(z), b = Math.min(belt(z), roof(z) - .04), t = roof(z);
-    return [[w - .07, yb], [w, yb + .1], [w, b], [lerp(w, w * .66, .62), lerp(b, t, .72)], [w * .58, t]];
-  }, (z, jj, bottom) => {
-    if (bottom || jj === 0) return 2;
-    if ((jj === 2 || jj === 3) && z > -1.5 && z < .95) return 1;      // side glass band
-    if (jj === 3 && z >= .95 && z < 1.4) return 1;                     // windshield corners
-    if (jj === 4 && z > -.45 && z < 1.42) return 1;                    // windshield + glass roof
-    return 0;
-  });
-  const g = new THREE.Group(); g.add(new THREE.Mesh(geo, [M.paint, M.glass, M.trim]));
-  for (const z of [WB, -WB]) for (const s2 of [-1, 1]) { const w = wheel(M, WR, .24, 'body'); w.position.set(s2 * .82, WR, z); if (s2 < 0) w.rotation.y = Math.PI; g.add(w); }
+  const M = mats(new THREE.Color('#b59a6c'), { metal: .88, rough: .26, coat: .7, env: 1.25, hub: 0x8b8e92 });
+  const ZF = 2.16, ZR = -2.14, WF = 1.40, WR = -1.42, RW = .36, RA = .44;
+  const top = curve1D([[ZR, .99], [-1.95, 1.05], [-1.5, 1.19], [-.9, 1.34], [-.25, 1.42], [.35, 1.39], [.9, 1.24], [1.32, 1.0], [1.62, .9], [1.95, .83], [2.08, .76], [ZF, .6]]);
+  const arches = [[WF, .36, RA], [WR, .36, RA]];
+  const base = z => z > 1.9 ? lerp(.2, .32, (z - 1.9) / (ZF - 1.9)) : z < -1.82 ? lerp(.2, .46, (-1.82 - z) / (-1.82 - ZR)) : .2;
+  const plan = curve1D([[ZR, .9], [-1.85, .965], [-1.2, .985], [1.0, .985], [1.75, .95], [2.05, .88], [ZF, .8]]);
+  const belt = .9;
+  const P = {
+    zs: zSamples(ZR, ZF, [WF - RA, WF + RA, WR - RA, WR + RA, WF - RA - .004, WF + RA + .004, WR - RA - .004, WR + RA + .004, ZF - .01, ZF - .025, ZR + .01, ZR + .025], .04),
+    bot: z => archBot(z, base(z), arches), top, crown: .035, rB: .07, rT: curve1D([[-2.14, .13], [-1.6, .26], [1.15, .26], [1.6, .13]]),
+    X: (z, y) => { const w = plan(z), b = .2; return y < belt ? w * (1 - .07 * ((belt - y) / (belt - b)) ** 2) : w * lerp(1, .74, Math.min(1, (y - belt) / (1.42 - belt)) ** 1.3); }
+  };
+  const g = new THREE.Group(); g.add(new THREE.Mesh(smoothBody(P), M.paint));
+  // one black glass canopy: windshield, roof and side glass, ending in a raked edge over the fastback
+  g.add(patch(P, -1.05, 1.34, (z, h) => kAtY(h, z > 1.1 ? .99 : z < -.6 ? lerp(1.12, .93, (z + 1.05) / .45) : .93), () => K - 1, M.glass, { nz: 56 }));
+  g.add(patch(P, -1.95, 2.0, ...yBand(.2, .3), M.trim, { nz: 50, nk: 4 }));                // black sills
+  g.add(patch(P, 1.94, ZF, (z, h) => 0, (z, h) => kAtY(h, .42), M.trim, { nz: 8, nk: 8 })); // front lower
+  for (const z of [1.08, -.5]) g.add(patch(P, z, z + .012, ...yBand(.31, .9), M.seam, { nz: 1, nk: 8 }));   // door seams
+  for (const [zc] of arches) wellLiner(g, M, zc, .36, RA, 1.86);
+  for (const z of [WF, WR]) for (const s of [-1, 1]) { const w = wheel(M, RW, .25, 'aero'); w.position.set(s * .8, RW, z); if (s < 0) w.rotation.y = Math.PI; g.add(w); }
   const fpts = [], rpts = [];
-  for (let i = 0; i <= 12; i++) { const x = lerp(-.74, .74, i / 12); fpts.push([x, .78, ZF + .006]); rpts.push([lerp(-.8, .8, i / 12), .9, ZR - .006]); }
-  const front = new LightBar(fpts, WHITE, 64, { width: .05 }), rear = new LightBar(rpts, RED, 48, { width: .065 });
+  for (let i = 0; i <= 14; i++) { const x = lerp(-.74, .74, i / 14), xr = lerp(-.84, .84, i / 14); fpts.push([x, .78, endZ(P, x, .78, true) + .008]); rpts.push([xr, .95, ZR - .008]); }
+  const front = new LightBar(fpts, WHITE, 64, { width: .045 }), rear = new LightBar(rpts, RED, 48, { width: .06 });
   g.add(front.group, rear.group);
-  const turns = sideLamps(g, glowTex, [[-.86, .9, ZR - .02, AMBER, .07], [.86, .9, ZR - .02, AMBER, .07]]);
-  const repeaters = sideLamps(g, glowTex, [[-.985, .9, 1.02, AMBER, .045], [.985, .9, 1.02, AMBER, .045]]);
-  return { group: g, bars: { front, rear }, turns, repeaters, len: 4.34, M };
+  const turns = sideLamps(g, glowTex, [[-.86, .89, ZR - .015, AMBER, .06], [.86, .89, ZR - .015, AMBER, .06]]);
+  const ry = .8, rz = 1.0, rx = P.X(rz, ry) + .012;
+  const repeaters = sideLamps(g, glowTex, [[-rx, ry, rz, AMBER, .04], [rx, ry, rz, AMBER, .04]]);
+  return { group: g, bars: { front, rear }, turns, repeaters, len: 4.3, M };
 }
 
 function buildSemi(glowTex) {
-  const M = mats(new THREE.Color('#d9dbdc'), { metal: .25, rough: .45, coat: .6, env: .9, flat: true });
-  const ZF = 3.1, ZC = -.75, WF = 2.05, R = .52;
-  const roof = curve1D([[ZC, 3.5], [-.35, 3.7], [.5, 3.8], [1.3, 3.62], [2.8, 2.1], [3.0, 1.75], [ZF, 1.45]]);
-  const zs = [ZC, ZC + .04, -.2, .9, 1.4, WF - .82, WF - .52, WF + .52, 2.85, 2.95, 3.04, ZF].sort((a, b) => a - b);
-  const geo = facetBody(zs, z => {
-    const yb = archLift(z, WF, .52, .55, 1.16), t = roof(z), b = Math.min(2.2, t - .06), w = 1.25 * (z < -.4 ? .94 : 1);
-    return [[w - .1, yb], [w, yb + .14], [w, b], [w * .93, lerp(b, t, .55)], [w * .76, lerp(b, t, .9)], [w * .56, t]];
-  }, (z, jj, bottom) => {
-    if (bottom || jj === 0) return 2;
-    if ((jj === 2 || jj === 3) && z > 1.3 && z < 2.6) return 1;         // door windows
-    if (jj >= 3 && z > 1.42 && z < 2.84) return 1;                      // wraparound windshield
-    return 0;
-  });
-  const g = new THREE.Group(); g.add(new THREE.Mesh(geo, [M.paint, M.glass, M.trim]));
+  const M = mats(new THREE.Color('#e9eaea'), { metal: .15, rough: .28, coat: 1, env: 1.0, hub: 0x9a9da1 });
+  const ZF = 3.16, ZC = -.95, WF = 2.05, R = .52, RA = .62;
+  const top = curve1D([[ZC, 3.86], [-.5, 3.95], [.3, 3.97], [.85, 3.86], [1.3, 3.56], [1.65, 3.12], [2.05, 2.6], [2.45, 2.12], [2.8, 1.8], [3.0, 1.56], [3.11, 1.28], [ZF, .95]]);
+  const base = z => z > 2.75 ? lerp(.42, .6, (z - 2.75) / (ZF - 2.75)) : .42;
+  const plan = curve1D([[ZC, 1.2], [-.6, 1.25], [2.25, 1.25], [2.75, 1.19], [3.0, 1.1], [ZF, .98]]);
+  const P = {
+    zs: zSamples(ZC, ZF, [WF - RA, WF + RA, WF - RA - .004, WF + RA + .004, ZF - .01, ZF - .03, ZC + .01], .045),
+    bot: z => archBot(z, base(z), [[WF, R, RA]]), top, crown: .05, rB: .08, rT: curve1D([[-.95, .3], [.6, .3], [1.5, .42]]),
+    X: (z, y) => plan(z) * (y < 1.75 ? 1 : lerp(1, .8, Math.min(1, (y - 1.75) / 2.2) ** 1.25))
+  };
+  const g = new THREE.Group(); g.add(new THREE.Mesh(smoothBody(P), M.paint));
+  g.add(patch(P, 1.4, 2.9, (z, h) => kAtY(h, 1.86), () => K - 1, M.glass, { nz: 64, nk: 18, eps: .014 }));            // wraparound windshield
+  g.add(patch(P, .52, 1.26, ...yBand(1.98, 2.95), M.glass, { nz: 16, nk: 8 }));                   // door window
+  g.add(patch(P, 2.6, ZF, () => 0, (z, h) => kAtY(h, .74), M.trim, { nz: 16, nk: 8 }));            // front lower bumper
+  g.add(patch(P, ZC, 1.42, ...yBand(.42, .6), M.trim, { nz: 40, nk: 4 }));                       // skirt strip
+  for (const z of [.42, 1.36]) g.add(patch(P, z, z + .014, ...yBand(.62, 3.1), M.seam, { nz: 1, nk: 10 }));
+  wellLiner(g, M, WF, R, RA, 2.4);
   const box = (w, h, d, x, y, z, m) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); g.add(b); return b; };
-  box(1.0, .26, 3.0, 0, .86, -2.15, M.trim);                                   // frame rails
+  box(1.0, .26, 2.9, 0, .86, -2.1, M.trim);                                    // frame rails
   box(1.9, .1, 1.2, 0, 1.2, -2.2, M.hub);                                      // fifth wheel deck
+  box(2.2, .5, .1, 0, 1.15, -1.0, M.trim);                                     // cab back panel
   for (const s of [-1, 1]) {
-    box(.12, .62, 2.1, s * 1.17, .78, .25, M.paint);                           // side fairing / battery skirt
-    box(.06, .62, 1.75, s * 1.13, .88, -1.8, M.trim);                           // skirt behind cab
-    box(.9, .05, .5, s * .82, 1.18, -2.27, M.trim);                             // drive-axle fenders
+    box(.95, .05, 2.05, s * .8, 1.2, -2.24, M.trim);                            // drive-axle fender tops
+    box(.5, .55, .03, s * .9, .62, -3.38, M.trim);                              // mud flaps
+    const arm = box(.05, .05, .32, s * 1.3, 2.45, 1.5, M.trim), pod = box(.08, .42, .2, s * 1.42, 2.4, 1.34, M.paint);   // mirrors
   }
   box(2.3, .14, .08, 0, .98, -3.38, M.trim);                                   // rear light bracket
   for (const s of [-1, 1]) {
@@ -222,53 +259,71 @@ function buildSemi(glowTex) {
     for (const z of [-1.62, -2.86]) { const d = wheel(M, R, .56, 'aero'); d.position.set(s * .95, R, z); if (s < 0) d.rotation.y = Math.PI; g.add(d); }
   }
   const fpts = [], rpts = [];
-  for (let i = 0; i <= 12; i++) { const x = lerp(-1.1, 1.1, i / 12); fpts.push([x, 1.5, ZF + .01]); rpts.push([lerp(-.28, .28, i / 12), 1.0, -3.43]); }
+  for (let i = 0; i <= 14; i++) { const x = lerp(-1.0, 1.0, i / 14); fpts.push([x, 1.5, endZ(P, x, 1.5, true) + .01]); rpts.push([lerp(-.28, .28, i / 14), 1.0, -3.43]); }
   const front = new LightBar(fpts, WHITE, 64, { width: .06 }), rear = new LightBar(rpts, RED, 24, { width: .06 });
   g.add(front.group, rear.group);
   const tails = sideLamps(g, glowTex, [[-.98, .99, -3.44, RED, .09], [.98, .99, -3.44, RED, .09]]);
   const turns = sideLamps(g, glowTex, [[-1.12, .99, -3.44, AMBER, .08], [1.12, .99, -3.44, AMBER, .08]]);
-  const repeaters = sideLamps(g, glowTex, [[-1.265, 1.75, 2.45, AMBER, .06], [1.265, 1.75, 2.45, AMBER, .06]]);
-  const markers = sideLamps(g, glowTex, [...[-1, 1].flatMap(s => [[s * 1.25, 1.05, .9, AMBER, .045], [s * 1.25, 1.05, -.4, AMBER, .045], [s * 1.18, 1.05, -2.9, RED, .045]]),
-    ...[-.5, -.25, 0, .25, .5].map(x => [x, 3.79, 1.25, AMBER, .04])]);
+  const rx = P.X(2.42, 1.7) + .012;
+  const repeaters = sideLamps(g, glowTex, [[-rx, 1.7, 2.42, AMBER, .06], [rx, 1.7, 2.42, AMBER, .06]]);
+  const mx = (z) => P.X(z, 1.05) + .012, ry = top(.95) + P.crown * .4 + .03;
+  const markers = sideLamps(g, glowTex, [...[-1, 1].flatMap(s => [[s * mx(.9), 1.05, .9, AMBER, .045], [s * mx(-.4), 1.05, -.4, AMBER, .045], [s * 1.18, 1.05, -2.9, RED, .045]]),
+    ...[-.5, -.25, 0, .25, .5].map(x => [x, ry, .95, AMBER, .04])]);
   return { group: g, bars: { front, rear }, tails, turns, repeaters, markers, len: 6.6, M };
 }
+
+/* Cybertruck: flat stainless panels. The lower body is a straight extrusion of the side profile (arches cut in);
+   the greenhouse and tonneau sit on the belt line and lean inward linearly, so every panel stays planar. */
+function extrude(outline, xOf) {
+  const sh = new THREE.Shape(outline.map(([z, y]) => new THREE.Vector2(z, y)));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: 1, bevelEnabled: false, curveSegments: 1 }), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) { const z = p.getX(i), y = p.getY(i), t = p.getZ(i); p.setXYZ(i, xOf(t, y), y, z); }
+  g.computeVertexNormals(); return g;
+}
+function fan(pts, mat) {   // convex polygon of [x, y, z]
+  const pos = pts.flat(), idx = []; for (let i = 1; i < pts.length - 1; i++) idx.push(0, i, i + 1);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return new THREE.Mesh(g, mat);
+}
 function buildCybertruck(glowTex) {
-  const M = mats(new THREE.Color('#c4c6c8'), { metal: .9, rough: .55, coat: 0, env: .7, flat: true });
-  const ZF = 2.84, ZR = -2.84, WF = 1.89, WRr = -1.92, R = .445;
-  const topY = z => z >= -.2 ? lerp(1.80, 1.05, (z + .2) / (ZF + .2)) : lerp(1.80, 1.22, (-.2 - z) / (-.2 - ZR));
-  const archY = (z, zc) => { const d = Math.abs(z - zc); return d < .36 ? 1.0 : d < .7 ? lerp(1.0, .5, (d - .36) / .34) : -1; };
-  const botY = z => Math.max(.5, archY(z, WF), archY(z, WRr));
-  const zs = [ZR, ZR + .02];
-  for (const zc of [WRr, WF]) zs.push(zc - .7, zc - .36, zc + .36, zc + .7);
-  zs.push(-.2, 1.95, 2.56, ZF - .02, ZF); zs.sort((a, b) => a - b);
-  const rings = zs.map(z => {
-    const yt = topY(z), yb = botY(z), belt = Math.min(1.12, yt), hw = 1.0, hwt = lerp(hw, z > -1.0 ? .66 : .8, clamp((yt - belt) / .22)), rock = Math.max(yb + .06, .66);
-    const h = [[.96, yb], [hw, yb + .04], [hw, Math.min(rock, belt - .01)], [hw, belt], [hwt, yt]];
-    return [...h.map(([x, y]) => [x, y, z]), ...h.slice().reverse().map(([x, y]) => [-x, y, z])];
-  });
-  const geo = loft(rings, (i, j) => {
-    const z = (zs[i] + zs[i + 1]) / 2, jj = j < 5 ? j : 9 - j;
-    if (j === 9 || jj === 0 || jj === 1) return 2;          // bottom, rocker chamfer
-    if (jj === 2) return 2;                                   // black lower cladding band
-    if (jj === 4 && j === 4 && z > -.95 && z < 1.95) return 1; // roof / windshield glass
-    if (jj === 3 && z > -.9 && z < 1.35) return 1;            // side glass
-    return 0;
-  }, { flat: true, capCls: [0, 0] });
-  const body = new THREE.Mesh(geo, [M.paint, M.glass, M.trim]);
-  const g = new THREE.Group(); g.add(body);
-  // bumpers + arch flares
-  const fb = new THREE.Mesh(new THREE.BoxGeometry(1.98, .3, .3), M.trim); fb.position.set(0, .56, ZF - .13); g.add(fb);
-  const rb = new THREE.Mesh(new THREE.BoxGeometry(1.98, .3, .26), M.trim); rb.position.set(0, .6, ZR + .11); g.add(rb);
+  const M = mats(new THREE.Color('#b9bcbf'), { metal: .95, rough: .38, coat: 0, env: .9, flat: true, hub: 0x2a2c2f });
+  const ZF = 2.86, ZR = -2.84, WF = 1.89, WRr = -1.92, R = .445, BELT = 1.12, AP = [-.1, 1.87], NOSE = [ZF, 1.04], TAIL = [ZR, 1.30];
+  const lineY = (z) => z >= AP[0] ? lerp(NOSE[1], AP[1], (NOSE[0] - z) / (NOSE[0] - AP[0])) : lerp(AP[1], TAIL[1], (AP[0] - z) / (AP[0] - TAIL[0]));
+  const zBelt = NOSE[0] - (BELT - NOSE[1]) / (AP[1] - NOSE[1]) * (NOSE[0] - AP[0]);
+  const xs = y => 1 - .3 * Math.max(0, y - BELT) / (AP[1] - BELT);           // greenhouse lean-in
+  const archPts = zc => [[zc + .66, .44], [zc + .42, .98], [zc - .42, .98], [zc - .66, .44]];
+  const lower = [[ZF - .02, .5], NOSE, [zBelt, BELT], [ZR, BELT], [ZR, .56], [ZR + .12, .44], ...archPts(WRr).reverse(), ...archPts(WF).reverse(), [ZF - .1, .44]];
+  const upper = [[zBelt, BELT], AP, TAIL, [ZR, BELT]];
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(extrude(lower, (t) => 1 - 2 * t), M.paint));
+  g.add(new THREE.Mesh(extrude(upper, (t, y) => (1 - 2 * t) * xs(y)), M.paint));
+  // glass: windshield + roof on the front slope, rear glass behind the apex, and the side windows
+  const topPt = (z, x, e = .008) => [x, lineY(z) + e, z];
+  const ws = (z0, z1, inset) => fan([topPt(z0, -(xs(lineY(z0)) - inset)), topPt(z0, xs(lineY(z0)) - inset), topPt(z1, xs(lineY(z1)) - inset), topPt(z1, -(xs(lineY(z1)) - inset))], M.glass);
+  g.add(ws(1.95, .02, .07), ws(-.16, -.72, .1));
+  for (const s of [-1, 1]) {
+    const sp = (z, y) => [s * (xs(y) + .006), y, z];
+    g.add(fan([sp(-.86, 1.17), sp(1.98, 1.17), sp(-.04, lineY(-.04) - .08), sp(-.86, lineY(-.86) - .08)], M.glass));
+    g.add(fan([sp(.34, 1.16), sp(.42, 1.16), sp(.42, lineY(.42) - .06), sp(.34, lineY(.34) - .06)], M.trim));           // B-pillar
+    const lp = (z, y) => [s * 1.004, y, z];
+    for (const [z0, z1] of [[ZR + .12, WRr - .66], [WRr + .66, WF - .66], [WF + .66, ZF - .1]]) {                   // black lower cladding
+      const k = (.64 - .44) / (.98 - .44) * .24;
+      g.add(fan([lp(z0, .44), lp(z1, .44), lp(z1 - (z1 === WRr - .66 || z1 === WF - .66 ? -k : 0), .64), lp(z0 + (z0 === WRr + .66 || z0 === WF + .66 ? -k : 0), .64)], M.trim));
+    }
+    for (const z of [1.86, .38, -.92]) g.add(fan([lp(z, .66), lp(z + .012, .66), lp(z + .012, BELT - .01), lp(z, BELT - .01)], M.seam));  // door seams
+  }
+  g.add(fan([[-.98, lineY(-.9) + .009, -.9], [.98, lineY(-.9) + .009, -.9], [.98, lineY(-.92) + .009, -.92], [-.98, lineY(-.92) + .009, -.92]].map(([x, y, z]) => [x * xs(y), y, z]), M.seam));   // tonneau seam
+  // angular arch flares
   for (const zc of [WF, WRr]) for (const s of [-1, 1]) {
-    const sh = new THREE.Shape(); sh.moveTo(-.78, .44); sh.lineTo(-.4, 1.08); sh.lineTo(.4, 1.08); sh.lineTo(.78, .44); sh.lineTo(.7, .44); sh.lineTo(.35, 1.0); sh.lineTo(-.35, 1.0); sh.lineTo(-.7, .44);
-    const fg = new THREE.ExtrudeGeometry(sh, { depth: .03, bevelEnabled: false }); const f = new THREE.Mesh(fg, M.trim); f.rotation.y = s > 0 ? Math.PI / 2 : -Math.PI / 2; f.position.set(s * 1.0, 0, zc); g.add(f);
+    const band = [[zc + .82, .42], [zc + .5, 1.1], [zc - .5, 1.1], [zc - .82, .42], [zc - .66, .42], [zc - .42, .98], [zc + .42, .98], [zc + .66, .42]];
+    g.add(new THREE.Mesh(extrude(band, (t) => s * (1.0 + .045 * (1 - t))), M.trim));
     const w = wheel(M, R, .3, 'aero'); w.position.set(s * .86, R, zc); if (s < 0) w.rotation.y = Math.PI; g.add(w);
   }
-  const fpts = [], rpts = []; for (let i = 0; i <= 12; i++) { const x = lerp(-.99, .99, i / 12); fpts.push([x, 1.05, ZF + .006]); rpts.push([x, 1.215, ZR - .006]); }
-  const front = new LightBar(fpts, WHITE, 64, { width: .075 }), rear = new LightBar(rpts, RED, 48, { width: .085 });
+  const fb = new THREE.Mesh(new THREE.BoxGeometry(2.0, .2, .1), M.trim); fb.position.set(0, .54, ZF - .04); g.add(fb);
+  const rb = new THREE.Mesh(new THREE.BoxGeometry(2.0, .22, .1), M.trim); rb.position.set(0, .56, ZR + .03); g.add(rb);
+  const fpts = [], rpts = []; for (let i = 0; i <= 12; i++) { const x = lerp(-.99, .99, i / 12); fpts.push([x, 1.03, ZF + .01]); rpts.push([x, 1.28, ZR - .008]); }
+  const front = new LightBar(fpts, WHITE, 64, { width: .07 }), rear = new LightBar(rpts, RED, 48, { width: .08 });
   g.add(front.group, rear.group);
-  // headlamp emitters at the outer ends of the bar
-  const heads = [-1, 1].map(s => { const l = new Lamp([s * .8, 1.0, ZF + .01], WHITE, .05, glowTex); g.add(l.group); return l; });
+  const heads = [-1, 1].map(s => { const l = new Lamp([s * .8, 1.0, ZF + .012], WHITE, .05, glowTex); g.add(l.group); return l; });
   return { group: g, bars: { front, rear }, heads, len: 5.68, M };
 }
 /* ---------------- headlamp beams (cybertruck) ---------------- */

@@ -139,7 +139,7 @@ export const cards = [
   { id: 'lidar', date: '2023', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
   { id: 'ftc', date: '2022', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
   { id: 'ri3d', date: 'Jan 2024', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
-  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Personal · CAD', blurb: 'A custom tracked drive designed for rough terrain.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
+  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Design · Studica', blurb: 'A tracked drive concept designed for rough terrain, rendered in CAD.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
   { id: 'gooseminator', date: '2022', title: 'The Gooseminator', kicker: 'First year · Team design', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
   { id: 'robotic-arm', date: '2022', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
@@ -321,7 +321,7 @@ export const details = {
       { type: 'youtube', src: 'Pv3DPuoHrXA', caption: 'Robot version 1 CAD' }
     ], body: ['Wrote all the robot software in Java: PIDF control holds the arm in position and the flywheel at speed under load, TensorFlow vision detects game elements, and distance sensors and gyros handle localization. The team won the Control Award at the Asia Pacific Open Championship.'], chips: ['Java', 'PID', 'TensorFlow'], links: [['Robot reveal', 'https://youtu.be/yTg-Im7ZjQQ'], ['Top match', 'https://youtu.be/hSD0i93UDiY']] },
   ri3d: { hero: 'qqqrSge0pF4', body: ['As team lead of UW REACT, organized an FRC Robot-in-3-Days event and built a ring-launching robot in 48 hours with five people.'], chips: ['FRC', 'Rapid prototyping'] },
-  'tank-tread': { body: ['A custom tank-tread drive for off-road terrain, designed in CAD and tested on rock.'], chips: ['CAD'] }
+  'tank-tread': { body: ['A tank-tread drive concept for off-road terrain, designed in CAD as part of my work with Studica. What you see is a render.'], chips: ['CAD'] }
 };
 
 export const uses = [
