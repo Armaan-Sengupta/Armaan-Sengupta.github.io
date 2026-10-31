@@ -340,7 +340,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 .endzone{position:relative;clip-path:inset(-140vh 0 0 0)}   /* the rocket may reach up past the section, never sideways or below */
 #skills{position:relative;z-index:1}
 .endzone > :not(.crash){position:relative;z-index:1}
-.crash{position:absolute;left:0;right:0;bottom:0;top:-140vh;pointer-events:none;z-index:0}
+.crash{position:absolute;left:0;right:0;bottom:0;top:-140vh;pointer-events:none;z-index:0;overflow:hidden}   /* clipped here so the buried part adds no scroll */
 .crash-rocket{position:absolute;left:calc(24vw - 17.35vw);bottom:-2.6vw;width:34.7vw;transform:rotate(-22deg);transform-origin:50% 100%;opacity:.55}
 .crash-rocket img{display:block;width:100%;height:auto;transform:rotate(180deg)}
 .crash-cracks{position:absolute;left:calc(24vw - 21vw);bottom:0;width:42vw;height:60px;opacity:.8}
@@ -348,3 +348,27 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 
 /* the buried rocket only appears once the launch clip's nose-dive has played */
 html:not(.rocket-fell) .crash{display:none}
+
+/* volunteering */
+#volunteering{padding-top:clamp(60px,10vh,120px)}
+.vols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.vol{display:grid;grid-template-columns:132px minmax(0,1fr);gap:20px;align-items:center;padding:20px;border-radius:16px;background:var(--bg-2)}
+.vol img{width:132px;height:132px;border-radius:50%;object-fit:cover}
+.vol h4{font:500 21px/1.2 var(--display);margin:0 0 8px}
+.vol p{margin:0;color:var(--fg-2);font-size:14.5px;line-height:1.55}
+@media(max-width:860px){.vols{grid-template-columns:1fr}.vol{grid-template-columns:84px minmax(0,1fr);gap:14px;padding:16px}.vol img{width:84px;height:84px}}
+#volunteering{position:relative;z-index:1}
+/* where-you-are rail */
+.rail{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:35;display:flex;flex-direction:column;gap:2px;padding:10px 12px 10px 4px;border-radius:12px;
+  opacity:0;pointer-events:none;transition:opacity .4s,background .3s}
+.rail.on{opacity:1;pointer-events:auto}
+.rail button{display:flex;align-items:center;gap:10px;height:16px;color:var(--mute);font-size:12.5px;white-space:nowrap}
+.rail i{display:block;width:14px;height:2px;border-radius:2px;background:rgba(242,239,233,.28);transition:width .3s var(--ease),background .3s}
+.rail span{opacity:0;transform:translateX(-4px);transition:opacity .25s,transform .25s}
+.rail button.cur i{width:22px;background:var(--fg)}
+.rail:hover{background:rgba(8,8,10,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.rail:hover span{opacity:1;transform:none}
+.rail:hover button.cur{color:var(--fg)}
+.rail button:hover{color:var(--fg)}
+.rail button:hover i{background:rgba(242,239,233,.7)}
+@media(max-width:860px){.rail{display:none}}

@@ -7,7 +7,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const smooth = (t) => t * t * (3 - 2 * t);
 const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const allProjects = new Map([...chapters, ...cards].map((p) => [p.id, p]));
+const allProjects = new Map([...cards, ...chapters].map((p) => [p.id, p]));   // a chapter's own entry wins over its grid card
 
 /* ── content.json: galleries and extra facts scraped from the original site ── */
 let content = new Map();
@@ -131,7 +131,7 @@ function buildSequence(ch) {
   return wrap;
 }
 function buildHead(ch) {
-  const head = document.createElement('header'); head.className = 'seq-head';
+  const head = document.createElement('header'); head.className = 'seq-head'; head.dataset.ch = ch.id;
   head.innerHTML = `
     <div class="meta mono"><span>${esc([ch.org, ch.dates].filter(Boolean).join(' · '))}</span></div>
     <h3>${titleHTML(ch)}</h3>
@@ -171,10 +171,16 @@ async function mountChapter(st) {
           const r = document.createElement('div'); r.className = 'fall-rocket'; r.setAttribute('aria-hidden', 'true');
           r.innerHTML = '<img src="elements/airbrakes/borealis.svg" alt="">';
           document.body.append(r);
-          vid.addEventListener('timeupdate', () => {
-            const left = vid.duration - vid.currentTime, go = vid.duration > 0 && left < 1.5 && vid.currentTime > 0.5 && st.visible && st.active === i;
-            r.classList.toggle('go', go);
-            if (go) document.documentElement.classList.add('rocket-fell');   // it only lands at the end of the page once it has fallen
+          // it falls 5 s later than the clip's last moments: 3.5 s after the clip ends, if the reader is still here
+          let timer = 0;
+          vid.addEventListener('play', () => { clearTimeout(timer); r.classList.remove('go'); });
+          vid.addEventListener('ended', () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+              if (!st.visible || st.active !== i) return;
+              r.classList.remove('go'); void r.offsetWidth; r.classList.add('go');
+              document.documentElement.classList.add('rocket-fell');   // it only lands at the end of the page once it has fallen
+            }, 3500);
           });
         }
         if (v.once) vid.addEventListener('timeupdate', () => { const b = $$('.ch-tabs b', st.sec)[i]; if (b && st.active === i && vid.duration) b.style.transform = `scaleX(${vid.currentTime / vid.duration})`; });
@@ -303,7 +309,7 @@ function showFlow(name, { restore = true } = {}) {
   flowState.offsets[flowState.current] = clamp(scrollY - top, 0, flows[flowState.current].offsetHeight);
   const first = !flowState.seen[name];
   flows[flowState.current].hidden = true; flows[name].hidden = false;
-  flowState.current = name; flowState.seen[name] = true;
+  flowState.current = name; flowState.seen[name] = true; buildRail();
   $$('button', flowSwitch).forEach((b) => b.setAttribute('aria-checked', b.dataset.flow === name));
   flowSwitch.dataset.flow = name;
   scrollTo({ top: top + (first || !restore ? 0 : flowState.offsets[name]), behavior: 'auto' });
@@ -333,8 +339,34 @@ $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {
 
 /* ═════════════ scroll loop ═════════════ */
 let ticking = false, lastY = scrollY;
+/* ═════════════ where-you-are rail ═════════════
+   A stack of short lines on the left, one per section, the current one brighter; hovering opens the names,
+   clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. */
+const rail = document.createElement('nav'); rail.className = 'rail'; rail.setAttribute('aria-label', 'Sections');
+document.body.append(rail);
+let railItems = [];
+function buildRail() {
+  const flowEls = (id) => $(`[data-ch="${id}"]`, flows[flowState.current]);
+  railItems = [
+    ...chapters.filter((c) => c.flow === flowState.current).map((c) => ({ label: c.title, el: () => flowEls(c.id) })),
+    { label: 'Projects', el: () => $('#projects') }, { label: 'Skills', el: () => $('#skills') }, { label: 'Volunteering', el: () => $('#volunteering') }
+  ];
+  rail.innerHTML = railItems.map((it, i) => `<button data-i="${i}"><i></i><span>${esc(it.label)}</span></button>`).join('');
+}
+rail.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const el = railItems[+b.dataset.i].el(); if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 10, behavior: reduce ? 'auto' : 'smooth' });
+});
+function updateRail() {
+  let cur = -1;
+  railItems.forEach((it, i) => { const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });
+  rail.classList.toggle('on', cur >= 0);
+  $$('button', rail).forEach((b, i) => b.classList.toggle('cur', i === cur));
+}
+
 function onScroll() {
   ticking = false;
+  updateRail();
   const y = scrollY, top = flowTop(), h = flows[flowState.current].offsetHeight;
   chapterState.forEach((st) => { if (!st.sec.closest('.flow').hidden) updateChapter(st); });
   // the switch floats only while the chapters are on screen
@@ -555,6 +587,7 @@ $$('.sk').forEach((b) => b.addEventListener('click', () => {
 }));
 
 /* ═════════════ boot ═════════════ */
+buildRail();
 for (const ch of chapters) {
   if (ch.seq) flows[ch.flow].append(buildSequence(ch));
   else if (ch.intro) flows[ch.flow].append(buildHead(ch), buildBeat({ ...ch, views: ch.views.slice(0, ch.intro) }), buildChapter({ ...ch, views: ch.views.slice(ch.intro) }));

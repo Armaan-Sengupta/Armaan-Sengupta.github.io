@@ -126,6 +126,9 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
+  { id: 'platform', date: 'Dec 2025', title: 'Stewart Platform', kicker: 'Personal', blurb: 'A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.', media: { video: 'media/stewart-demo.mp4' } },
+  { id: 'airbrakes', date: 'Dec 2024', title: 'Rocket Airbrakes', kicker: 'Waterloo Rocketry', blurb: 'Active drag control for Borealis: one servo drives three panels, and the firmware steers to a target apogee.', media: { video: 'media/airbrakes/irl/actuation-1.mp4' } },
+  { id: 'measurement', date: 'Dec 2023', title: 'Automated Measurement System', kicker: 'Team project', blurb: 'Vision-guided, force-sensed part measurement with no human in the loop.', media: { scrub: 'media/lottie/measurement-device.mp4' } },
   { id: 'trashminator', date: '2022', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
   { id: 'radial-engine', date: '2021', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
   { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
