@@ -31,7 +31,8 @@ const VIEWS = {
 };
 export const AIRBRAKE_DURATION = 9;
 /* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
- * loop moves the panels until the prediction meets the target. x = predicted minus target (1 at the start of coast),
+ * loop moves the panels until the prediction meets the target. x = how far the prediction is from the target, drawn
+ * short of it (panels fully out at the start of the phase),
  * e = extension. eq is the extension that exactly hits the target. Saturates out, eases back in, settles. */
 const CONTROL = (() => {
   const N = 400, dt = 1 / N, a = 4.5, eq = 0.45, Kp = 1.4, Ki = 7, out = []; let x = 1, I = 0;
@@ -376,9 +377,10 @@ class ASAirbrakes extends HTMLElement {
     const al = smooth((J.zoom - 0.5) / 0.5); if (al <= 0) { this._flow.dim = null; return; }
     const narrow = w < 700, x0 = narrow ? w * 0.08 : w * 0.55, x1 = narrow ? w * 0.92 : Math.min(w * 0.93, x0 + 560);
     const top = narrow ? h * 0.34 : h * 0.2, mid = top + (narrow ? h * 0.17 : h * 0.3), bot = narrow ? h * 0.74 : h * 0.78, n = Math.round(J.q * (CONTROL.length - 1));
-    // altitude climbs toward apogee with the target near the top; the prediction starts above the target and is pulled down onto it
-    const N = CONTROL.length - 1, yT = top + (mid - top) * 0.34;
-    const X = (i) => x0 + (x1 - x0) * i / N, Yp = (x) => yT - (yT - top) * 0.9 * x, Ye = (e) => bot - (bot - mid - 56) * e;
+    // target apogee at the top: with the panels out the prediction starts short of it, and rises onto it as they ease back in;
+    // altitude climbs toward the same point
+    const N = CONTROL.length - 1, yT = top + 8;
+    const X = (i) => x0 + (x1 - x0) * i / N, Yp = (x) => yT + (mid - yT) * 0.6 * x, Ye = (e) => bot - (bot - mid - 56) * e;
     const Ya = (i) => { const t = i / N; return mid - 4 + (Yp(CONTROL[i].x) - mid + 4) * (1 - (1 - t) * (1 - t)); };
     this._flow.dim = { x0: x0 - 18, x1: x1 + 18, y0: top - 34, y1: bot + 18, k: al };
     g.globalAlpha = al; g.font = `400 ${narrow ? 12 : 13}px Inter, system-ui, sans-serif`; g.textBaseline = 'alphabetic';
@@ -386,8 +388,8 @@ class ASAirbrakes extends HTMLElement {
     // target apogee
     g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, yT); g.lineTo(x1, yT); g.stroke(); g.setLineDash([]);
     g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, yT + 18);
-    g.textAlign = 'left'; g.fillStyle = '#f0a040'; g.fillText('Predicted apogee', x0, top - 12);
-    g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0 + g.measureText('Predicted apogee').width + 18, top - 12);
+    g.textAlign = 'left'; g.fillStyle = '#f0a040'; g.fillText('Predicted apogee', x0, top - 8);
+    g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0 + g.measureText('Predicted apogee').width + 18, top - 8);
     g.strokeStyle = '#f0a040'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Yp(CONTROL[i].x); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
     g.strokeStyle = 'rgba(242,239,233,.9)'; g.lineWidth = 2; g.beginPath();
