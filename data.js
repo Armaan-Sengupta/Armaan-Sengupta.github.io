@@ -67,7 +67,7 @@ export const chapters = [
     id: 'neuralink', flow: 'professional', mono: true, seq: true,
     org: 'California', logo: ['media/logos/neuralink.svg', 1.0], dates: 'Jan – Aug 2026',
     title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern · Stimulation – Blindsight',
-    points: ['Wrote stimulation implant firmware across thousands of electrodes', 'Architected the app-to-ASIC stack for Blindsight', 'Cut registration time per trial by about 97%'],
+    points: ['Wrote stimulation implant firmware coordinating waveforms and sampling for 3k+ electrodes', 'Architected the app-to-ASIC stack for Blindsight', 'Cut registration time per trial by about 97%'],
     views: [
       { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },
       { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter' },
@@ -240,7 +240,7 @@ export const details = {
       { type: 'image', src: 'elements/neuralink/media/neural-implant-cutaway.jpg', caption: 'Cut-away implant and thread exit. This is an artistic rendering, not official Neuralink material, and does not indicate product fidelity.' },
       { type: 'image', src: 'elements/neuralink/media/neural-signals.jpg', caption: 'Stimulation pulses travelling to the electrode contacts. This is an artistic rendering, not official Neuralink material, and does not indicate product fidelity.' }
     ],
-    body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling across thousands of electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
+    body: ['Led firmware for a 1st-gen neural stimulation implant: interrupt-driven, DMA-fed, high-throughput code coordinating waveforms and sampling for 3k+ electrodes (Rust and C). Architected the full app-to-ASIC stack for Blindsight, a human visual prosthesis.',
       'Cut registration time per trial by ~97%, which made the stimulation safety study feasible on schedule and met the FDA submission deadline. Brought up impedance and calibration so chips could self-test, unblocking the production line.'],
     chips: ['Rust', 'C', 'ARM', 'Nordic', 'DMA', 'Interrupts', 'ASIC bring-up', 'Protobuf'], links: [['Blindsight', 'https://neuralink.com/trials/visual-prosthesis/']]
   },
