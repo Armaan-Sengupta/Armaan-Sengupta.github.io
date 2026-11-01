@@ -598,7 +598,7 @@ $$('.sk').forEach((b) => b.addEventListener('click', () => {
       ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"/></svg>'
       : '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9M11 3.5v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
     b.title = label; b.setAttribute('aria-label', label); b.setAttribute('aria-pressed', String(on));
-    b.addEventListener('click', () => { try { on ? localStorage.removeItem('motion') : localStorage.setItem('motion', 'reduce'); } catch (e) {} location.reload(); });
+    b.addEventListener('click', () => { try { if (!on) sessionStorage.setItem('motion', 'reduce'); } catch (e) {} location.reload(); });
   });
 }
 

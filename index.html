@@ -7,7 +7,8 @@
 /* Reduce-motion toggle: when on, the page reports prefers-reduced-motion to its own scripts, so every animation
    takes the still path it already has for that setting. */
 (function () {
-  var on = false; try { on = localStorage.getItem('motion') === 'reduce'; } catch (e) {}
+  // one-shot: set by the toggle just before it reloads, cleared at once so a normal refresh starts with motion on
+  var on = false; try { on = sessionStorage.getItem('motion') === 'reduce'; sessionStorage.removeItem('motion'); localStorage.removeItem('motion'); } catch (e) {}
   if (!on) return;
   document.documentElement.classList.add('rm');
   var mm = window.matchMedia.bind(window);
