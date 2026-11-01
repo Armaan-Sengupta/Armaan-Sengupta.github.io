@@ -83,7 +83,6 @@ class AnimBase extends HTMLElement {
 }
 
 function label(c, s, x, y, a = 0.5, align = 'left') { c.globalAlpha = a; c.textAlign = align; c.fillStyle = '#fff'; c.fillText(s, x, y); c.globalAlpha = 1; }
-function ih(n) { n |= 0; n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
 
 
 // ---------------------------------------------------------------------------

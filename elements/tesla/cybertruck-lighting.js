@@ -52,24 +52,6 @@ function shadowTexture() {
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
 }
 
-/* ---------------- geometry helpers ---------------- */
-// rings: array of arrays of [x,y,z] (equal length, closed loops). cls(i,j) -> material group for quad
-function loft(rings, cls, { flat = false, capStart = true, capEnd = true, capCls = [0, 0] } = {}) {
-  const M = rings[0].length, pos = [], groups = [[], [], [], []];
-  rings.forEach(r => r.forEach(p => pos.push(p[0], p[1], p[2])));
-  for (let i = 0; i < rings.length - 1; i++) for (let j = 0; j < M; j++) {
-    const a = i * M + j, b = i * M + (j + 1) % M, c = (i + 1) * M + j, d = (i + 1) * M + (j + 1) % M, g = groups[cls(i, j)];
-    g.push(a, b, c, b, d, c);
-  }
-  const cap = (ri, flip, gi) => { const r = rings[ri], cx = r.reduce((s, p) => s + p[0], 0) / M, cy = r.reduce((s, p) => s + p[1], 0) / M, cz = r.reduce((s, p) => s + p[2], 0) / M;
-    const ci = pos.length / 3; pos.push(cx, cy, cz); for (let j = 0; j < M; j++) { const a = ri * M + j, b = ri * M + (j + 1) % M; flip ? groups[gi].push(ci, a, b) : groups[gi].push(ci, b, a); } };
-  if (capStart) cap(0, false, capCls[0]); if (capEnd) cap(rings.length - 1, true, capCls[1]);
-  let geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  const idx = []; let start = 0; groups.forEach((g, gi) => { idx.push(...g); if (g.length) geo.addGroup(start, g.length, gi); start += g.length; });
-  geo.setIndex(idx);
-  if (flat) { const gs = geo.groups.slice(); geo = geo.toNonIndexed(); geo.clearGroups(); gs.forEach(g => geo.addGroup(g.start, g.count, g.materialIndex)); }
-  geo.computeVertexNormals(); return geo;
-}
 /* ---------------- light bars ---------------- */
 const barVS = `attribute float side; attribute vec3 tang; attribute float u; uniform float uW; varying float vS; varying float vU;
 void main(){ vU = u; vS = side; vec4 c = modelViewMatrix*vec4(position,1.); vec3 t = normalize((modelViewMatrix*vec4(tang,0.)).xyz);
@@ -251,7 +233,7 @@ function buildSemi(glowTex) {
   for (const s of [-1, 1]) {
     box(.95, .05, 2.05, s * .8, 1.2, -2.24, M.trim);                            // drive-axle fender tops
     box(.5, .55, .03, s * .9, .62, -3.38, M.trim);                              // mud flaps
-    const arm = box(.05, .05, .32, s * 1.3, 2.45, 1.5, M.trim), pod = box(.08, .42, .2, s * 1.42, 2.4, 1.34, M.paint);   // mirrors
+    box(.05, .05, .32, s * 1.3, 2.45, 1.5, M.trim); box(.08, .42, .2, s * 1.42, 2.4, 1.34, M.paint);   // mirror arm and pod
   }
   box(2.3, .14, .08, 0, .98, -3.38, M.trim);                                   // rear light bracket
   for (const s of [-1, 1]) {

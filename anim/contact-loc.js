@@ -11,7 +11,7 @@
 // Out-of-plane joints (τ1, τ3, τ5, τ7) see only sensor noise because the force is in the drawing plane.
 
 const MONO = '500 9.5px "JetBrains Mono", ui-monospace, monospace';
-const ARM = '#c9c6bf', ARM_EDGE = 'rgba(8,8,10,.55)', CAP = '#1c1d1f';
+const ARM_EDGE = 'rgba(8,8,10,.55)', CAP = '#1c1d1f';
 const FORCE = '#cf6a4c', EST = '#8fb8c9';
 const CYCLE = 6.2, STEP = 1 / 30, SIGMA_TAU = 0.25, CONE = 0.05;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -182,7 +182,7 @@ class ContactLoc extends HTMLElement {
     const ctx = this.ctx, W = this.W, H = this.H; if (!W || !H) return;
     if (!this.cur) this.step(0, this.reduce);
     ctx.clearRect(0, 0, W, H);
-    const f = this.frame(), { P, sp, dir, k, F } = this.cur, s = f.s;
+    const f = this.frame(), { P, sp, dir, k } = this.cur, s = f.s;
     // floor + plinth
     const fl = this.toScr([-0.16, 0], f), fr = this.toScr([0.84, 0], f);
     ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(fl[0], fl[1] + 0.5); ctx.lineTo(fr[0], fr[1] + 0.5); ctx.stroke();

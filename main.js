@@ -6,7 +6,6 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-const smooth = (t) => t * t * (3 - 2 * t);
 const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const allProjects = new Map([...cards, ...chapters].map((p) => [p.id, p]));   // a chapter's own entry wins over its grid card
 
@@ -122,7 +121,7 @@ grid.innerHTML = cards.map((c) => `
     <div class="thumb"></div>
     <div class="body">
       ${c.date ? `<div class="k mono"><span>${esc(c.date)}</span></div>` : ''}
-      <h4>${esc(c.title)}</h4>
+      <h3>${esc(c.title)}</h3>
       <p>${esc(c.blurb)}</p>
     </div>
   </a>`).join('');
@@ -199,7 +198,7 @@ async function openPop(id, { push = true } = {}) {
   popBody.innerHTML = `
     <header>
       <div class="meta mono"><span>${esc(p.org || p.kicker)}</span><span>${esc(p.dates || p.date || c.dates || '')}</span></div>
-      <h3 id="pop-title">${esc(p.title)}</h3>
+      <h2 id="pop-title">${esc(p.title)}</h2>
       ${p.role ? `<p class="role">${esc(p.role)}</p>` : ''}
     </header>
     <div class="pop-text">
@@ -212,7 +211,7 @@ async function openPop(id, { push = true } = {}) {
     </div>
     <figure class="pop-hero"><div class="pop-stage">${hero ? mediaBox(hero, p.title) : ''}</div>${hero ? cap(hero) : ''}</figure>
     ${top.length ? `<div class="pop-top">${top.map((g) => `<figure><div class="box">${mediaBox(g, p.title)}</div>${cap(g)}</figure>`).join('')}</div>` : ''}
-    ${story[id] ? `<div class="pop-story">${story[id].map(([h, ps, list, after]) => `<section><h4>${esc(h)}</h4>${ps.map((t) => `<p>${esc(t)}</p>`).join('')}${list ? `<ul class="points">${list.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}${(after || []).map((t) => `<p>${esc(t)}</p>`).join('')}</section>`).join('')}</div>` : ''}
+    ${story[id] ? `<div class="pop-story">${story[id].map(([h, ps, list, after]) => `<section><h3>${esc(h)}</h3>${ps.map((t) => `<p>${esc(t)}</p>`).join('')}${list ? `<ul class="points">${list.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}${(after || []).map((t) => `<p>${esc(t)}</p>`).join('')}</section>`).join('')}</div>` : ''}
     ${rest.length ? `<div class="tiles">${rest.map((g) => tile(g, p.title)).join('')}</div>` : ''}
     ${docs.length ? `<div class="pop-docs">${docs.map((g) => `<a class="doc" href="${g.src}" target="_blank" rel="noopener"><span class="mono">PDF</span><b>${esc(g.caption || 'Report')}</b><span aria-hidden="true">↗</span></a>`).join('')}</div>` : ''}
     ${linkRow('pop-links')}`;
@@ -223,7 +222,7 @@ async function openPop(id, { push = true } = {}) {
     else if (lead.img) { const im = new Image(); im.src = lead.img; im.className = 'fit'; im.alt = ''; stage.append(im); }
     else if (lead.lottie || lead.scrub) makeLottie(stage, { ...lead, loop: true }, true).then(() => { const v = $('video', stage); if (v) { v.loop = true; v.play().catch(() => {}); } });
   }
-  pop.classList.add('open'); pop.setAttribute('aria-hidden', 'false');
+  pop.classList.add('open'); pop.setAttribute('aria-hidden', 'false'); pop.inert = false;
   document.documentElement.classList.add('locked');
   $('.card-pop', pop).scrollTop = 0;
   $('.close', pop).focus({ preventScroll: true });
@@ -231,7 +230,7 @@ async function openPop(id, { push = true } = {}) {
 }
 function closePop({ push = true } = {}) {
   if (!popId) return; popId = null;
-  pop.classList.remove('open'); pop.setAttribute('aria-hidden', 'true');
+  pop.classList.remove('open'); pop.setAttribute('aria-hidden', 'true'); pop.inert = true;
   document.documentElement.classList.remove('locked');
   $$('video', popBody).forEach((v) => v.pause());
   setTimeout(() => { if (!popId) popBody.innerHTML = ''; }, 500);

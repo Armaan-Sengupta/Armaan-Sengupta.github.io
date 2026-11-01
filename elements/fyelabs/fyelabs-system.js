@@ -32,7 +32,7 @@ const DEG = Math.PI / 180;
 // additive glow that leaves canvas alpha untouched (canvas is transparent over the page)
 function addGlow(m, premult) { m.blending = THREE.CustomBlending; m.blendEquation = THREE.AddEquation; m.blendSrc = premult ? THREE.OneFactor : THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.ZeroFactor; m.blendDstAlpha = THREE.OneFactor; m.transparent = true; m.depthWrite = false; return m; }
 const ACCENT = new THREE.Color('#d0745c');
-const WS = 5, RMAX = 17.5;            // world units per metre around the truck; display range 3.5 m
+const RMAX = 17.5;                   // display range in world units (3.5 m)
 
 /* ---------- sheet-metal helpers (mm, plan = x/z, height = y) ---------- */
 function filletPath(pts, R) {

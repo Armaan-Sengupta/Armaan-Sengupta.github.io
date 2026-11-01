@@ -2,8 +2,7 @@
 // every old address (the old Wix site's pages and the earlier /work/<id>/ pages), 404.html, sitemap.xml and the
 // Cloudflare Bulk Redirect list, all from the same data the interactive site uses. The home page stays the
 // interactive version; these pages exist so search engines and link previews see the actual content.
-// Run from the site folder after editing data.js or story.json:
-//   node tools/build-pages.mjs
+// It runs inside the build output folder; use tools/build.mjs, which copies the site there first.
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -55,7 +54,8 @@ const head = ({ title, desc, url, image, ld }) => `<!doctype html>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"></noscript>
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/project.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
@@ -64,6 +64,8 @@ const head = ({ title, desc, url, image, ld }) => `<!doctype html>
 <header class="top"><a class="brand" href="/"><span class="dot"></span>${NAME}</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 `;
 const foot = `<footer><a href="/">armaansengupta.ca</a><span>© ${new Date().getFullYear()} ${NAME}</span></footer>
+<script>document.addEventListener('click', (e) => { const b = e.target.closest('.yt-play'); if (!b) return;
+  b.outerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + b.dataset.yt + '?autoplay=1" title="' + b.getAttribute('aria-label').replace('Play the ', '') + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>'; });</script>
 </body>
 </html>
 `;
@@ -101,7 +103,7 @@ function page(it, i) {
 <div class="live" id="live"></div>
 <script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, '${it.id}')) h.remove();</script>
 <main class="wrap rest">`,
-    d.hero ? `<div class="video-hero"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${esc(d.hero)}" title="${esc(it.title)} video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>` : '',
+    d.hero ? `<div class="video-hero"><button class="yt-play" data-yt="${esc(d.hero)}" aria-label="Play the ${esc(it.title)} video"><img src="https://i.ytimg.com/vi/${esc(d.hero)}/hqdefault.jpg" alt="" loading="lazy"><span aria-hidden="true">▶</span></button></div>` : '',
     ...(d.body || []).slice(it.summary === d.body?.[0] ? 1 : 0).map((p) => `<p>${esc(p)}</p>`),
     ...it.story.map(([h, ps, list, after]) => `<section><h2>${esc(h)}</h2>${(ps || []).map((p) => `<p>${esc(p)}</p>`).join('')}${list ? `<ul>${list.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}${(after || []).map((p) => `<p>${esc(p)}</p>`).join('')}</section>`),
     d.chips?.length ? `<ul class="chips" aria-label="Skills">${d.chips.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : '',
@@ -161,8 +163,10 @@ h1{font-weight:500;font-size:28px;margin:0 0 12px}p{color:rgba(242,239,233,.6);m
 </head><body><div><h1>That page moved</h1><p>The site was rebuilt and this address no longer exists.</p><a href="/">Go to the homepage</a></div></body></html>
 `);
 
-// Cloudflare Bulk Redirect list: source, target, status, preserve query, include subdomains, subpath matching, preserve path suffix
-writeFileSync('tools/cloudflare-redirects.csv', Object.entries(OLD).flatMap(([from, to]) => [`www.armaansengupta.ca/${from}`, `www.armaansengupta.ca/${from}/`]
+// Cloudflare Bulk Redirect list (node tools/build-pages.mjs --csv <file>): source, target, status, preserve query,
+// include subdomains, subpath matching, preserve path suffix
+const csvAt = process.argv.indexOf('--csv');
+if (csvAt > 0) writeFileSync(process.argv[csvAt + 1], Object.entries(OLD).flatMap(([from, to]) => [`www.armaansengupta.ca/${from}`, `www.armaansengupta.ca/${from}/`]
   .map((src) => `${src},${ORIGIN}${to},301,true,true,false,false`)).join('\n') + '\n');
 
 // sitemap

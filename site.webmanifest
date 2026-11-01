@@ -1,0 +1,12 @@
+{
+  "name": "Armaan Sengupta",
+  "short_name": "Armaan",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#08080a",
+  "theme_color": "#08080a",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

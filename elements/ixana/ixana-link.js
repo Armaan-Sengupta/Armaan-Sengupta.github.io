@@ -36,7 +36,6 @@ function camAt(p,W,H){p=clamp(p);const i=p<=KEYS[1].p?0:1,A=KEYS[i],B=KEYS[i+1],
 const PATH=(()=>{const P=ROUTE,pts=[];for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];for(let k=0;k<16;k++){const t=k/16,t2=t*t,t3=t2*t;pts.push([0,1].map(j=>.5*(2*p1[j]+(-p0[j]+p2[j])*t+(2*p0[j]-5*p1[j]+4*p2[j]-p3[j])*t2+(-p0[j]+3*p1[j]-3*p2[j]+p3[j])*t3)))}}pts.push(P[P.length-1]);
  const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return {pts,L,len:L[L.length-1]}})();
 function along(u){const d=clamp(u)*PATH.len,L=PATH.L;let lo=0,hi=L.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(L[m]<d)lo=m;else hi=m}const r=(d-L[lo])/((L[hi]-L[lo])||1),a=PATH.pts[lo],b=PATH.pts[hi];return [a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r]}
-const PATCH_U=(()=>{let best=0,bd=1e9;for(let i=0;i<=200;i++){const q=along(i/200),d=Math.hypot(q[0]-PATCH[0],q[1]-PATCH[1]);if(d<bd){bd=d;best=i/200}}return best})();
 const LATENCY=1.15; // seconds for a frame burst to travel glasses → watch (illustrative)
 const CSS=`:host{display:block;position:relative;width:100%;height:100%;min-height:240px;background:#08080a;contain:content;color:#f2efe9}
 canvas{display:block;width:100%;height:100%}video{position:absolute;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}

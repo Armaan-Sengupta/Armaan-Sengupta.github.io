@@ -6,8 +6,6 @@
 // Bit timing is slowed down for legibility.
 
 const MONO = '500 10px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
-const clamp = (v, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
-const ease = (v) => { v = clamp(v); return v * v * (3 - 2 * v); };
 const GLOW = 'rgba(255,244,226,0.95)';
 
 class AnimBase extends HTMLElement {
@@ -80,7 +78,6 @@ class AnimBase extends HTMLElement {
 }
 
 function label(c, s, x, y, a = 0.5, align = 'left') { c.globalAlpha = a; c.textAlign = align; c.fillStyle = '#fff'; c.fillText(s, x, y); c.globalAlpha = 1; }
-function ih(n) { n |= 0; n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
 
 
 // ---------------------------------------------------------------------------

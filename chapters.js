@@ -75,7 +75,7 @@ export function buildChapter(ch) {
     <div class="pin">
       <div class="ch-copy">
         <div class="meta mono"><span>${esc(ch.org || '')}</span><span>${esc(ch.dates || '')}</span></div>
-        <h3>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h3>
+        <h2>${ch.logo ? `<img class="logo" src="${ch.logo[0]}" alt="${esc(ch.title)}" style="height:${ch.logo[1]}em">` : esc(ch.title)}</h2>
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
         <div class="ch-actions">
@@ -108,7 +108,7 @@ export function buildSequence(ch) {
   wrap.innerHTML = `
     <header class="seq-head">
       <div class="meta mono"><span>${esc([ch.org, ch.dates].filter(Boolean).join(' · '))}</span></div>
-      <h3>${titleHTML(ch)}</h3>
+      <h2>${titleHTML(ch)}</h2>
       ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
     </header>`;
   const groups = [];
@@ -128,7 +128,7 @@ export function buildHead(ch) {
   const head = document.createElement('header'); head.className = 'seq-head'; head.dataset.ch = ch.id;
   head.innerHTML = `
     <div class="meta mono"><span>${esc([ch.org, ch.dates].filter(Boolean).join(' · '))}</span></div>
-    <h3>${titleHTML(ch)}</h3>
+    <h2>${titleHTML(ch)}</h2>
     ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}`;
   return head;
 }
@@ -283,12 +283,18 @@ function setView(st, i) {
   if (prev !== i) $('.frame', st.sec).classList.toggle('compare-on', !!v.compare);
 }
 
+// Heavy elements (Three.js scenes, videos) wait until the page has loaded and the main thread is idle, so the
+// first paint and first interaction are never held up by a chapter the reader has not reached yet.
+const settled = new Promise((res) => {
+  const idle = () => (window.requestIdleCallback ? requestIdleCallback(res, { timeout: 2000 }) : setTimeout(res, 200));
+  document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true });
+});
 const chapterIO = new IntersectionObserver((es) => es.forEach((e) => {
   const st = chapterState.find((s) => s.sec === e.target); if (!st) return;
   st.visible = e.isIntersecting;
-  if (e.isIntersecting) { mountChapter(st); }
+  if (e.isIntersecting) settled.then(() => { if (st.visible) mountChapter(st); });
   setView(st, Math.max(0, st.active));
-}), { rootMargin: '100% 0px' });
+}), { rootMargin: '75% 0px' });
 
 
 export function layoutChapters() {

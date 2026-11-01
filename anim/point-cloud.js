@@ -79,14 +79,12 @@ class AnimBase extends HTMLElement {
 }
 
 function label(c, s, x, y, a = 0.5, align = 'left') { c.globalAlpha = a; c.textAlign = align; c.fillStyle = '#fff'; c.fillText(s, x, y); c.globalAlpha = 1; }
-function ih(n) { n |= 0; n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n = Math.imul(n ^ (n >>> 16), 0x45d9f3b); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
 
 
 // ---------------------------------------------------------------------------
 const PERIOD = 17;
 const VOXEL = 1.6;
 const STAGES = ['RAW', 'VOXEL DOWNSAMPLE', 'OUTLIER REMOVAL', 'FURTHEST PAIR'];
-const PARAMS = ['FRAME 0001', 'LEAF 1.6 m', 'SOR k=16 σ=1.0', 'O(n²) EXACT'];
 
 function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
@@ -211,12 +209,10 @@ class AsPointCloud extends AnimBase {
     const cam = 90;
     const S = Math.min(W / 60, (H - 44) / (24 + 40 * sp));
     const ox = W * 0.5, oy = H * 0.5 - 6;
-    let lastD = 0;
     const proj = (x, y, z) => {
       const xr = x * cyaw - z * syaw, zr = x * syaw + z * cyaw, yc = y - cy0;
       const y2 = yc * cp + zr * sp, z2 = zr * cp - yc * sp;
       const f = cam / (cam + z2);
-      lastD = z2;
       return [ox + xr * S * f, oy - y2 * S * f];
     };
 
@@ -297,7 +293,6 @@ class AsPointCloud extends AnimBase {
     }
 
     // Readouts
-    const cnt = Math.round(s.n + (s.reps - s.n) * k1 - s.noiseReps * clamp(k2 * 1.25 - 0.25));
 
     const by = H - 12, fade = ease(since / 0.45);
     // stage pips

@@ -19,20 +19,8 @@ const AS_NEURAL_STYLE = `:host{display:block;position:relative;width:100%;height
 const asNClamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const asNLerp=(a,b,t)=>a+(b-a)*t;
 const asNSmooth=t=>{t=asNClamp(t);return t*t*(3-2*t)};
-const asNSeg=(t,a,b)=>asNSmooth((t-a)/(b-a));
-// Shared world-space camera: fixed implant at (634,205), thread tips around y=263.
-// Smooth focus and logarithmic zoom are continuous at each segment boundary.
-function neuralCameraAt(t){
- const keys=[{t:0,x:575,y:340,zoom:.95},{t:2.2,x:620,y:255,zoom:1.7},{t:6.5,x:634,y:214,zoom:6.6},{t:11.6,x:640,y:247,zoom:15},{t:13.2,x:641,y:255,zoom:22}];
- const time=asNClamp(t,0,13.2);let a=keys[0],b=keys[1];for(let i=0;i<keys.length-1;i++)if(time>=keys[i].t){a=keys[i];b=keys[i+1]}
- const u=asNSmooth((time-a.t)/(b.t-a.t));return {x:asNLerp(a.x,b.x,u),y:asNLerp(a.y,b.y,u),zoom:Math.exp(asNLerp(Math.log(a.zoom),Math.log(b.zoom),u))};
-}
 function asNLine(c,pts,color='#fff',width=1){c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.strokeStyle=color;c.lineWidth=width;c.stroke()}
-function asNText(c,s,x,y,size=12,color='#999',align='left'){c.fillStyle=color;c.font=size+'px Consolas,monospace';c.textAlign=align;c.fillText(s,x,y)}
 function asNCircle(c,x,y,r,color='#fff'){c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fillStyle=color;c.fill()}
-function asNCurve(c,p,color='#fff',width=1){c.beginPath();c.moveTo(p[0],p[1]);c.bezierCurveTo(...p.slice(2));c.strokeStyle=color;c.lineWidth=width;c.stroke()}
-function asNCubic(p,t){const a=1-t;return [a*a*a*p[0]+3*a*a*t*p[2]+3*a*t*t*p[4]+t*t*t*p[6],a*a*a*p[1]+3*a*a*t*p[3]+3*a*t*t*p[5]+t*t*t*p[7]]}
-function asNPanel(c,x,y,w,h){const g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#171717');g.addColorStop(1,'#030303');c.fillStyle=g;c.fillRect(x,y,w,h);c.strokeStyle='#555';c.lineWidth=1;c.strokeRect(x,y,w,h)}
 class ASNeuralBase extends HTMLElement{
  constructor(){super();this.attachShadow({mode:'open'});this.shadowRoot.innerHTML='<style>'+AS_NEURAL_STYLE+'</style><canvas aria-label="Conceptual neural stimulation illustration"></canvas><div class="controls"><div class="control-group"><button type="button" class="replay">Replay</button><button type="button" class="pause">Pause</button></div></div>';this._canvas=this.shadowRoot.querySelector('canvas');this._ctx=this._canvas.getContext('2d',{alpha:false});this._time=0;this._last=0;this._playing=true;this._visible=true;this.readyPromise=Promise.resolve(this);this.ready=this.readyPromise;this._reduced=matchMedia('(prefers-reduced-motion: reduce)');this._frame=this._frame.bind(this);this._ro=new ResizeObserver(()=>this.resize());this._io=new IntersectionObserver(es=>{this._visible=es[0].isIntersecting});this.shadowRoot.querySelector('.replay').onclick=()=>{this.seek(0);this.play()};this.shadowRoot.querySelector('.pause').onclick=()=>this._playing?this.pause():this.play();}
  connectedCallback(){this._ro.observe(this);this._io.observe(this);this.resize();if(this._reduced.matches)this.pause();this._raf=requestAnimationFrame(this._frame)}

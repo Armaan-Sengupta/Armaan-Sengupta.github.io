@@ -20,7 +20,7 @@ import * as G from './geometry.js';
 export const FLOW_DURATION = 14;
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const ease = v => { v = clamp(v); return v * v * (3 - 2 * v); };
-const INK = '#f2efe9', MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace', SANS = '"Inter Tight", Inter, system-ui, sans-serif';
+const INK = '#f2efe9', MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
 const C = { alu: '#c4c8cd', aluDark: '#7d838a', brass: '#a58c55', pcb: '#4f6b4a', warn: '#a8564b' };
 const STAGES = [
   { name: 'SENSE', sub: ['VN-300 raw IMU', 'altimeter · CAN'] },
