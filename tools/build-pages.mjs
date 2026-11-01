@@ -14,6 +14,17 @@ const tmp = join(tmpdir(), `site-data-${process.pid}.mjs`);
 copyFileSync('data.js', tmp);
 const { chapters, cards, details, pagePath } = await import(pathToFileURL(tmp).href);
 const story = JSON.parse(readFileSync('story.json', 'utf8'));
+const content = new Map(JSON.parse(readFileSync('content.json', 'utf8')).projects.map((p) => [p.id, p]));
+// A project's details as its popup on the home page shows them: data.js first, then the galleries and links
+// gathered from the old site (content.json), without duplicates; the first video becomes the lead video.
+function detailsFor(id) {
+  const d = details[id] || {}, c = content.get(id) || {};
+  const gallery = [...(d.gallery || []), ...(c.gallery || [])].filter((g, i, a) => a.findIndex((x) => x.src === g.src) === i);
+  const links = [...(d.links || []), ...(c.links || []).map((l) => [l.label, l.href])].filter((l, i, a) => a.findIndex((x) => x[1] === l[1]) === i);
+  const hero = d.hero || gallery.find((g) => g.type === 'youtube')?.src;
+  // the old site's one-line summary stands in for a body only where there is no story to tell it already
+  return { ...d, hero, body: d.body || (c.summary && !story[id] ? [c.summary] : []), gallery: gallery.filter((g) => !(g.type === 'youtube' && g.src === hero)), links };
+}
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const abs = (src) => (/^https?:/.test(src) ? src : '/' + src.replace(/^\/+/, ''));
@@ -40,7 +51,7 @@ function liveVH(id) {
 // one entry per id; a chapter wins over its grid card but borrows the card's blurb
 const order = [...chapters.map((c) => c.id), ...cards.map((c) => c.id)].filter((id, i, a) => a.indexOf(id) === i);
 const items = order.map((id) => {
-  const ch = chapters.find((c) => c.id === id), cd = cards.find((c) => c.id === id), d = details[id] || {};
+  const ch = chapters.find((c) => c.id === id), cd = cards.find((c) => c.id === id), d = detailsFor(id);
   const pro = ch?.flow === 'professional';
   const meta = ch ? (pro ? [ch.role, ch.org, ch.dates] : [ch.role, ch.dates]) : [cd.kicker, cd.date];
   const summary = cd?.blurb || d.body?.[0] || ch?.points?.join('. ') || '';
