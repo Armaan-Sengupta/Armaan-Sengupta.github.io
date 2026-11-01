@@ -32,7 +32,7 @@ export const pagePath = (id) => `/${PAGE_SLUG[id] || id}`;
 export const chapters = [
   /* ─────────── personal ─────────── */
   {
-    id: 'platform', flow: 'personal', hero: true,
+    id: 'platform', flow: 'personal', hero: true, poster: 'media/platform-poster.webp',   // first frame, shown until the 3D starts
     org: '3RRS parallel manipulator', dates: 'Dec 2025',
     title: 'Stewart Platform', role: 'Ball balancing robot',
     points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],

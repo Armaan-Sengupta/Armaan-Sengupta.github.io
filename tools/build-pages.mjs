@@ -20,6 +20,23 @@ const abs = (src) => (/^https?:/.test(src) ? src : '/' + src.replace(/^\/+/, '')
 const full = (src) => (/^https?:/.test(src) ? src : ORIGIN + abs(src));
 const clip = (s, n = 158) => { s = s.replace(/\s+/g, ' ').trim(); if (s.length <= n) return s; const c = s.slice(0, n - 1); return c.slice(0, c.lastIndexOf(' ')).replace(/[,;:·–-]$/, '') + '…'; };
 
+// Height of a project's live section, in viewport heights, mirroring how chapters.js lays it out (each pinned
+// section is 1 + the sum of its views' scroll lengths). Written into the page so the text below does not jump
+// when the section mounts.
+const sectionVH = (views) => 1 + views.reduce((s, v) => s + (v.len ?? 0.5), 0);
+function liveVH(id) {
+  const ch = chapters.find((c) => c.id === id), m = cards.find((c) => c.id === id)?.media;
+  if (ch?.seq) {
+    const groups = [];
+    ch.views.forEach((v) => { const g = groups[groups.length - 1]; if (g && v.el && g[0].el && g[0].el.tag === v.el.tag) g.push(v); else groups.push([v]); });
+    return groups.reduce((s, g) => s + sectionVH(g), 0);
+  }
+  if (ch?.intro) return sectionVH(ch.views.slice(0, ch.intro)) + sectionVH(ch.views.slice(ch.intro));
+  if (ch) return sectionVH(ch.views);
+  if (m && (m.el || m.lottie || m.scrub || m.video)) return 1 + (m.progress ? 1.2 : 0.4);
+  return 0;
+}
+
 // one entry per id; a chapter wins over its grid card but borrows the card's blurb
 const order = [...chapters.map((c) => c.id), ...cards.map((c) => c.id)].filter((id, i, a) => a.indexOf(id) === i);
 const items = order.map((id) => {
@@ -100,7 +117,7 @@ function page(it, i) {
     it.points.length ? `<ul class="points">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '',
     // the project's live, scroll-driven chapter from the home page, full width; removed if it has nothing live
     `</main>
-<div class="live" id="live"></div>
+<div class="live" id="live"${liveVH(it.id) ? ` style="min-height:${Math.round(liveVH(it.id) * 100)}vh"` : ''}></div>
 <script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, '${it.id}')) h.remove();</script>
 <main class="wrap rest">`,
     d.hero ? `<div class="video-hero"><button class="yt-play" data-yt="${esc(d.hero)}" aria-label="Play the ${esc(it.title)} video"><img src="https://i.ytimg.com/vi/${esc(d.hero)}/hqdefault.jpg" alt="" loading="lazy"><span aria-hidden="true">▶</span></button></div>` : '',
