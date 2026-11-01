@@ -23,6 +23,11 @@ const EL = {
 };
 const withAttrs = (el, attrs) => ({ ...el, attrs: { ...(el.attrs || {}), ...attrs } });
 
+// Each project's own page sits at the site root; a project that had a page on the old site keeps that address,
+// so links and search results that point at it land on the real page with no redirect.
+const PAGE_SLUG = { airbrakes: 'rocketry' };
+export const pagePath = (id) => `/${PAGE_SLUG[id] || id}/`;
+
 export const chapters = [
   /* ─────────── personal ─────────── */
   {

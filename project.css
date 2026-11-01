@@ -1,4 +1,4 @@
-/* Plain project pages (/work/…): same palette and type as the interactive site, no scripts. */
+/* Plain project pages (/<project>/): same palette and type as the interactive site, no scripts. */
 :root{--bg:#08080a;--bg-2:#0e0e11;--bg-3:#141418;--fg:#f2efe9;--fg-2:rgba(242,239,233,.74);--mute:rgba(242,239,233,.5);--line:rgba(242,239,233,.1);
   --display:'Inter Tight',system-ui,sans-serif;--body:Inter,system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 *{box-sizing:border-box}

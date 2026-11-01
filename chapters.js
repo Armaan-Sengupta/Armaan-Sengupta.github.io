@@ -1,7 +1,7 @@
-// Pinned, scroll-driven project chapters, shared by the home page (main.js) and the plain project pages (/work/…).
+// Pinned, scroll-driven project chapters, shared by the home page (main.js) and the plain project pages (/<project>/).
 // A chapter is a section several viewports tall whose sticky stage shows one view at a time; scroll position picks
 // the view and feeds progress to the view's element, lottie or scrub video.
-import { chapters, cards } from './data.js';
+import { chapters, cards, pagePath } from './data.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
@@ -79,12 +79,12 @@ export function buildChapter(ch) {
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
         <div class="ch-actions">
-          <a class="btn" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
+          <a class="btn" href="${pagePath(ch.id)}" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
           ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
         </div>
       </div>
       <div class="ch-stage">
-        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<a class="btn hero-more" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>` : ''}</div>
+        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<a class="btn hero-more" href="${pagePath(ch.id)}" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>` : ''}</div>
         <div class="ch-tabs mono" role="tablist">${ch.views.map((v, i) => `<button role="tab" data-i="${i}" aria-selected="${i === 0}"><span>${esc(v.label)}</span><i><b></b></i></button>`).join('')}</div>
         ${ch.disclaimer ? `<p class="disclaimer mono">${esc(ch.disclaimer)}</p>` : ''}
       </div>
@@ -118,7 +118,7 @@ export function buildSequence(ch) {
   det.innerHTML = `
     <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
     <div class="ch-actions">
-      <a class="btn" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
+      <a class="btn" href="${pagePath(ch.id)}" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
       ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
     </div>`;
   wrap.append(det);

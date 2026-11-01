@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
+<title>Automated Measurement System · Armaan Sengupta</title>
+<meta name="description" content="Vision-guided, force-sensed part measurement with no human in the loop.">
+<link rel="canonical" href="https://armaansengupta.ca/measurement/">
+<meta name="author" content="Armaan Sengupta">
+<meta name="theme-color" content="#08080a">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Armaan Sengupta">
+<meta property="og:title" content="Automated Measurement System · Armaan Sengupta">
+<meta property="og:description" content="Vision-guided, force-sensed part measurement with no human in the loop.">
+<meta property="og:url" content="https://armaansengupta.ca/measurement/">
+<meta property="og:image" content="https://armaansengupta.ca/media/measurement-rig.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/project.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Automated Measurement System","headline":"Automated Measurement System","description":"Vision-guided, force-sensed part measurement with no human in the loop.","url":"https://armaansengupta.ca/measurement/","image":"https://armaansengupta.ca/media/measurement-rig.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C++, ESP32, Protocol design, OpenCV"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Automated Measurement System","item":"https://armaansengupta.ca/measurement/"}]}]}</script>
+</head>
+<body>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
+<main class="wrap">
+<p class="crumbs"><a href="/#projects">Projects</a> / Automated Measurement System</p>
+<h1>Automated Measurement System</h1>
+<p class="meta">Dec 2023</p>
+<p class="lede">Vision-guided, force-sensed part measurement with no human in the loop.</p>
+<ul class="points"><li>Used OpenCV to turn each part to its critical dimension</li><li>Wrote a 2-wire protocol so an ESP32 could talk to the VEX brain</li><li>Measured parts to within 0.3 mm</li></ul>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'measurement')) h.remove();</script>
+<main class="wrap rest">
+<p>Owned all firmware: both motors, encoder-to-dimension mapping, the GUI, and a custom 2-wire clocked protocol so an ESP32 could talk to a VEX brain that only exposes digital reads.</p>
+<p>OpenCV finds part orientation, angles stream over WebSockets, and the part turns to its critical dimension. Out-of-spec parts are logged to a server.</p>
+<section><h2>What it does</h2><p>A station for quality assurance on an automation line that checks part tolerances right after manufacturing with no human involved. A part goes on a rotary platform; computer vision turns it to the orientation of its critical dimension; a clamp on a rotary encoder closes on it and stops on firm contact using force sensing, and the encoder rotation becomes a length. Out-of-spec parts have their image and failing dimension logged to a remote server, with a notice on the machine&#39;s display.</p></section>
+<section><h2>What I did</h2><p>I was the lead firmware engineer: C++ on the ESP32 and the main controller for all motor control, dimension derivation and the GUI. I also worked with a teammate on the OpenCV orientation detection in Python, which sends the angle to the ESP32 over WebSockets.</p></section>
+<section><h2>A custom 2-wire protocol</h2><p>The VEX V5 brain runs proprietary firmware with no UART, I²C or SPI, only the ability to read a pin as high or low. So the ESP32 receives the angle wirelessly from the PC and sends it to the brain over two wires using a protocol we designed, loosely inspired by I²C, with a clock line and a data line. The brain decodes the binary angle into encoder ticks and turns the part to the right orientation.</p></section>
+<ul class="chips" aria-label="Skills"><li>C++</li><li>ESP32</li><li>Protocol design</li><li>OpenCV</li></ul>
+<section class="gallery"><h2>Media</h2><figure><img loading="lazy" src="/media/measurement-rig.webp" alt="The built rig: VEX brain, turntable, clamp and the camera mast"><figcaption>The built rig: VEX brain, turntable, clamp and the camera mast</figcaption></figure></section>
+<p class="actions"><a class="btn" href="/#measurement">See it on the interactive site</a><a class="btn ghost" href="https://youtu.be/MB9A7U8ksmc" target="_blank" rel="noopener">Demo ↗</a></p>
+<nav class="pn"><a href="/rocketry/">← Rocket Airbrakes</a><a href="/neuralink/">Neuralink →</a></nav>
+</main>
+<footer><a href="/">armaansengupta.ca</a><span>© 2026 Armaan Sengupta</span></footer>
+</body>
+</html>

@@ -1,6 +1,8 @@
-// Builds a plain, crawlable page for every project at /work/<id>/ (plus the /work/ index and sitemap.xml) from
-// the same data the interactive site uses. The home page stays the interactive version; these exist so search
-// engines and link previews see the actual content. Run from the site folder after editing data.js or story.json:
+// Builds a plain, crawlable page for every project at its own root path (pagePath in data.js), the redirects for
+// every old address (the old Wix site's pages and the earlier /work/<id>/ pages), 404.html, sitemap.xml and the
+// Cloudflare Bulk Redirect list, all from the same data the interactive site uses. The home page stays the
+// interactive version; these pages exist so search engines and link previews see the actual content.
+// Run from the site folder after editing data.js or story.json:
 //   node tools/build-pages.mjs
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'fs';
 import { tmpdir } from 'os';
@@ -11,7 +13,7 @@ const ORIGIN = 'https://armaansengupta.ca';
 const NAME = 'Armaan Sengupta';
 const tmp = join(tmpdir(), `site-data-${process.pid}.mjs`);
 copyFileSync('data.js', tmp);
-const { chapters, cards, details } = await import(pathToFileURL(tmp).href);
+const { chapters, cards, details, pagePath } = await import(pathToFileURL(tmp).href);
 const story = JSON.parse(readFileSync('story.json', 'utf8'));
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -55,7 +57,7 @@ const head = ({ title, desc, url, image, ld }) => `<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/work/work.css">
+<link rel="stylesheet" href="/project.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 </head>
 <body>
@@ -77,7 +79,7 @@ function media(g, title) {
 }
 
 function page(it, i) {
-  const url = `${ORIGIN}/work/${it.id}/`, d = it.d;
+  const url = ORIGIN + pagePath(it.id), d = it.d;
   const title = `${it.title}${it.pro ? ' · ' + it.meta[0].split(' · ')[0] : ''} · ${NAME}`;
   const desc = clip(it.summary);
   const prev = items[(i - 1 + items.length) % items.length], next = items[(i + 1) % items.length];
@@ -105,24 +107,63 @@ function page(it, i) {
     d.chips?.length ? `<ul class="chips" aria-label="Skills">${d.chips.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : '',
     (d.gallery || []).length ? `<section class="gallery"><h2>Media</h2>${d.gallery.map((g) => media(g, it.title)).join('')}</section>` : '',
     `<p class="actions"><a class="btn" href="/#${it.id}">See it on the interactive site</a>${(d.links || []).map(([l, u]) => `<a class="btn ghost" href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join('')}</p>`,
-    `<nav class="pn"><a href="/work/${prev.id}/">← ${esc(prev.title)}</a><a href="/work/${next.id}/">${esc(next.title)} →</a></nav>`,
+    `<nav class="pn"><a href="${pagePath(prev.id)}">← ${esc(prev.title)}</a><a href="${pagePath(next.id)}">${esc(next.title)} →</a></nav>`,
     `</main>`
   ].filter(Boolean).join('\n');
-  mkdirSync(`work/${it.id}`, { recursive: true });
-  writeFileSync(`work/${it.id}/index.html`, head({ title, desc, url, image: full(it.img), ld }) + body + '\n' + foot);
+  const dir = pagePath(it.id).slice(1);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(`${dir}index.html`, head({ title, desc, url, image: full(it.img), ld }) + body + '\n' + foot);
 }
 items.forEach(page);
 
-// /work/ itself: the project list lives on the home page
-writeFileSync('work/index.html', `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Projects · ${NAME}</title>
-<link rel="canonical" href="${ORIGIN}/#projects">
-<meta http-equiv="refresh" content="0; url=/#projects">
-<script>location.replace('/#projects');</script>
-</head><body><a href="/#projects">Projects</a></body></html>
+/* ── redirects ──
+   Every old address that is not a page itself: the old Wix site's pages (and the section anchors the résumé
+   links into), and the earlier /work/<id>/ pages. Each gets a tiny page that redirects at once and names its
+   target as canonical; 404.html catches other casings; the same table is written out as a Cloudflare Bulk
+   Redirect list for true 301s if the domain ever moves behind Cloudflare. */
+const P = pagePath;
+const OLD = {
+  ...Object.fromEntries(['home', 'under-construction', 'about-me', 'education', 'academic-achivment', 'certifications', 'copy-of-activities-and-honors', 'waterloo-class-list'].map((p) => [p, '/'])),
+  'contact-me': '/#contact', experience: '/#professional', experiences: '/#professional',
+  'first-year': P('gooseminator'), 'second-year': P('measurement'), 'third-year': P('platform'),
+  ...Object.fromEntries(['projects', 'personal-projects', 'school-projects', 'grade-9', 'grade-10', 'grade-11'].map((p) => [p, '/#projects'])),
+  skills: '/#skills', 'technlogical-skills': '/#skills',
+  ...Object.fromEntries(['robotics', 'leadership', 'leadership-and-volunteering', 'clubs', 'gratitude-letters'].map((p) => [p, '/#volunteering'])),
+  resume: '/media/Armaan_Sengupta_Resume.pdf',
+  work: '/#projects',
+  ...Object.fromEntries(items.map((it) => [`work/${it.id}`, P(it.id)]))
+};
+const pages = new Set(items.map((it) => P(it.id).slice(1, -1)));
+for (const k of Object.keys(OLD)) if (pages.has(k)) throw new Error(`old path ${k} is now a page`);
+// section anchors from the old site, mapped to the project they described
+const ANCHOR = { 'communication-protocol': P('measurement'), 'stewart-platform': P('platform'), 'segway-system-modeling': P('segway'), hmi: P('fyelabs'), visualizer: P('fyelabs') };
+const redirectPage = (to) => `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>${NAME}</title>
+<link rel="canonical" href="${ORIGIN}${to}">
+<meta http-equiv="refresh" content="0; url=${to}">
+<script>var a=${JSON.stringify(ANCHOR)};location.replace(a[location.hash.slice(1)]||'${to}');</script>
+<style>body{background:#08080a;color:#f2efe9;font:16px system-ui;padding:40px}a{color:inherit}</style>
+</head><body><a href="${to}">Continue to armaansengupta.ca</a></body></html>
+`;
+for (const [from, to] of Object.entries(OLD)) { mkdirSync(from, { recursive: true }); writeFileSync(`${from}/index.html`, redirectPage(to)); }
+
+// 404: old addresses in any casing, with or without the trailing slash
+const LOWER = { ...OLD, ...Object.fromEntries([...pages].map((p) => [p, `/${p}/`])) };
+writeFileSync('404.html', `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Not found · ${NAME}</title>
+<script>var M=${JSON.stringify(LOWER)},A=${JSON.stringify(ANCHOR)};
+var p=location.pathname.toLowerCase().replace(/^\\/+|\\/+$/g,''),h=location.hash.slice(1);
+if(M[p]!==undefined)location.replace(A[h]||M[p]);</script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#08080a;color:#f2efe9;font:16px Inter,system-ui,sans-serif;text-align:center}
+h1{font-weight:500;font-size:28px;margin:0 0 12px}p{color:rgba(242,239,233,.6);margin:0 0 24px}a{color:#f2efe9}</style>
+</head><body><div><h1>That page moved</h1><p>The site was rebuilt and this address no longer exists.</p><a href="/">Go to the homepage</a></div></body></html>
 `);
 
+// Cloudflare Bulk Redirect list: source, target, status, preserve query, include subdomains, subpath matching, preserve path suffix
+writeFileSync('tools/cloudflare-redirects.csv', Object.entries(OLD).flatMap(([from, to]) => [`armaansengupta.ca/${from}`, `armaansengupta.ca/${from}/`]
+  .map((src) => `${src},${ORIGIN}${to},301,true,true,false,false`)).join('\n') + '\n');
+
 // sitemap
-const urls = ['/', ...items.map((it) => `/work/${it.id}/`), '/media/Armaan_Sengupta_Resume.pdf'];
+const urls = ['/', ...items.map((it) => P(it.id)), '/media/Armaan_Sengupta_Resume.pdf'];
 writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${ORIGIN}${u}</loc></url>`).join('\n')}\n</urlset>\n`);
-console.log(`${items.length} project pages, /work/ redirect, sitemap with ${urls.length} urls`);
+console.log(`${items.length} project pages, ${Object.keys(OLD).length} redirects, sitemap with ${urls.length} urls`);

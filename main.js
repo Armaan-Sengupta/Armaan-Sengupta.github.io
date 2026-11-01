@@ -1,5 +1,5 @@
 import { initHero } from './hero.js';
-import { chapters, cards, details, uses, skills } from './data.js';
+import { chapters, cards, details, uses, skills, pagePath } from './data.js';
 import { VH as _VH, chapterState, updateChapter, makeEl, makeLottie, makeVideo, buildProject, layoutChapters, observeChapters } from './chapters.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -17,7 +17,7 @@ const storyReady = fetch('story.json').then((r) => (r.ok ? r.json() : {})).then(
 const contentReady = fetch('content.json').then((r) => (r.ok ? r.json() : { projects: [] }))
   .then((j) => { content = new Map((j.projects || []).map((p) => [p.id, p])); }).catch(() => {});
 
-/* ── chapters live in chapters.js (shared with the /work/ pages) ── */
+/* ── chapters live in chapters.js (shared with the project pages) ── */
 let VH = _VH;
 const flows = { personal: $('[data-flow="personal"].flow'), professional: $('[data-flow="professional"].flow') };
 const flowTop = () => $('#work').offsetTop;
@@ -118,7 +118,7 @@ addEventListener('resize', () => { if (innerWidth !== lastW || Math.abs(innerHei
 /* ═════════════ grid ═════════════ */
 const grid = $('#grid'), scrubbers = [];
 grid.innerHTML = cards.map((c) => `
-  <a class="card" href="/work/${c.id}/" data-open="${c.id}">
+  <a class="card" href="${pagePath(c.id)}" data-open="${c.id}">
     <div class="thumb"></div>
     <div class="body">
       ${c.date ? `<div class="k mono"><span>${esc(c.date)}</span></div>` : ''}

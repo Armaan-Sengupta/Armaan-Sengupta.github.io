@@ -1,53 +1,7 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<base href="/">
-<title>Stewart Platform · Armaan Sengupta</title>
-<meta name="description" content="A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.">
-<link rel="canonical" href="https://armaansengupta.ca/work/platform/">
-<meta name="author" content="Armaan Sengupta">
-<meta name="theme-color" content="#08080a">
-<meta property="og:type" content="article">
-<meta property="og:site_name" content="Armaan Sengupta">
-<meta property="og:title" content="Stewart Platform · Armaan Sengupta">
-<meta property="og:description" content="A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.">
-<meta property="og:url" content="https://armaansengupta.ca/work/platform/">
-<meta property="og:image" content="https://armaansengupta.ca/media/platform/spv4-ik-plot.webp">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Stewart Platform","headline":"Stewart Platform","description":"A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.","url":"https://armaansengupta.ca/work/platform/","image":"https://armaansengupta.ca/media/platform/spv4-ik-plot.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"Python, Simulink · Simscape, Kinematics, PID · feedforward, OpenCV"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Stewart Platform","item":"https://armaansengupta.ca/work/platform/"}]}]}</script>
-</head>
-<body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
-<main class="wrap">
-<p class="crumbs"><a href="/#projects">Projects</a> / Stewart Platform</p>
-<h1>Stewart Platform</h1>
-<p class="meta">Ball balancing robot · Dec 2025</p>
-<p class="lede">A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.</p>
-<ul class="points"><li>Inverse kinematics to three servos</li><li>Simscape plant, PID and feedforward</li><li>Force-torque sensor finds the ball</li></ul>
-</main>
-<div class="live" id="live"></div>
-<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'platform')) h.remove();</script>
-<main class="wrap rest">
-<div class="video-hero"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/CxzUW5jrmIc" title="Stewart Platform video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
-<p>A 3RRS parallel manipulator that balances a ball on its plate. Inverse kinematics map a desired plate plane to three servo angles; a Simscape multibody plant with a custom C contact S-function let controllers be tuned before touching hardware.</p>
-<p>Trajectory-planned feedforward was compared against classic PID on settling and overshoot, and the ball was located with a 3-axis force-torque sensor, benchmarked against an OpenCV vision baseline.</p>
-<section><h2>The goal</h2><p>Balance a ball on a plate. Our design is a 3RRS parallel manipulator: three degrees of freedom rather than a full Stewart platform&#39;s six, which is enough to do the same job.</p></section>
-<section><h2>Building blocks</h2><p>Forward and inverse kinematics for the servo legs; a Simulink and Simscape plant, characterized against the hardware, to tune controllers before running them; trajectory-planned feedforward compared against PID; and ball position sensed by a 3-axis force-torque sensor under the plate.</p></section>
-<ul class="chips" aria-label="Skills"><li>Python</li><li>Simulink · Simscape</li><li>Kinematics</li><li>PID · feedforward</li><li>OpenCV</li></ul>
-<section class="gallery"><h2>Media</h2><figure><video controls muted playsinline preload="none" poster="/media/stewart-assembly.jpg" src="/media/stewart-assembly.mp4"></video><figcaption>Assembly timelapse</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-setup.jpg" src="/media/stewart-setup.mp4"></video><figcaption>Desk setup with live ball-position and kinematics plots</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-ik.jpg" src="/media/stewart-ik.mp4"></video><figcaption>Prototype tilting alongside the live 3D inverse-kinematics plot</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-sensing.jpg" src="/media/stewart-sensing.mp4"></video><figcaption>Force-torque sensor estimating contact position</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-demo.jpg" src="/media/stewart-demo.mp4"></video><figcaption>Full system demo: the ball held on the plate; the LED ring turns green once balanced</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-sim.jpg" src="/media/stewart-sim.mp4"></video><figcaption>Simscape ball-on-plate simulation</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-trajectory.jpg" src="/media/stewart-trajectory.mp4"></video><figcaption>Trajectory planner profiles (simulation study)</figcaption></figure><figure><video controls muted playsinline preload="none" poster="/media/stewart-skeleton.jpg" src="/media/stewart-skeleton.mp4"></video><figcaption>SolidWorks kinematic skeleton</figcaption></figure><figure><img loading="lazy" src="/media/platform/spv4-ik-plot.webp" alt="Matplotlib inverse-kinematics model of the three chains"><figcaption>Matplotlib inverse-kinematics model of the three chains</figcaption></figure><figure><img loading="lazy" src="/media/platform/simulink-plant-controller.webp" alt="Simulink plant and controller model"><figcaption>Simulink plant and controller model</figcaption></figure><figure><img loading="lazy" src="/media/img/stewart_kinematics_diagram.webp" alt="Ball free-body diagram and overview"><figcaption>Ball free-body diagram and overview</figcaption></figure><figure><img loading="lazy" src="/media/img/stewart_platform_prototype.webp" alt="Prototype"><figcaption>Prototype</figcaption></figure><figure><img loading="lazy" src="/media/img/stewart_platform_sim_sensor.webp" alt="Kinematics, Simulink and sensor collage"><figcaption>Kinematics, Simulink and sensor collage</figcaption></figure></section>
-<p class="actions"><a class="btn" href="/#platform">See it on the interactive site</a></p>
-<nav class="pn"><a href="/work/robotic-arm/">← 3-DOF Robotic Arm</a><a href="/work/airbrakes/">Rocket Airbrakes →</a></nav>
-</main>
-<footer><a href="/">armaansengupta.ca</a><span>© 2026 Armaan Sengupta</span></footer>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><title>Armaan Sengupta</title>
+<link rel="canonical" href="https://armaansengupta.ca/platform/">
+<meta http-equiv="refresh" content="0; url=/platform/">
+<script>var a={"communication-protocol":"/measurement/","stewart-platform":"/platform/","segway-system-modeling":"/segway/","hmi":"/fyelabs/","visualizer":"/fyelabs/"};location.replace(a[location.hash.slice(1)]||'/platform/');</script>
+<style>body{background:#08080a;color:#f2efe9;font:16px system-ui;padding:40px}a{color:inherit}</style>
+</head><body><a href="/platform/">Continue to armaansengupta.ca</a></body></html>
