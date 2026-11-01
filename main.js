@@ -86,12 +86,12 @@ function buildChapter(ch) {
         ${ch.role ? `<p class="role">${esc(ch.role)}</p>` : ''}
         <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
         <div class="ch-actions">
-          <button class="btn" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>
+          <a class="btn" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
           ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
         </div>
       </div>
       <div class="ch-stage">
-        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<button class="btn hero-more" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>` : ''}</div>
+        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<a class="btn hero-more" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>` : ''}</div>
         <div class="ch-tabs mono" role="tablist">${ch.views.map((v, i) => `<button role="tab" data-i="${i}" aria-selected="${i === 0}"><span>${esc(v.label)}</span><i><b></b></i></button>`).join('')}</div>
         ${ch.disclaimer ? `<p class="disclaimer mono">${esc(ch.disclaimer)}</p>` : ''}
       </div>
@@ -126,7 +126,7 @@ function buildSequence(ch) {
   det.innerHTML = `
     <ul class="points">${ch.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
     <div class="ch-actions">
-      <button class="btn" data-open="${ch.id}">Details <span aria-hidden="true">→</span></button>
+      <a class="btn" href="/work/${ch.id}/" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>
       ${ch.more ? `<a class="btn ghost" href="${ch.more[1]}" target="_blank" rel="noopener">${esc(ch.more[0])} ↗</a>` : ''}
     </div>`;
   wrap.append(det);
@@ -397,7 +397,7 @@ addEventListener('resize', () => { if (innerWidth !== lastW || Math.abs(innerHei
 /* ═════════════ grid ═════════════ */
 const grid = $('#grid'), scrubbers = [];
 grid.innerHTML = cards.map((c) => `
-  <a class="card" href="#${c.id}" data-open="${c.id}">
+  <a class="card" href="/work/${c.id}/" data-open="${c.id}">
     <div class="thumb"></div>
     <div class="body">
       ${c.date ? `<div class="k mono"><span>${esc(c.date)}</span></div>` : ''}

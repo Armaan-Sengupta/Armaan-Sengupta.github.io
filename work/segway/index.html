@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Segway Dynamics · Armaan Sengupta</title>
+<meta name="description" content="A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.">
+<link rel="canonical" href="https://armaansengupta.ca/work/segway/">
+<meta name="author" content="Armaan Sengupta">
+<meta name="theme-color" content="#08080a">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Armaan Sengupta">
+<meta property="og:title" content="Segway Dynamics · Armaan Sengupta">
+<meta property="og:description" content="A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.">
+<meta property="og:url" content="https://armaansengupta.ca/work/segway/">
+<meta property="og:image" content="https://armaansengupta.ca/media/segway/workflow-matlab-simulink.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/work/work.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Segway Dynamics","headline":"Segway Dynamics","description":"A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.","url":"https://armaansengupta.ca/work/segway/","image":"https://armaansengupta.ca/media/segway/workflow-matlab-simulink.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"MATLAB, Simulink, SimulationX, Python"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"Segway Dynamics","item":"https://armaansengupta.ca/work/segway/"}]}]}</script>
+</head>
+<body>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<main class="wrap">
+<p class="crumbs"><a href="/work/">Projects</a> / Segway Dynamics</p>
+<h1>Segway Dynamics</h1>
+<p class="meta">Year 3 · Modelling · Apr 2025</p>
+<p class="lede">A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.</p>
+<p>We derived the nonlinear kinematic and kinetic equations of a human transporter, then linearized them with a small-angle approximation into a state-space model.</p>
+<p>A Simulink model swept thrust force and lean angle, coarse first and then finely. SimulationX models the system acausally without hand-derived equations; the gap between the two is the cost of the idealizations.</p>
+<section><h2>The goal</h2><p>Analyze and model a human transporter, then tune its properties, with no active control, to travel as far as possible before tipping, and compare our Simulink model against an acausal SimulationX model.</p></section>
+<section><h2>Method</h2><p>We derived the nonlinear kinematic and kinetic equations, linearized them with a small-angle approximation, and swept thrust force and lean angle in Simulink: coarse first, then 160 to 180 N in 0.5 N steps and 0.2 to 0.8 rad in 0.05 rad steps. SimulationX needs no hand-derived equations, so it checked our derivation; Python parsed and plotted its data.</p></section>
+<section><h2>Results</h2><p>The system is very sensitive to both inputs. Simulink&#39;s best was 12.3 m at 170 N and -0.2 rad; SimulationX&#39;s was 9.15 m at 110 N and 11°. The gap shows the cost of the idealizations: Simulink suits theoretical analysis, while SimulationX captures more of the physical interactions.</p></section>
+<ul class="chips" aria-label="Skills"><li>MATLAB</li><li>Simulink</li><li>SimulationX</li><li>Python</li></ul>
+<section class="gallery"><h2>Media</h2><figure><video controls muted playsinline preload="none" poster="/media/segway/simulationx-run.jpg" src="/media/segway/simulationx-run.mp4"></video><figcaption>SimulationX model riding until it tips</figcaption></figure><figure><img loading="lazy" src="/media/segway/workflow-matlab-simulink.webp" alt="MATLAB init script and Simulink model"><figcaption>MATLAB init script and Simulink model</figcaption></figure><figure><img loading="lazy" src="/media/segway/simulink-sweep-broad.webp" alt="Broad thrust and lean sweep"><figcaption>Broad thrust and lean sweep</figcaption></figure><figure><img loading="lazy" src="/media/segway/simulink-sweep-max-6p55.webp" alt="Sweep maximum: 6.55 m at 170 N, 0.2 rad"><figcaption>Sweep maximum: 6.55 m at 170 N, 0.2 rad</figcaption></figure><figure><img loading="lazy" src="/media/segway/simulink-sweep-narrow.webp" alt="Narrow sweep near 170 N"><figcaption>Narrow sweep near 170 N</figcaption></figure><figure><img loading="lazy" src="/media/segway/simulink-distance-traces.webp" alt="Position traces"><figcaption>Position traces</figcaption></figure><figure><img loading="lazy" src="/media/segway/simulationx-optimization.webp" alt="SimulationX optimum: 110 N, 11°, 9.15 m"><figcaption>SimulationX optimum: 110 N, 11°, 9.15 m</figcaption></figure><p class="doc"><a href="/media/segway/syde351-human-transporter-report.pdf" target="_blank" rel="noopener">Technical report: human transporter (PDF)</a></p></section>
+<p class="actions"><a class="btn" href="/#segway">See it on the interactive site</a><a class="btn ghost" href="https://github.com/Armaan-Sengupta/MTE-351-Code" target="_blank" rel="noopener">Code ↗</a></p>
+<nav class="pn"><a href="/work/beam-balancer/">← Beam Balancer</a><a href="/work/gantry/">Two-Axis Gantry →</a></nav>
+</main>
+<footer><a href="/">armaansengupta.ca</a><span>© 2026 Armaan Sengupta</span></footer>
+</body>
+</html>

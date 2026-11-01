@@ -1,0 +1,42 @@
+/* Plain project pages (/work/…): same palette and type as the interactive site, no scripts. */
+:root{--bg:#08080a;--bg-2:#0e0e11;--bg-3:#141418;--fg:#f2efe9;--fg-2:rgba(242,239,233,.74);--mute:rgba(242,239,233,.5);--line:rgba(242,239,233,.1);
+  --display:'Inter Tight',system-ui,sans-serif;--body:Inter,system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px max(16px,5vw);border-bottom:1px solid var(--line)}
+.top nav{display:flex;gap:22px;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.top nav a,.crumbs a,footer a{color:var(--mute);text-decoration:none}.top nav a:hover,.crumbs a:hover,footer a:hover{color:var(--fg)}
+.brand{display:flex;align-items:center;gap:10px;font:600 16px var(--display);text-decoration:none;letter-spacing:-.01em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--fg);box-shadow:0 0 12px rgba(255,248,235,.8)}
+.wrap{max-width:820px;margin:0 auto;padding:48px 16px 72px}
+.crumbs{font:400 13px var(--mono);color:var(--mute);margin:0 0 18px}
+h1{font:600 clamp(36px,6vw,58px)/1.02 var(--display);letter-spacing:-.035em;margin:0 0 14px}
+h2{font:500 24px/1.2 var(--display);letter-spacing:-.02em;margin:44px 0 12px}
+.meta{font:400 13.5px var(--mono);color:var(--mute);margin:0 0 26px}
+.lede{font-size:20px;line-height:1.55;color:var(--fg)}
+p,li{color:var(--fg-2)}
+.points{padding-left:20px}.points li{margin:4px 0}
+.hero{position:relative;aspect-ratio:16/9;margin:32px 0;border-radius:14px;overflow:hidden;background:var(--bg-2)}
+.hero iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:32px 0 0}
+.chips li{font:400 12.5px var(--mono);padding:5px 11px;border:1px solid var(--line);border-radius:999px;color:var(--fg-2)}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.gallery h2{grid-column:1/-1;margin-bottom:0}
+figure{margin:0}figure img,figure video{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:var(--bg-2)}
+figcaption{font-size:13.5px;color:var(--mute);margin-top:8px;line-height:1.45}
+.yt{position:relative;display:block}.yt span{position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.6)}
+.doc{grid-column:1/-1;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:40px 0 0}
+.btn{display:inline-block;padding:11px 18px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font:500 14px var(--body)}
+.btn.ghost{background:none;color:var(--fg);border:1px solid var(--line)}.btn.ghost:hover{border-color:var(--mute)}
+.pn{display:flex;justify-content:space-between;gap:16px;margin-top:56px;padding-top:22px;border-top:1px solid var(--line);font-size:15px}
+.pn a{color:var(--mute);text-decoration:none}.pn a:hover{color:var(--fg)}
+.list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.list a{display:grid;grid-template-columns:120px minmax(0,1fr);gap:18px;align-items:center;padding:14px;border-radius:14px;background:var(--bg-2);text-decoration:none;transition:background .2s}
+.list a:hover{background:var(--bg-3)}
+.list img{width:120px;height:90px;object-fit:cover;border-radius:10px;background:var(--bg-3)}
+.list span{display:block;color:var(--fg-2);font-size:14.5px;line-height:1.5}.list strong{display:block;color:var(--fg);font:500 19px var(--display)}
+.list em{display:block;font:normal 400 12.5px var(--mono);color:var(--mute);margin:2px 0 6px}
+footer{display:flex;justify-content:space-between;gap:16px;padding:26px max(16px,5vw);border-top:1px solid var(--line);font:400 12.5px var(--mono);color:var(--mute)}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}.list a{grid-template-columns:84px minmax(0,1fr)}.list img{width:84px;height:64px}.top nav{gap:14px}}
