@@ -198,7 +198,6 @@ if (csvAt > 0) writeFileSync(process.argv[csvAt + 1], Object.entries(OLD).flatMa
   .map((src) => `${src},${ORIGIN}${to},301,true,true,false,false`)).join('\n') + '\n');
 
 // sitemap
-// /uwaterloo-gpa-calculator/ is a separate repo published under this domain; it has no other link for crawlers to find
-const urls = ['/', ...items.map((it) => P(it.id)), '/media/Armaan_Sengupta_Resume.pdf', '/uwaterloo-gpa-calculator/'];
+const urls = ['/', ...items.map((it) => P(it.id)), '/media/Armaan_Sengupta_Resume.pdf'];
 writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${ORIGIN}${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 console.log(`${items.length} project pages, ${Object.keys(OLD).length} redirects, sitemap with ${urls.length} urls`);
