@@ -14,7 +14,6 @@ const EL = {
   neural: { tag: 'as-neural-journey', src: 'elements/neuralink/neuralink-elements.js' },
   tesla: { tag: 'as-cybertruck-lighting', src: 'elements/tesla/cybertruck-lighting.js' },
   ixana: {  tag: 'as-ixana-link', src: 'elements/ixana/ixana-link.js', attrs: { controls: 'hidden' } },
-  strain: { tag: 'as-strain-monitor', src: 'anim/strain-monitor.js' },
   fyelabs: { tag: 'as-fyelabs-system', src: 'elements/fyelabs/fyelabs-system.js' },
   hub: { tag: 'as-clamping-hub', src: 'elements/hub/clamping-hub.js' },
   contact: { tag: 'as-contact-loc', src: 'anim/contact-loc.js' },
@@ -110,7 +109,7 @@ export const chapters = [
     title: 'Magna', role: 'Crack detection in a stamping die',
     points: ['Streamed strain-gauge data over MQTT to a live dashboard', 'Caught every cracked part with no false alarms', 'Built a patent-pending PLC buffer that raised sampling from 142 to 500 Hz'],
     views: [
-      { id: 'detector', label: 'Live detector', caption: 'Each stroke is checked against the learned normal envelope; cracked parts stand out', el: EL.strain },
+      { id: 'detector', label: 'Live detector', caption: 'Each stroke is checked against the learned normal envelope; cracked parts stand out', video: 'media/magna/strain-monitor.mp4' },
       { id: 'dashboard', label: 'Dashboard', caption: 'The operator dashboard', img: 'media/img/magna_crack_detection_dashboard.webp', color: true }
     ]
   },
