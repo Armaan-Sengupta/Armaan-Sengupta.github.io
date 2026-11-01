@@ -343,27 +343,34 @@ $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {
 let ticking = false, lastY = scrollY;
 /* ═════════════ where-you-are rail ═════════════
    A stack of short lines on the left, one per section, the current one brighter; hovering opens the names,
-   clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. */
+   clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. While open, a small
+   Personal / Professional toggle changes which list it shows; the page only switches once an item is clicked. */
 const rail = document.createElement('nav'); rail.className = 'rail'; rail.setAttribute('aria-label', 'Sections');
 document.body.append(rail);
-let railItems = [];
-function buildRail() {
-  const flowEls = (id) => $(`[data-ch="${id}"]`, flows[flowState.current]);
+let railItems = [], railFlow = null;
+function buildRail(show = flowState.current) {
+  railFlow = show;
   railItems = [
-    ...chapters.filter((c) => c.flow === flowState.current).map((c) => ({ label: c.title, el: () => flowEls(c.id) })),
+    ...chapters.filter((c) => c.flow === show).map((c) => ({ label: c.title, flow: c.flow, el: () => $(`[data-ch="${c.id}"]`, flows[c.flow]) })),
     { label: 'Projects', el: () => $('#projects') }, { label: 'Skills', el: () => $('#skills') }, { label: 'Volunteering', el: () => $('#volunteering') }
   ];
-  rail.innerHTML = railItems.map((it, i) => `<button data-i="${i}"><i></i><span>${esc(it.label)}</span></button>`).join('');
+  rail.innerHTML = `<div class="rail-flow">${['personal', 'professional'].map((f) => `<button data-f="${f}" class="${f === show ? 'on' : ''}">${f === 'personal' ? 'Personal' : 'Professional'}</button>`).join('')}</div>`
+    + railItems.map((it, i) => `<button data-i="${i}"><i></i><span>${esc(it.label)}</span></button>`).join('');
+  updateRail();
 }
 rail.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return;
-  const el = railItems[+b.dataset.i].el(); if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 10, behavior: reduce ? 'auto' : 'smooth' });
+  if (b.dataset.f) { if (b.dataset.f !== railFlow) buildRail(b.dataset.f); return; }
+  const it = railItems[+b.dataset.i];
+  const jump = () => { const el = it.el(); if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 10, behavior: reduce ? 'auto' : 'smooth' }); };
+  if (it.flow && it.flow !== flowState.current) { swapWithVeil(it.flow, { restore: false }); setTimeout(jump, reduce ? 0 : 1100); } else jump();
 });
+rail.addEventListener('mouseleave', () => { if (railFlow !== flowState.current) buildRail(); });
 function updateRail() {
   let cur = -1;
-  railItems.forEach((it, i) => { const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });
+  railItems.forEach((it, i) => { if (it.flow && it.flow !== flowState.current) return; const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });
   rail.classList.toggle('on', cur >= 0);
-  $$('button', rail).forEach((b, i) => b.classList.toggle('cur', i === cur));
+  $$('button[data-i]', rail).forEach((b, i) => b.classList.toggle('cur', i === cur));
 }
 
 function onScroll() {
