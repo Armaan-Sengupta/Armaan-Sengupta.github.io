@@ -288,6 +288,27 @@ export class AirbrakeRenderer {
     cap(y0); cap(y1);
     const lid = new THREE.Mesh(new THREE.CircleGeometry(Ri, 96).rotateX(-Math.PI / 2), this.mat.shellCap); lid.position.y = y1 - 0.15; this.shell.add(lid);
     this.shell.visible = false;
+    this._paintShell(R, this.Y.panel + 0.12);
+  }
+  /* Paint the tube with the same Borealis drawing the flat overlay uses: the drawing is projected straight on along
+     the airframe camera's view (+x), its airbrake ring on the panels and its body width matching the tube, so the
+     3D-to-flat crossfade swaps nothing but depth. */
+  _paintShell(R, ringY) {
+    const B = BOREALIS, img = new Image(), cv = document.createElement('canvas'); cv.width = 128; cv.height = 4096;
+    img.onload = () => {
+      cv.getContext('2d').drawImage(img, B.cx - B.body / 2, 0, B.body, B.h, 0, 0, cv.width, cv.height);
+      const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+      const svgY = (y) => B.ring - (y - ringY) * B.body / (2 * R);
+      this.shell.traverse((m) => {
+        if (!m.isMesh || m.material !== this.mat.shell) return;
+        const p = m.geometry.attributes.position, uv = m.geometry.attributes.uv;
+        for (let i = 0; i < p.count; i++) uv.setXY(i, Math.min(1, Math.max(0, 0.5 + p.getZ(i) / (2 * R))), 1 - svgY(p.getY(i) + m.position.y) / B.h);
+        uv.needsUpdate = true;
+      });
+      Object.assign(this.mat.shell, { map: tex, metalness: 0.2, roughness: 0.55 }); this.mat.shell.color.set(0xffffff); this.mat.shell.needsUpdate = true;
+      this._dirty = true;
+    };
+    img.src = B.src;
   }
   setExtension(f) {
     const k = G.kinematics(f);
