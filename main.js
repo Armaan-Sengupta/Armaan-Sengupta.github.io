@@ -75,7 +75,7 @@ function buildRail(show = flowState.current) {
     { label: 'Projects', el: () => $('#projects') }, { label: 'Skills', el: () => $('#skills') }, { label: 'Volunteering', el: () => $('#volunteering') }
   ];
   rail.innerHTML = `<div class="rail-flow">${['personal', 'professional'].map((f) => `<button data-f="${f}" class="${f === show ? 'on' : ''}">${f === 'personal' ? 'Personal' : 'Professional'}</button>`).join('')}</div>`
-    + railItems.map((it, i) => `<button data-i="${i}"><i></i><span>${esc(it.label)}</span></button>`).join('');
+    + railItems.map((it, i) => `<button data-i="${i}"${it.flow ? ' class="sub"' : ''}><i></i><span>${esc(it.label)}</span></button>`).join('');
   updateRail();
 }
 rail.addEventListener('click', (e) => {
@@ -85,7 +85,10 @@ rail.addEventListener('click', (e) => {
   const jump = () => { const el = it.el(); if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 10, behavior: reduce ? 'auto' : 'smooth' }); };
   if (it.flow && it.flow !== flowState.current) { swapWithVeil(it.flow, { restore: false }); setTimeout(jump, reduce ? 0 : 1100); } else jump();
 });
-rail.addEventListener('mouseleave', () => { if (railFlow !== flowState.current) buildRail(); });
+// The rail is centred on the viewport, so a list of a different length would move it out from under the cursor
+// (and close it). While hovered, pin its top edge where it is so swapping the list only grows or shrinks the bottom.
+rail.addEventListener('mouseenter', () => { rail.style.top = rail.getBoundingClientRect().top + 'px'; rail.style.transform = 'none'; });
+rail.addEventListener('mouseleave', () => { rail.style.top = rail.style.transform = ''; if (railFlow !== flowState.current) buildRail(); });
 function updateRail() {
   let cur = -1;
   railItems.forEach((it, i) => { if (it.flow && it.flow !== flowState.current) return; const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });

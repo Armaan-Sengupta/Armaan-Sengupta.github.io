@@ -374,6 +374,10 @@ html:not(.rocket-fell) .crash{display:none}
 .rail:hover button.cur{color:var(--fg)}
 .rail button:hover{color:var(--fg)}
 .rail button:hover i{background:rgba(242,239,233,.7)}
+/* the current flow's sections sit indented on a thin guide; the shared sections below follow a small gap */
+.rail button.sub{margin-left:9px;position:relative}
+.rail button.sub::before{content:'';position:absolute;left:-9px;top:-1px;bottom:-1px;width:1px;background:rgba(242,239,233,.16)}
+.rail button.sub+button:not(.sub){margin-top:8px}
 @media(max-width:860px){.rail{display:none}}
 
 /* reduce-motion toggle */

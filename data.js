@@ -33,8 +33,8 @@ export const chapters = [
   {
     id: 'platform', flow: 'personal', hero: true,
     org: '3RRS parallel manipulator', dates: 'Dec 2025',
-    title: 'Stewart Platform', role: 'Ball balancing robot',
-    points: ['Inverse kinematics to three servos', 'Simscape plant, PID and feedforward', 'Force-torque sensor finds the ball'],
+    title: 'Stewart Platform', role: 'Mechanical redesign for a 200× heavier ball',
+    points: ['Redesigned the platform around a 538 g steel ball so a force-torque sensor could find it', 'Topology-optimized the plate: 14% lighter and 12% stiffer than a standard cutout design', 'Designed a ball-joint-free spherical parallel manipulator with pin joints only'],
     views: [
       { id: 'assemble', label: 'Assembly', el: EL.platform, progress: 'view', len: 1.3 },
       { id: 'live', label: 'Live model', el: EL.platform, hint: 'Click the plate to drop the ball' },
@@ -131,20 +131,20 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
-  { id: 'platform', date: 'Dec 2025', title: 'Stewart Platform', kicker: 'Personal', blurb: 'A ball balancing robot: inverse kinematics, a Simscape plant, and a force-torque sensor that finds the ball.', media: { video: 'media/stewart-demo.mp4' } },
-  { id: 'airbrakes', date: 'Dec 2024', title: 'Rocket Airbrakes', kicker: 'Waterloo Rocketry', blurb: 'Active drag control for Borealis: one servo drives three panels, and the firmware steers to a target apogee.', media: { video: 'media/airbrakes/irl/actuation-1.mp4' } },
-  { id: 'measurement', date: 'Dec 2023', title: 'Automated Measurement System', kicker: 'Team project', blurb: 'Vision-guided, force-sensed part measurement with no human in the loop.', media: { scrub: 'media/lottie/measurement-device.mp4' } },
-  { id: 'trashminator', date: '2022', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'An autonomous surface robot that collects floating trash, built to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
-  { id: 'radial-engine', date: '2021', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Twenty-plus parts modelled from orthographic drawings into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
-  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'An ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
-  { id: 'ripl', date: 'Sep 2025 – Jan 2026', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'A MuJoCo–ROS 2 bridge for the Franka Panda with force injection to benchmark contact localization.', media: { el: EL.contact } },
-  { id: 'beam-balancer', date: '2025', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
-  { id: 'segway', date: 'Apr 2025', title: 'Segway Dynamics', kicker: 'Year 3 · Modelling', blurb: 'A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.', media: { el: EL.segRide } },
-  { id: 'gantry', date: '2025', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Interrupt-driven endstops, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
-  { id: 'lidar', date: '2023', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Filtering, voxel downsampling and a fast furthest-pair search on millions of points.', media: { el: EL.cloud } },
+  { id: 'platform', date: 'Dec 2025', title: 'Stewart Platform', kicker: 'MTE 380 · Team of five', blurb: 'Redesigned a ball balancing platform for a 200× heavier ball: a topology-optimized plate, stronger links and a ball-joint-free manipulator.', media: { video: 'media/stewart-demo.mp4' } },
+  { id: 'airbrakes', date: 'Dec 2024', title: 'Rocket Airbrakes', kicker: 'Waterloo Rocketry', blurb: 'Designed the cam mechanism that drives three panels from one servo, and co-wrote the firmware that steers Borealis to its target apogee.', media: { video: 'media/airbrakes/irl/actuation-1.mp4' } },
+  { id: 'measurement', date: 'Dec 2023', title: 'Automated Measurement System', kicker: 'Team project', blurb: 'Led the firmware for a station that measures parts to 0.3 mm, including a custom 2-wire protocol to the VEX brain.', media: { scrub: 'media/lottie/measurement-device.mp4' } },
+  { id: 'trashminator', date: '2022', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'Designed and built an autonomous surface robot that collects floating trash, meant to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
+  { id: 'radial-engine', date: '2021', title: 'Radial Engine', kicker: 'Grade 11 · CAD', blurb: 'Modelled twenty-plus parts from orthographic drawings and assembled them into a working six-cylinder linkage.', media: { scrub: 'media/lottie/radial-engine.mp4' } },
+  { id: 'clamping-hub', title: 'Clamping Hub', kicker: 'Product · Studica', blurb: 'Designed and FEA-tested an ultra-low-profile clamping shaft hub, now sold commercially by Studica.', media: { el: EL.hub, progress: true } },
+  { id: 'ripl', date: 'Sep 2025 – Jan 2026', title: 'Contact Localization', kicker: 'Research · RIPL', blurb: 'Built a MuJoCo–ROS 2 bridge for the Franka Panda, with force injection to benchmark contact localization.', media: { el: EL.contact } },
+  { id: 'beam-balancer', date: '2025', title: 'Beam Balancer', kicker: 'Personal · 2025', blurb: 'Took a 1-D ball balancer from linkage design to working firmware in two weeks.', media: { video: 'media/beam-balancer.mp4' } },
+  { id: 'segway', date: 'Apr 2025', title: 'Segway Dynamics', kicker: 'Year 3 · Modelling', blurb: 'Derived the equations of motion for a human transporter by hand and checked them in Simulink against SimulationX.', media: { el: EL.segRide } },
+  { id: 'gantry', date: '2025', title: 'Two-Axis Gantry', kicker: 'Year 3 · STM32', blurb: 'Wrote the STM32 firmware: interrupt-driven endstops, homing, UART positioning and an ADC-characterized pot.', media: { el: EL.gantry } },
+  { id: 'lidar', date: '2023', title: 'LiDAR Point Clouds', kicker: 'Year 1 · Software', blurb: 'Wrote filtering, voxel downsampling and a fast furthest-pair search for millions of points.', media: { el: EL.cloud } },
   { id: 'ftc', date: '2022', title: 'FTC 16397 Robots', kicker: 'Competitive robotics', blurb: 'All software, solo. Control Award at the Asia Pacific Open Championship.', media: { video: 'media/ftc-robot.mp4' } },
   { id: 'ri3d', date: 'Jan 2024', title: 'Robot in 3 Days', kicker: 'UW REACT · FRC', blurb: 'Organized the event and built a ring-launching robot in 48 hours with five people.', media: { img: 'https://i.ytimg.com/vi/qqqrSge0pF4/hqdefault.jpg' } },
-  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Design · Studica', blurb: 'A tracked drive concept designed for rough terrain, rendered in CAD.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
+  { id: 'tank-tread', title: 'Off-Road Tank Tread', kicker: 'Design · Studica', blurb: 'Designed a tracked drive concept for rough terrain, shown here as a CAD render.', media: { img: 'https://i.ytimg.com/vi/oDeQVKhRZAk/hqdefault.jpg' } },
   { id: 'gooseminator', date: '2022', title: 'The Gooseminator', kicker: 'First year · Team design', blurb: 'Sweeps an area and sorts bird eggs by whether they are an invasive or protected species.', media: { img: 'https://i.ytimg.com/vi/Ba5209A3aXg/hqdefault.jpg' } },
   { id: 'robotic-arm', date: '2022', title: '3-DOF Robotic Arm', kicker: 'First year · 8-hour build', blurb: 'Built in under 8 hours from a Tetrix kit to pick up oddly shaped bones and sort them.', media: { video: 'media/gallery/robotic-arm/demo.mp4' } }
 ];
@@ -160,15 +160,22 @@ export const details = {
       { type: 'video', src: 'media/stewart-sim.mp4', poster: 'media/stewart-sim.jpg', caption: 'Simscape ball-on-plate simulation' },
       { type: 'video', src: 'media/stewart-trajectory.mp4', poster: 'media/stewart-trajectory.jpg', caption: 'Trajectory planner profiles (simulation study)' },
       { type: 'video', src: 'media/stewart-skeleton.mp4', poster: 'media/stewart-skeleton.jpg', caption: 'SolidWorks kinematic skeleton' },
+      { type: 'image', src: 'media/platform/slides/topo-plate.webp', caption: 'The topology-optimized plate' },
+      { type: 'image', src: 'media/platform/slides/topo-comparison.webp', caption: 'FEA: topology-optimized against standard cutouts, with the ball at the edge' },
+      { type: 'image', src: 'media/platform/slides/link-failure.webp', caption: 'The first plate overloaded the links, which cracked at the bearing' },
+      { type: 'image', src: 'media/platform/slides/link-redesign.webp', caption: 'Redesigned links: wider around the bearings, with a new washer stack' },
+      { type: 'image', src: 'media/platform/slides/joint-slop.webp', caption: 'Joint stack: shims reduced the slop but could not remove it' },
+      { type: 'image', src: 'media/platform/slides/redesign-why.webp', caption: 'Why the linkage needed a deeper redesign' },
+      { type: 'image', src: 'media/platform/slides/spm-layouts.webp', caption: 'Spherical parallel manipulator layouts: every joint axis must meet at one point' },
+      { type: 'image', src: 'media/platform/slides/spm-egg.webp', caption: 'The 3D-printed spherical parallel manipulator, pin joints only, balancing an egg' },
       { type: 'image', src: 'media/platform/spv4-ik-plot.webp', caption: 'Matplotlib inverse-kinematics model of the three chains' },
       { type: 'image', src: 'media/platform/simulink-plant-controller.webp', caption: 'Simulink plant and controller model' },
       { type: 'image', src: 'media/img/stewart_kinematics_diagram.webp', caption: 'Ball free-body diagram and overview' },
       { type: 'image', src: 'media/img/stewart_platform_prototype.webp', caption: 'Prototype' },
       { type: 'image', src: 'media/img/stewart_platform_sim_sensor.webp', caption: 'Kinematics, Simulink and sensor collage' }
     ],
-    body: ['A 3RRS parallel manipulator that balances a ball on its plate. Inverse kinematics map a desired plate plane to three servo angles; a Simscape multibody plant with a custom C contact S-function let controllers be tuned before touching hardware.',
-      'Trajectory-planned feedforward was compared against classic PID on settling and overshoot, and the ball was located with a 3-axis force-torque sensor, benchmarked against an OpenCV vision baseline.'],
-    chips: ['Python', 'Simulink · Simscape', 'Kinematics', 'PID · feedforward', 'OpenCV']
+    body: ['A 3RRS ball balancing platform, rebuilt so a force-torque sensor under the plate could find the ball by feel. That meant a 538 g steel ball, 200 times heavier than the ping-pong ball it replaced, and I led the mechanical redesign it forced: the plate, the linkages and joints, and a new ball-joint-free mechanism.'],
+    chips: ['SolidWorks', 'Topology optimization · FEA', 'Laser cutting · 3D printing', 'Kinematics', 'Python', 'Simulink', 'PID · feedforward']
   },
   airbrakes: { hero: 'SJO39WQ7Uv0', gallery: [
       { type: 'youtube', src: 'Z126ZESX3uA', caption: 'Borealis launch, Launch Canada 2024' },

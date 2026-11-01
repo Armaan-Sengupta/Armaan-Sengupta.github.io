@@ -139,15 +139,50 @@
  ],
  "platform": [
   [
-   "The goal",
+   "The twist",
    [
-    "Balance a ball on a plate. Our design is a 3RRS parallel manipulator: three degrees of freedom rather than a full Stewart platform's six, which is enough to do the same job."
+    "The course platform balances a 2.7 g ping-pong ball under an overhead camera. Our team of five set out to find the ball by feel instead: a ForceN 3-axis force-torque sensor under the plate reads the normal force and the two tipping moments, and the ball's position follows from them. A ping-pong ball barely registers on a load cell, so we switched to a 538 g, 2-inch 440C steel ball, 200 times heavier. That one change broke almost every part of the platform, and redesigning the mechanics around it was my main job."
    ]
   ],
   [
-   "Building blocks",
+   "A plate that is stiff and light",
    [
-    "Forward and inverse kinematics for the servo legs; a Simulink and Simscape plant, characterized against the hardware, to tune controllers before running them; trajectory-planned feedforward compared against PID; and ball position sensed by a 3-axis force-torque sensor under the plate."
+    "Any flex in the plate corrupts the moments the sensor reads, yet every gram it adds loads the links and servos. My first plate, three 3 mm laser-cut acrylic discs bonded with UV resin, was stiff enough but heavy enough to break the links. A single 3 mm plate was light, but with the ball near the edge it sagged onto the base and the readings became useless. For the third iteration I ran a topology optimization against the ball-at-the-edge load case and compared it in FEA with a conventional pattern of concentric cutouts:"
+   ],
+   [
+    "Topology-optimized: 118.8 g, 5.65 mm maximum deflection",
+    "Standard cutouts: 138.0 g, 6.42 mm maximum deflection"
+   ],
+   [
+    "The topology-optimized plate was 14% lighter and 12% stiffer, so it went into the build. Every geometry was laser-cut in paper first to check the fit before committing to acrylic."
+   ]
+  ],
+  [
+   "When the links cracked",
+   [
+    "With the first plate, the links cracked at the joint between link 1 and link 2. As the servos tilted the plate, the heavy ball resisted and pushed a large lateral force down the linkage chain; the link most perpendicular to the tilt took it as shear at the thinnest acrylic around the bearing. I redesigned the links wider around the bearings for shear capacity, added printed end stops so link 2 couldn't peel away from link 1, and rebuilt the joint stack with thin shims, tuning their count by trial until the slop was minimal without binding. It helped, but some play remained: acrylic links on ball joints were the limit, not the tolerances."
+   ]
+  ],
+  [
+   "Servos that fought back",
+   [
+    "The stock MG995 servos stalled outright. 35 kg brushless servos had the torque and almost matched the ping-pong ball's performance, but drew 20 A spikes that no bench supply on campus could deliver. Higher-geared Studica smart servos could lift the load, but on a fast downward tilt the ball drove the plate faster than the servos would follow, back-driving them into generators that tripped the supply. The fix was a protection circuit between the servo shield and the supply: a 15 A Schottky diode to block reverse current, and a 4,700 µF capacitor with a 10 Ω, 100 W dump resistor to absorb and burn off the returned energy."
+   ]
+  ],
+  [
+   "Getting rid of the ball joints",
+   [
+    "The slop pointed at a deeper fix, which became our second design question: remove the ball joints altogether. Of six concepts, including cable pulleys, magnetic levitation, two gimbal layouts and slotted links, I took a spherical parallel manipulator forward. It uses pin joints only, with every joint axis passing through one point, so the plate pivots about a fixed centre."
+   ],
+   null,
+   [
+    "A first concentric-sphere design made aligning the axes and assembling the curved links impractical. The second uses coaxial inputs, base links angled 45° toward the centre axis and three identical L-shaped links, with lengths set so that every axis meets at the same point. Get that slightly wrong and the mechanism either won't assemble or locks to a single degree of freedom. The 3D-printed prototype holds its load at neutral with the motors off, moves smoothly with no bearings at all, and balances an egg."
+   ]
+  ],
+  [
+   "Sensing and control",
+   [
+    "As a team, we estimate the ball's position from a quasi-static model of the sensor's force and moments, filtered and aligned to the plate, and benchmark it against an OpenCV Hough-circle tracker reworked for the mirror-like steel ball. Control is decoupled X–Y PID with velocity feedforward and extra derivative action to catch the heavy ball's momentum; trajectory planning was compared on a Simulink plant model."
    ]
   ]
  ],
@@ -191,7 +226,7 @@
   [
    "The build",
    [
-    "An STM32 controls a two-axis machine over UART and a potentiometer, with safety stops and homing. Interrupts catch the endstops so the machine never drives past a limit, and a characterized ADC lets the potentiometer set each axis precisely. The final demo showed safe stops at the limits and a race to position the machine over a target as fast and precisely as possible."
+    "I wrote STM32 firmware to control a two-axis machine over UART and a potentiometer, with safety stops and homing. Interrupts catch the endstops so the machine never drives past a limit, and I characterized the ADC so the potentiometer sets each axis precisely. The final demo showed safe stops at the limits and a race to position the machine over a target as fast and precisely as possible."
    ]
   ]
  ],
@@ -199,7 +234,7 @@
   [
    "The project",
    [
-    "Manipulating, cleaning and analyzing a massive LiDAR point cloud: removing anomalies, extracting buildings, and finding the two furthest points in a set of millions of points, a good excuse to try some fun algorithms."
+    "I wrote a pipeline to manipulate, clean and analyze a massive LiDAR point cloud: removing anomalies, extracting buildings, and finding the two furthest points in a set of millions, a good excuse to try some fun algorithms."
    ]
   ]
  ],
