@@ -84,7 +84,7 @@ export function buildChapter(ch) {
         </div>
       </div>
       <div class="ch-stage">
-        <div class="frame"${ch.poster ? ` style="background:url(${ch.poster}) center/cover no-repeat"` : ''}><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<a class="btn hero-more" href="${pagePath(ch.id)}" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>` : ''}</div>
+        <div class="frame"><div class="layers"></div><span class="hint mono"></span>${ch.hero ? `<a class="btn hero-more" href="${pagePath(ch.id)}" data-open="${ch.id}">Details <span aria-hidden="true">→</span></a>` : ''}</div>
         <div class="ch-tabs mono" role="tablist">${ch.views.map((v, i) => `<button role="tab" data-i="${i}" aria-selected="${i === 0}"><span>${esc(v.label)}</span><i><b></b></i></button>`).join('')}</div>
         ${ch.disclaimer ? `<p class="disclaimer mono">${esc(ch.disclaimer)}</p>` : ''}
       </div>
@@ -154,9 +154,6 @@ export async function mountChapter(st) {
         host.append(el);
         st.els.set(v.el.tag, { layer: el, node: null, ready: makeEl(v.el).then((n) => {
           el.append(n); st.els.get(v.el.tag).node = n; updateChapter(st);
-          // the chapter's still poster gives way once the live element has drawn its first frame
-          if (st.ch.poster) { const frame = $('.frame', st.sec), clear = () => { frame.style.background = ''; };
-            n.addEventListener('platform-ready', clear, { once: true }); n.addEventListener('ready', clear, { once: true }); setTimeout(clear, 4000); }
           return n;
         }).catch((e) => console.warn('element failed', v.el.tag, e)) });
       }
@@ -289,13 +286,11 @@ function setView(st, i) {
   if (prev !== i) $('.frame', st.sec).classList.toggle('compare-on', !!v.compare);
 }
 
-// Heavy elements (Three.js scenes, videos) start on the reader's first interaction (scroll, touch, key, mouse)
-// once the page has loaded, so loading the page itself never pays for a chapter the reader has not reached.
+// Heavy elements (Three.js scenes, videos) wait until the page has loaded and the main thread is idle, so the
+// first paint is never held up; they are ready before the reader scrolls to them.
 const settled = new Promise((res) => {
-  const EVENTS = ['scroll', 'wheel', 'touchstart', 'pointerdown', 'pointermove', 'keydown'];
-  const go = () => { EVENTS.forEach((e) => removeEventListener(e, go)); res(); };
-  const arm = () => EVENTS.forEach((e) => addEventListener(e, go, { passive: true }));
-  document.readyState === 'complete' ? arm() : addEventListener('load', arm, { once: true });
+  const idle = () => (window.requestIdleCallback ? requestIdleCallback(res, { timeout: 2000 }) : setTimeout(res, 200));
+  document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true });
 });
 const chapterIO = new IntersectionObserver((es) => es.forEach((e) => {
   const st = chapterState.find((s) => s.sec === e.target); if (!st) return;
