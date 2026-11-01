@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>Segway Dynamics · Armaan Sengupta</title>
 <meta name="description" content="A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.">
 <link rel="canonical" href="https://armaansengupta.ca/work/segway/">
@@ -21,16 +22,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Segway Dynamics","headline":"Segway Dynamics","description":"A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.","url":"https://armaansengupta.ca/work/segway/","image":"https://armaansengupta.ca/media/segway/workflow-matlab-simulink.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"MATLAB, Simulink, SimulationX, Python"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"Segway Dynamics","item":"https://armaansengupta.ca/work/segway/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Segway Dynamics","headline":"Segway Dynamics","description":"A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.","url":"https://armaansengupta.ca/work/segway/","image":"https://armaansengupta.ca/media/segway/workflow-matlab-simulink.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"MATLAB, Simulink, SimulationX, Python"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Segway Dynamics","item":"https://armaansengupta.ca/work/segway/"}]}]}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 <main class="wrap">
-<p class="crumbs"><a href="/work/">Projects</a> / Segway Dynamics</p>
+<p class="crumbs"><a href="/#projects">Projects</a> / Segway Dynamics</p>
 <h1>Segway Dynamics</h1>
 <p class="meta">Year 3 · Modelling · Apr 2025</p>
 <p class="lede">A human transporter modelled from hand-derived equations of motion through Simulink and SimulationX.</p>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'segway')) h.remove();</script>
+<main class="wrap rest">
 <p>We derived the nonlinear kinematic and kinetic equations of a human transporter, then linearized them with a small-angle approximation into a state-space model.</p>
 <p>A Simulink model swept thrust force and lean angle, coarse first and then finely. SimulationX models the system acausally without hand-derived equations; the gap between the two is the cost of the idealizations.</p>
 <section><h2>The goal</h2><p>Analyze and model a human transporter, then tune its properties, with no active control, to travel as far as possible before tipping, and compare our Simulink model against an acausal SimulationX model.</p></section>

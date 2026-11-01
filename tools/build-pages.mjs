@@ -35,6 +35,7 @@ const head = ({ title, desc, url, image, ld }) => `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${url}">
@@ -53,11 +54,12 @@ const head = ({ title, desc, url, image, ld }) => `<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>${NAME}</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>${NAME}</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 `;
 const foot = `<footer><a href="/">armaansengupta.ca</a><span>© ${new Date().getFullYear()} ${NAME}</span></footer>
 </body>
@@ -83,16 +85,21 @@ function page(it, i) {
     { '@type': 'CreativeWork', name: it.title, headline: it.title, description: desc, url, image: full(it.img), author: person, keywords: (d.chips || []).join(', ') || undefined },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: ORIGIN + '/' },
-      { '@type': 'ListItem', position: 2, name: 'Projects', item: ORIGIN + '/work/' },
+      { '@type': 'ListItem', position: 2, name: 'Projects', item: ORIGIN + '/#projects' },
       { '@type': 'ListItem', position: 3, name: it.title, item: url }] }] };
   const body = [
     `<main class="wrap">`,
-    `<p class="crumbs"><a href="/work/">Projects</a> / ${esc(it.title)}</p>`,
+    `<p class="crumbs"><a href="/#projects">Projects</a> / ${esc(it.title)}</p>`,
     `<h1>${esc(it.title)}</h1>`,
     it.meta.length ? `<p class="meta">${it.meta.map(esc).join(' · ')}</p>` : '',
     `<p class="lede">${esc(it.summary)}</p>`,
     it.points.length ? `<ul class="points">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : '',
-    d.hero ? `<div class="hero"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${esc(d.hero)}" title="${esc(it.title)} video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>` : '',
+    // the project's live, scroll-driven chapter from the home page, full width; removed if it has nothing live
+    `</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, '${it.id}')) h.remove();</script>
+<main class="wrap rest">`,
+    d.hero ? `<div class="video-hero"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${esc(d.hero)}" title="${esc(it.title)} video" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>` : '',
     ...(d.body || []).slice(it.summary === d.body?.[0] ? 1 : 0).map((p) => `<p>${esc(p)}</p>`),
     ...it.story.map(([h, ps, list, after]) => `<section><h2>${esc(h)}</h2>${(ps || []).map((p) => `<p>${esc(p)}</p>`).join('')}${list ? `<ul>${list.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}${(after || []).map((p) => `<p>${esc(p)}</p>`).join('')}</section>`),
     d.chips?.length ? `<ul class="chips" aria-label="Skills">${d.chips.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : '',
@@ -106,18 +113,16 @@ function page(it, i) {
 }
 items.forEach(page);
 
-// /work/ index
-{
-  const url = `${ORIGIN}/work/`, desc = `Projects by ${NAME}: implant firmware at Neuralink, vehicle lighting firmware at Tesla, rocket airbrakes, a ball-balancing Stewart platform, robotics and more.`;
-  const ld = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: `Projects · ${NAME}`, url, description: desc, author: person,
-    mainEntity: { '@type': 'ItemList', itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, url: `${ORIGIN}/work/${it.id}/`, name: it.title })) } };
-  const group = (pro) => items.filter((it) => it.pro === pro).map((it) => `<li><a href="/work/${it.id}/"><img loading="lazy" src="${abs(it.img)}" alt=""><span><strong>${esc(it.title)}</strong><em>${esc(it.meta.join(' · '))}</em>${esc(clip(it.summary, 140))}</span></a></li>`).join('');
-  writeFileSync('work/index.html', head({ title: `Projects · ${NAME}`, desc, url, image: ORIGIN + '/media/og.jpg', ld })
-    + `<main class="wrap"><h1>Projects</h1><p class="lede">${esc(desc)} <a href="/">The interactive version</a> has live 3D models of most of them.</p>`
-    + `<h2>Professional</h2><ul class="list">${group(true)}</ul><h2>Personal and school</h2><ul class="list">${group(false)}</ul></main>\n` + foot);
-}
+// /work/ itself: the project list lives on the home page
+writeFileSync('work/index.html', `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Projects · ${NAME}</title>
+<link rel="canonical" href="${ORIGIN}/#projects">
+<meta http-equiv="refresh" content="0; url=/#projects">
+<script>location.replace('/#projects');</script>
+</head><body><a href="/#projects">Projects</a></body></html>
+`);
 
 // sitemap
-const urls = ['/', '/work/', ...items.map((it) => `/work/${it.id}/`), '/media/Armaan_Sengupta_Resume.pdf'];
+const urls = ['/', ...items.map((it) => `/work/${it.id}/`), '/media/Armaan_Sengupta_Resume.pdf'];
 writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${ORIGIN}${u}</loc></url>`).join('\n')}\n</urlset>\n`);
-console.log(`${items.length} project pages, /work/ index, sitemap with ${urls.length} urls`);
+console.log(`${items.length} project pages, /work/ redirect, sitemap with ${urls.length} urls`);

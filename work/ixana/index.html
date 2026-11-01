@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>Ixana · Embedded Firmware Intern · Armaan Sengupta</title>
 <meta name="description" content="Built video streaming from smart glasses to a smartwatch over Ixana&#39;s Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.">
 <link rel="canonical" href="https://armaansengupta.ca/work/ixana/">
@@ -21,17 +22,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Ixana","headline":"Ixana","description":"Built video streaming from smart glasses to a smartwatch over Ixana's Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.","url":"https://armaansengupta.ca/work/ixana/","image":"https://armaansengupta.ca/elements/ixana/assets/original-wearable-pipeline.png","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C++, Bare metal, Nordic, MIPI DSI, FPGA · Verilog, HIL"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"Ixana","item":"https://armaansengupta.ca/work/ixana/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Ixana","headline":"Ixana","description":"Built video streaming from smart glasses to a smartwatch over Ixana's Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.","url":"https://armaansengupta.ca/work/ixana/","image":"https://armaansengupta.ca/elements/ixana/assets/original-wearable-pipeline.png","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C++, Bare metal, Nordic, MIPI DSI, FPGA · Verilog, HIL"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Ixana","item":"https://armaansengupta.ca/work/ixana/"}]}]}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 <main class="wrap">
-<p class="crumbs"><a href="/work/">Projects</a> / Ixana</p>
+<p class="crumbs"><a href="/#projects">Projects</a> / Ixana</p>
 <h1>Ixana</h1>
 <p class="meta">Embedded Firmware Intern · Indiana · Aug – Dec 2024</p>
 <p class="lede">Built video streaming from smart glasses to a smartwatch over Ixana&#39;s Wi-R body-coupled silicon, using the body as an ultra-low-power data bus.</p>
 <ul class="points"><li>Streamed video from smart glasses to a watch through the body</li><li>Raised the frame rate from 4 to 13 fps</li><li>Owned the MIPI-DSI display drivers</li></ul>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'ixana')) h.remove();</script>
+<main class="wrap rest">
 <p>Raised frame rate from 4 to 13 fps and cut power by 8% with a bare-metal C++ core OS on Ambiq and NXP MCUs. Debugged the whole path (camera, FPGA encode, MCU, Wi-R, MCU, FPGA decode, AMOLED), owned the MIPI-DSI display drivers, and wrote a Python driver for a Rigol waveform generator for HIL testing.</p>
 <section><h2>The project</h2><p>A high-bandwidth video stream from smart glasses to a smartwatch over Ixana&#39;s YR22 silicon. It uses electro-quasistatic body communication, turning the wearer&#39;s body into a secure, ultra-low-power data bus that uses less power than Bluetooth or Wi-Fi.</p></section>
 <section><h2>What I did</h2><p>I worked across the whole stack, from capture on the glasses through compression, transmission and decompression to the watch display, and was primarily responsible for the watch display drivers.</p><ul><li>Bare metal: a power-efficient core OS in C++ for Ambiq and NXP ARM MCUs, scheduling real-time video tasks</li><li>System bring-up: debugged and helped build the full path, from camera to encoding FPGA, transmitter MCU, Wi-R silicon, receiver MCU and decoding FPGA to the AMOLED display</li><li>Signal integrity: resolved timing and data-encoding issues at the display interface</li></ul></section>

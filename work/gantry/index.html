@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>Two-Axis Gantry · Armaan Sengupta</title>
 <meta name="description" content="Interrupt-driven endstops, UART positioning and an ADC-characterized pot.">
 <link rel="canonical" href="https://armaansengupta.ca/work/gantry/">
@@ -21,16 +22,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Two-Axis Gantry","headline":"Two-Axis Gantry","description":"Interrupt-driven endstops, UART positioning and an ADC-characterized pot.","url":"https://armaansengupta.ca/work/gantry/","image":"https://armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C, STM32, UART"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"Two-Axis Gantry","item":"https://armaansengupta.ca/work/gantry/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Two-Axis Gantry","headline":"Two-Axis Gantry","description":"Interrupt-driven endstops, UART positioning and an ADC-characterized pot.","url":"https://armaansengupta.ca/work/gantry/","image":"https://armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C, STM32, UART"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Two-Axis Gantry","item":"https://armaansengupta.ca/work/gantry/"}]}]}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 <main class="wrap">
-<p class="crumbs"><a href="/work/">Projects</a> / Two-Axis Gantry</p>
+<p class="crumbs"><a href="/#projects">Projects</a> / Two-Axis Gantry</p>
 <h1>Two-Axis Gantry</h1>
 <p class="meta">Year 3 · STM32 · 2025</p>
 <p class="lede">Interrupt-driven endstops, UART positioning and an ADC-characterized pot.</p>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'gantry')) h.remove();</script>
+<main class="wrap rest">
 <p>An STM32 drives two stepper axes. Interrupts on the endstops stop motion into a limit, a homing routine zeros the machine, UART sets position from a PC, and a characterized ADC lets a potentiometer position each axis precisely.</p>
 <section><h2>The build</h2><p>An STM32 controls a two-axis machine over UART and a potentiometer, with safety stops and homing. Interrupts catch the endstops so the machine never drives past a limit, and a characterized ADC lets the potentiometer set each axis precisely. The final demo showed safe stops at the limits and a race to position the machine over a target as fast and precisely as possible.</p></section>
 <ul class="chips" aria-label="Skills"><li>C</li><li>STM32</li><li>UART</li></ul>

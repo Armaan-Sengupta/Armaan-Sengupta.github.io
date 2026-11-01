@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>FYELABS · Robotics &amp; Embedded Intern · Armaan Sengupta</title>
 <meta name="description" content="An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, an IR camera, IMU and GPS across 6 microcontrollers.">
 <link rel="canonical" href="https://armaansengupta.ca/work/fyelabs/">
@@ -21,17 +22,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"FYELABS","headline":"FYELABS","description":"An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, an IR camera, IMU and GPS across 6 microcontrollers.","url":"https://armaansengupta.ca/work/fyelabs/","image":"https://armaansengupta.ca/media/fyelabs/case-photo.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C++, LiDAR, EasyEDA, LoRa · UART · I²C, SolidWorks · sheet metal"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"FYELABS","item":"https://armaansengupta.ca/work/fyelabs/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"FYELABS","headline":"FYELABS","description":"An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, an IR camera, IMU and GPS across 6 microcontrollers.","url":"https://armaansengupta.ca/work/fyelabs/","image":"https://armaansengupta.ca/media/fyelabs/case-photo.webp","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"C++, LiDAR, EasyEDA, LoRa · UART · I²C, SolidWorks · sheet metal"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"FYELABS","item":"https://armaansengupta.ca/work/fyelabs/"}]}]}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 <main class="wrap">
-<p class="crumbs"><a href="/work/">Projects</a> / FYELABS</p>
+<p class="crumbs"><a href="/#projects">Projects</a> / FYELABS</p>
 <h1>FYELABS</h1>
 <p class="meta">Robotics &amp; Embedded Intern · Ontario · May – Sep 2023</p>
 <p class="lede">An autonomous back-up safety system for industrial garbage trucks: 10 LiDARs, 3 depth cameras, an IR camera, IMU and GPS across 6 microcontrollers.</p>
 <ul class="points"><li>Built back-up safety sensing for garbage trucks</li><li>Designed a LiDAR dust filter that still detects people</li><li>Designed the 100+ part enclosure and cut its cost by 56%</li></ul>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'fyelabs')) h.remove();</script>
+<main class="wrap rest">
 <p>Designed a LiDAR dust-filtering algorithm from field data, five parallel filters that reject dust and still catch people (C++). Designed the HMI: a 2-layer PCB with two MCUs, a LoRa link with custom checksums, a graphics library and 12-zone object mapping. Designed the 100+ part actuating stainless enclosure over 15 revisions, cutting cost 56% and halving lead time.</p>
 <section><h2>The problem</h2><p>Industrial garbage trucks reversing in harsh, dirty conditions need to reliably avoid people and objects. The sensing unit on the back of the truck carries 10 LiDARs, 3 depth cameras, an infrared camera, a light sensor, an IMU and GPS, run by 3 microcontrollers and 4 mini compute units, all in a weatherproof housing that protects the sensors when the truck isn&#39;t reversing.</p></section>
 <section><h2>The enclosure</h2><p>I designed the all-metal, actuating enclosure: over 100 parts across 15 major revisions covering electronics, sensor placement and manufacturability. Redesigning most of the structure as 6 sheet-metal parts, cut, bent and welded, instead of CNC milling cut manufacturing cost by 56% and halved lead time. My gasket and geometry design kept the electronics dry in a water-spray test.</p></section>

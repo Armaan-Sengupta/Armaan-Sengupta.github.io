@@ -101,7 +101,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .split span:first-child{right:14px}.split span:last-of-type{left:14px}
 
 /* hero chapter: the platform fills the viewport while it assembles, then settles centred */
-.chapter.hero .pin{grid-template-columns:1fr;grid-template-rows:1fr;padding:var(--nav) 0 0;max-width:none}
+.chapter.hero .pin{grid-template-columns:minmax(0,1fr);grid-template-rows:1fr;padding:var(--nav) 0 0;max-width:none}
 .chapter.hero .ch-stage,.chapter.hero .ch-copy{grid-area:1/1}
 .chapter.hero .frame{border-color:transparent;background:transparent;border-radius:0;transition:border-color .6s}
 .chapter.hero .ch-stage{padding:0 var(--gutter) 78px}

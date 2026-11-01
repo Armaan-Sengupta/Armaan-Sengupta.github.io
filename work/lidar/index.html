@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
 <title>LiDAR Point Clouds · Armaan Sengupta</title>
 <meta name="description" content="Filtering, voxel downsampling and a fast furthest-pair search on millions of points.">
 <link rel="canonical" href="https://armaansengupta.ca/work/lidar/">
@@ -21,16 +22,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/work/work.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"LiDAR Point Clouds","headline":"LiDAR Point Clouds","description":"Filtering, voxel downsampling and a fast furthest-pair search on millions of points.","url":"https://armaansengupta.ca/work/lidar/","image":"https://armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"Python, NumPy, LiDAR"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/work/"},{"@type":"ListItem","position":3,"name":"LiDAR Point Clouds","item":"https://armaansengupta.ca/work/lidar/"}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"LiDAR Point Clouds","headline":"LiDAR Point Clouds","description":"Filtering, voxel downsampling and a fast furthest-pair search on millions of points.","url":"https://armaansengupta.ca/work/lidar/","image":"https://armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://armaansengupta.ca/"},"keywords":"Python, NumPy, LiDAR"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"LiDAR Point Clouds","item":"https://armaansengupta.ca/work/lidar/"}]}]}</script>
 </head>
 <body>
-<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/work/">All projects</a><a href="/#contact">Contact</a></nav></header>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
 <main class="wrap">
-<p class="crumbs"><a href="/work/">Projects</a> / LiDAR Point Clouds</p>
+<p class="crumbs"><a href="/#projects">Projects</a> / LiDAR Point Clouds</p>
 <h1>LiDAR Point Clouds</h1>
 <p class="meta">Year 1 · Software · 2023</p>
 <p class="lede">Filtering, voxel downsampling and a fast furthest-pair search on millions of points.</p>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'lidar')) h.remove();</script>
+<main class="wrap rest">
 <p>Processing a large urban LiDAR scan with laspy, Open3D and NumPy: voxel downsampling, a nearest-neighbour outlier filter for dust and artifacts, and a custom furthest-pair search fast enough for 1M+ points.</p>
 <section><h2>The project</h2><p>Manipulating, cleaning and analyzing a massive LiDAR point cloud: removing anomalies, extracting buildings, and finding the two furthest points in a set of millions of points, a good excuse to try some fun algorithms.</p></section>
 <ul class="chips" aria-label="Skills"><li>Python</li><li>NumPy</li><li>LiDAR</li></ul>
