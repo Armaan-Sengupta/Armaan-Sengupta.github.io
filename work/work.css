@@ -45,3 +45,6 @@ footer{display:flex;justify-content:space-between;gap:16px;padding:26px max(16px
 .live .ch-actions,.live .hero-more{display:none}
 .wrap.rest{padding-top:24px}
 main.wrap:first-of-type{padding-bottom:16px}
+/* the page intro already carries the title, role and points: the live chapter keeps only its stage */
+.live .ch-copy,.live .seq-details{display:none}
+.live .chapter .pin{grid-template-columns:minmax(0,1fr)}
