@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
+<title>LiDAR Point Clouds · Armaan Sengupta</title>
+<meta name="description" content="Filtering, voxel downsampling and a fast furthest-pair search on millions of points.">
+<link rel="canonical" href="https://www.armaansengupta.ca/lidar">
+<meta name="author" content="Armaan Sengupta">
+<meta name="theme-color" content="#08080a">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Armaan Sengupta">
+<meta property="og:title" content="LiDAR Point Clouds · Armaan Sengupta">
+<meta property="og:description" content="Filtering, voxel downsampling and a fast furthest-pair search on millions of points.">
+<meta property="og:url" content="https://www.armaansengupta.ca/lidar">
+<meta property="og:image" content="https://www.armaansengupta.ca/media/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/project.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"LiDAR Point Clouds","headline":"LiDAR Point Clouds","description":"Filtering, voxel downsampling and a fast furthest-pair search on millions of points.","url":"https://www.armaansengupta.ca/lidar","image":"https://www.armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://www.armaansengupta.ca/"},"keywords":"Python, NumPy, LiDAR"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://www.armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"LiDAR Point Clouds","item":"https://www.armaansengupta.ca/lidar"}]}]}</script>
+</head>
+<body>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
+<main class="wrap">
+<p class="crumbs"><a href="/#projects">Projects</a> / LiDAR Point Clouds</p>
+<h1>LiDAR Point Clouds</h1>
+<p class="meta">Year 1 · Software · 2023</p>
+<p class="lede">Filtering, voxel downsampling and a fast furthest-pair search on millions of points.</p>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'lidar')) h.remove();</script>
+<main class="wrap rest">
+<p>Processing a large urban LiDAR scan with laspy, Open3D and NumPy: voxel downsampling, a nearest-neighbour outlier filter for dust and artifacts, and a custom furthest-pair search fast enough for 1M+ points.</p>
+<section><h2>The project</h2><p>Manipulating, cleaning and analyzing a massive LiDAR point cloud: removing anomalies, extracting buildings, and finding the two furthest points in a set of millions of points, a good excuse to try some fun algorithms.</p></section>
+<ul class="chips" aria-label="Skills"><li>Python</li><li>NumPy</li><li>LiDAR</li></ul>
+<p class="actions"><a class="btn" href="/#lidar">See it on the interactive site</a><a class="btn ghost" href="https://github.com/Armaan-Sengupta/Fyelabs-Project/blob/master/README.md" target="_blank" rel="noopener">Code and write-up ↗</a></p>
+<nav class="pn"><a href="/gantry">← Two-Axis Gantry</a><a href="/ftc">FTC 16397 Robots →</a></nav>
+</main>
+<footer><a href="/">armaansengupta.ca</a><span>© 2026 Armaan Sengupta</span></footer>
+</body>
+</html>

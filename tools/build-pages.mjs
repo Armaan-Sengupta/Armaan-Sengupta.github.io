@@ -9,7 +9,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 
-const ORIGIN = 'https://armaansengupta.ca';
+const ORIGIN = 'https://www.armaansengupta.ca';   // the host the old site was indexed under
 const NAME = 'Armaan Sengupta';
 const tmp = join(tmpdir(), `site-data-${process.pid}.mjs`);
 copyFileSync('data.js', tmp);
@@ -110,9 +110,7 @@ function page(it, i) {
     `<nav class="pn"><a href="${pagePath(prev.id)}">← ${esc(prev.title)}</a><a href="${pagePath(next.id)}">${esc(next.title)} →</a></nav>`,
     `</main>`
   ].filter(Boolean).join('\n');
-  const dir = pagePath(it.id).slice(1);
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(`${dir}index.html`, head({ title, desc, url, image: full(it.img), ld }) + body + '\n' + foot);
+  writeFileSync(`${pagePath(it.id).slice(1)}.html`, head({ title, desc, url, image: full(it.img), ld }) + body + '\n' + foot);
 }
 items.forEach(page);
 
@@ -133,7 +131,7 @@ const OLD = {
   work: '/#projects',
   ...Object.fromEntries(items.map((it) => [`work/${it.id}`, P(it.id)]))
 };
-const pages = new Set(items.map((it) => P(it.id).slice(1, -1)));
+const pages = new Set(items.map((it) => P(it.id).slice(1)));
 for (const k of Object.keys(OLD)) if (pages.has(k)) throw new Error(`old path ${k} is now a page`);
 // section anchors from the old site, mapped to the project they described
 const ANCHOR = { 'communication-protocol': P('measurement'), 'stewart-platform': P('platform'), 'segway-system-modeling': P('segway'), hmi: P('fyelabs'), visualizer: P('fyelabs') };
@@ -145,10 +143,14 @@ const redirectPage = (to) => `<!doctype html>
 <style>body{background:#08080a;color:#f2efe9;font:16px system-ui;padding:40px}a{color:inherit}</style>
 </head><body><a href="${to}">Continue to armaansengupta.ca</a></body></html>
 `;
-for (const [from, to] of Object.entries(OLD)) { mkdirSync(from, { recursive: true }); writeFileSync(`${from}/index.html`, redirectPage(to)); }
+// old Wix paths had no trailing slash, so they are <path>.html; the short-lived /work/ pages had one
+for (const [from, to] of Object.entries(OLD)) {
+  if (from === 'work' || from.startsWith('work/')) { mkdirSync(from, { recursive: true }); writeFileSync(`${from}/index.html`, redirectPage(to)); }
+  else writeFileSync(`${from}.html`, redirectPage(to));
+}
 
 // 404: old addresses in any casing, with or without the trailing slash
-const LOWER = { ...OLD, ...Object.fromEntries([...pages].map((p) => [p, `/${p}/`])) };
+const LOWER = { ...OLD, ...Object.fromEntries([...pages].map((p) => [p, `/${p}`])) };
 writeFileSync('404.html', `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Not found · ${NAME}</title>
 <script>var M=${JSON.stringify(LOWER)},A=${JSON.stringify(ANCHOR)};
@@ -160,7 +162,7 @@ h1{font-weight:500;font-size:28px;margin:0 0 12px}p{color:rgba(242,239,233,.6);m
 `);
 
 // Cloudflare Bulk Redirect list: source, target, status, preserve query, include subdomains, subpath matching, preserve path suffix
-writeFileSync('tools/cloudflare-redirects.csv', Object.entries(OLD).flatMap(([from, to]) => [`armaansengupta.ca/${from}`, `armaansengupta.ca/${from}/`]
+writeFileSync('tools/cloudflare-redirects.csv', Object.entries(OLD).flatMap(([from, to]) => [`www.armaansengupta.ca/${from}`, `www.armaansengupta.ca/${from}/`]
   .map((src) => `${src},${ORIGIN}${to},301,true,true,false,false`)).join('\n') + '\n');
 
 // sitemap

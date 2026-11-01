@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://armaansengupta.ca/sitemap.xml
+Sitemap: https://www.armaansengupta.ca/sitemap.xml

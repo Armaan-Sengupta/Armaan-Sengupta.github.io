@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="/">
+<title>Beam Balancer · Armaan Sengupta</title>
+<meta name="description" content="The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.">
+<link rel="canonical" href="https://www.armaansengupta.ca/beam-balancer">
+<meta name="author" content="Armaan Sengupta">
+<meta name="theme-color" content="#08080a">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Armaan Sengupta">
+<meta property="og:title" content="Beam Balancer · Armaan Sengupta">
+<meta property="og:description" content="The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.">
+<meta property="og:url" content="https://www.armaansengupta.ca/beam-balancer">
+<meta property="og:image" content="https://www.armaansengupta.ca/media/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/project.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","name":"Beam Balancer","headline":"Beam Balancer","description":"The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.","url":"https://www.armaansengupta.ca/beam-balancer","image":"https://www.armaansengupta.ca/media/og.jpg","author":{"@type":"Person","name":"Armaan Sengupta","url":"https://www.armaansengupta.ca/"},"keywords":"Python, C, PID, OpenCV, SolidWorks"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.armaansengupta.ca/"},{"@type":"ListItem","position":2,"name":"Projects","item":"https://www.armaansengupta.ca/#projects"},{"@type":"ListItem","position":3,"name":"Beam Balancer","item":"https://www.armaansengupta.ca/beam-balancer"}]}]}</script>
+</head>
+<body>
+<header class="top"><a class="brand" href="/"><span class="dot"></span>Armaan Sengupta</a><nav><a href="/#projects">All projects</a><a href="/#contact">Contact</a></nav></header>
+<main class="wrap">
+<p class="crumbs"><a href="/#projects">Projects</a> / Beam Balancer</p>
+<h1>Beam Balancer</h1>
+<p class="meta">Personal · 2025 · 2025</p>
+<p class="lede">The 1-D precursor to the Stewart platform. Linkage to firmware in two weeks.</p>
+</main>
+<div class="live" id="live"></div>
+<script type="module">import { mountProject } from '/chapters.js'; const h = document.getElementById('live'); if (!mountProject(h, 'beam-balancer')) h.remove();</script>
+<main class="wrap rest">
+<p>A ball rolls on a beam tilted by a servo through a four-bar linkage. Link lengths were chosen from 2-D constraints for mechanical advantage and a compact footprint. An OpenCV tracker measures ball position and a tuned controller commands the servo through embedded C firmware.</p>
+<section><h2>The precursor</h2><p>1-D ball balancing before the 2-D Stewart platform. I went from choosing the ideal link lengths to 3D modelling the mechanism to final code in about two weeks.</p></section>
+<ul class="chips" aria-label="Skills"><li>Python</li><li>C</li><li>PID</li><li>OpenCV</li><li>SolidWorks</li></ul>
+<p class="actions"><a class="btn" href="/#beam-balancer">See it on the interactive site</a><a class="btn ghost" href="https://youtube.com/shorts/xsgP9gpsP7k" target="_blank" rel="noopener">Demo video ↗</a><a class="btn ghost" href="https://github.com/Armaan-Sengupta/Ball-Beam-Control" target="_blank" rel="noopener">Code ↗</a></p>
+<nav class="pn"><a href="/ripl">← Contact Localization</a><a href="/segway">Segway Dynamics →</a></nav>
+</main>
+<footer><a href="/">armaansengupta.ca</a><span>© 2026 Armaan Sengupta</span></footer>
+</body>
+</html>
