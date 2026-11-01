@@ -1,10 +1,11 @@
 // Local preview of the built site with GitHub Pages' URL rules: /x serves x.html, /x/ serves x/index.html,
-// anything else gets 404.html. Run tools/build.mjs first, then:  node tools/serve.mjs [port]
+// anything else gets 404.html. Run tools/build.mjs first, then (from any folder):  node <site>/tools/serve.mjs [port]
 import { createServer } from 'http';
 import { readFile, stat } from 'fs/promises';
 import { join, extname, normalize } from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = join(process.cwd(), '_site'), PORT = +process.argv[2] || 8740;
+const ROOT = fileURLToPath(new URL('../_site', import.meta.url)), PORT = +process.argv[2] || 8740;
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.webm': 'video/webm',
   '.pdf': 'application/pdf', '.glb': 'model/gltf-binary', '.xml': 'application/xml', '.webmanifest': 'application/manifest+json', '.txt': 'text/plain' };

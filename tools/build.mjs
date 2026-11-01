@@ -1,13 +1,14 @@
 // Builds the deployable site into _site/: copies the source, generates the project pages, redirects, 404 and
 // sitemap (tools/build-pages.mjs), then minifies the JavaScript and CSS. GitHub Actions runs this on every push to
-// main (.github/workflows/pages.yml). To preview locally:
-//   node tools/build.mjs            (add --no-minify to keep readable output)
-//   python -m http.server -d _site 8740
+// main (.github/workflows/pages.yml). To preview locally (from any folder):
+//   node <site>/tools/build.mjs      (add --no-minify to keep readable output)
+//   node <site>/tools/serve.mjs      then open http://localhost:8740
 import { cpSync, rmSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
 import { execFileSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
-const ROOT = process.cwd(), OUT = join(ROOT, '_site');
+const ROOT = fileURLToPath(new URL('..', import.meta.url)), OUT = join(ROOT, '_site');   // the site folder, wherever this is run from
 // not published: build tooling, notes, repository files
 const SKIP = new Set(['_site', 'tools', '.github', '.git', 'node_modules', 'README.md', '.gitignore', '.nojekyll']);
 
