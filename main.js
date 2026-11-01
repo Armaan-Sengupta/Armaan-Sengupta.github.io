@@ -524,8 +524,15 @@ addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (!lightbox.hidden) closeLightbox(); else closePop();
 });
+// section anchors from the old site and résumé links, mapped to project ids here
+const LEGACY = { 'communication-protocol': 'measurement', 'stewart-platform': 'platform', 'segway-system-modeling': 'segway', hmi: 'fyelabs', visualizer: 'fyelabs' };
 function routeHash() {
-  const id = decodeURIComponent(location.hash.slice(1));
+  let id = decodeURIComponent(location.hash.slice(1)); id = LEGACY[id] || id;
+  if (id === 'personal' || id === 'professional') {   // #professional opens the work section on that flow
+    closePop({ push: false });
+    if (id !== flowState.current) swapWithVeil(id, { restore: false }); else scrollTo({ top: flowTop() });
+    return;
+  }
   if (allProjects.has(id)) openPop(id, { push: false }); else closePop({ push: false });
 }
 addEventListener('popstate', routeHash);
