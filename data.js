@@ -74,10 +74,10 @@ export const chapters = [
     title: 'Neuralink', role: 'Implant Firmware & Embedded Systems Intern · Stimulation – Blindsight',
     points: ['Wrote stimulation implant firmware coordinating waveforms and sampling for 3k+ electrodes', 'Architected the app-to-ASIC stack for Blindsight', 'Cut registration time per trial by about 97%'],
     views: [
-      { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter' },
-      { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter' },
-      { id: 'signals', label: 'Signals', el: EL.neural, progress: 'chapter' },
-      { id: 'perception', label: 'Perception', el: EL.neural, progress: 'chapter' }
+      { id: 'implant', label: 'Implant', el: EL.neural, progress: 'chapter', len: 1 },
+      { id: 'threads', label: 'Threads', el: EL.neural, progress: 'chapter', len: 1 },
+      { id: 'signals', label: 'Signals', el: EL.neural, progress: 'chapter', len: 1 },
+      { id: 'perception', label: 'Perception', el: EL.neural, progress: 'chapter', len: 1 }
     ]
   },
   {
