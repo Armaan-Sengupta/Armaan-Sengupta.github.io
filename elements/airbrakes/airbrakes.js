@@ -39,17 +39,24 @@ const BOREALIS_PROFILE = { y0: 300, step: 10,
   l: [0, 0, 1, 4, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 18, 19, 20, 21, 22, 22, 23, 24, 24, 25, 25, 26, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 44, 54, 64, 74, 84, 93, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 98, 30, 29, 28, -1, 0],
   r: [0, 0, 1, 4, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 18, 19, 20, 21, 22, 22, 23, 24, 24, 25, 25, 26, 27, 27, 28, 28, 29, 29, 29, 30, 30, 30, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 34, 43, 53, 63, 73, 82, 92, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 96, 30, 29, 28, 3, 0] };
 const BOREALIS = { src: new URL('./borealis.svg', import.meta.url).href, w: 230, h: 2700, body: 63, cx: 114.5, ring: 1080 };
-/* Apogee control, precomputed: the flight computer predicts apogee assuming the current extension holds, and a PI
- * loop moves the panels until the prediction meets the target. x = how far the prediction is from the target, drawn
- * short of it (panels fully out at the start of the phase),
- * e = extension. eq is the extension that exactly hits the target. Saturates out, eases back in, settles. */
+/* Apogee control, precomputed: 3.5 s of the coast toward apogee. The rocket climbs against gravity and
+ * quadratic drag that grows with extension e; the flight computer predicts apogee P in closed form assuming the
+ * current extension holds, and a PI loop on P - target drives the panels through a lagging, rate-limited servo. With the
+ * panels fully out the prediction starts short of the target; they pull in, the servo lag lets P overshoot a little,
+ * and the loop brings it back. h = altitude. Metres and seconds. */
+const APO = { g: 9.81, k0: 2e-5, k1: 2.4e-4, h0: 2400, v0: 150, T: 3.5 };
+const apogee = (h, v, k) => h + Math.log(1 + k * v * v / APO.g) / (2 * k);
+APO.target = (() => { const a0 = apogee(APO.h0, APO.v0, APO.k0), a1 = apogee(APO.h0, APO.v0, APO.k0 + APO.k1); return a1 + 0.6 * (a0 - a1); })();
 const CONTROL = (() => {
-  const N = 400, dt = 1 / N, a = 4.5, eq = 0.45, Kp = 1.4, Ki = 7, out = []; let x = 1, I = 0;
-  for (let i = 0; i <= N; i++) {
-    const e = clamp(eq + Kp * x + Ki * I);
-    out.push({ x, e });
-    if (!(e >= 1 && x > 0) && !(e <= 0 && x < 0)) I += x * dt;   // anti-windup
-    x += -a * (e - eq) * dt;
+  const { g, k0, k1, T, target } = APO, dt = 0.01, Kp = 0.8, Ki = 3, lag = 0.5, rate = 1.2, out = [];
+  let h = APO.h0, v = APO.v0, e = 1, I = 0;
+  for (let i = 0; i <= Math.round(T / dt); i++) {
+    const k = k0 + k1 * e, P = apogee(h, v, k), err = (P - target) / 100;
+    out.push({ h, P, e });
+    const cmd = Kp * err + I, c = clamp(cmd);
+    if (c === cmd) I += Ki * err * dt;                                   // anti-windup
+    e += clamp((c - e) * dt / lag, -rate * dt, rate * dt);              // servo: first-order lag, rate-limited
+    v -= (g + k * v * v) * dt; h += v * dt;
   }
   return out;
 })();
@@ -436,26 +443,37 @@ class ASAirbrakes extends HTMLElement {
     const al = smooth((J.zoom - 0.5) / 0.5) * (1 - smooth(J.exit / 0.6)); if (al <= 0) { this._flow.dim = null; return; }
     const narrow = w < 700, x0 = narrow ? w * 0.08 : w * 0.55, x1 = narrow ? w * 0.92 : Math.min(w * 0.93, x0 + 560);
     const top = narrow ? h * 0.34 : h * 0.2, mid = top + (narrow ? h * 0.17 : h * 0.3), bot = narrow ? h * 0.74 : h * 0.78, n = Math.round(J.q * (CONTROL.length - 1));
-    // target apogee at the top: with the panels out the prediction starts short of it, and rises onto it as they ease back in;
-    // altitude climbs toward the same point
-    const N = CONTROL.length - 1, yT = top + 8;
-    const X = (i) => x0 + (x1 - x0) * i / N, Yp = (x) => yT + (mid - yT) * 0.6 * x, Ye = (e) => bot - (bot - mid - 56) * e;
-    const Ya = (i) => { const t = i / N; return mid - 4 + (Yp(Math.max(0, CONTROL[i].x)) - mid + 4) * (1 - (1 - t) * (1 - t)); };
+    // Altitude runs on an exponentially stretched scale, about 3x finer near the target than at the start, so the
+    // prediction's overshoot reads next to the whole climb. Time fills the left 62%; from the latest point a dashed
+    // arc carries the predicted trajectory out to its apogee at the right edge.
+    const N = CONTROL.length - 1, yT = top + 14, yB = mid - 4, { h0, target } = APO, S = 3;
+    const xd = x0 + 0.62 * (x1 - x0), X = (i) => x0 + (xd - x0) * i / N, Ye = (e) => bot - (bot - mid - 56) * e;
+    const Y = (a) => yB - (yB - yT) * Math.expm1(S * (a - h0) / (target - h0)) / Math.expm1(S);
     this._flow.dim = { x0: x0 - 18, x1: x1 + 18, y0: top - 34, y1: bot + 18, k: al };
     g.globalAlpha = al; g.font = `400 ${narrow ? 12 : 13}px Inter, system-ui, sans-serif`; g.textBaseline = 'alphabetic';
     g.fillStyle = 'rgba(8,8,10,.55)'; g.fillRect(x0 - 18, top - 34, x1 - x0 + 36, bot - top + 52);
     // target apogee
-    g.strokeStyle = 'rgba(242,239,233,.45)'; g.setLineDash([4, 5]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, yT); g.lineTo(x1, yT); g.stroke(); g.setLineDash([]);
-    g.fillStyle = 'rgba(242,239,233,.6)'; g.textAlign = 'right'; g.fillText('Target apogee', x1, yT + 18);
+    g.strokeStyle = 'rgba(242,239,233,.3)'; g.setLineDash([1, 4]); g.lineWidth = 1; g.beginPath(); g.moveTo(x0, yT); g.lineTo(x1, yT); g.stroke(); g.setLineDash([]);
+    g.fillStyle = 'rgba(242,239,233,.55)'; g.textAlign = 'right'; g.fillText('Target apogee', x1 - 14, yT + 18);
+    // legend: altitude (solid) and predicted apogee (dashed)
     g.textAlign = 'left'; g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Altitude', x0, top - 8);
+    const lx = x0 + g.measureText('Altitude').width + 22;
+    g.strokeStyle = 'rgba(242,239,233,.9)'; g.lineWidth = 1.5; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(lx, top - 12); g.lineTo(lx + 18, top - 12); g.stroke(); g.setLineDash([]);
+    g.fillStyle = 'rgba(242,239,233,.7)'; g.fillText('Predicted apogee', lx + 26, top - 8);
     g.strokeStyle = 'rgba(242,239,233,.9)'; g.lineWidth = 2; g.beginPath();
-    for (let i = 0; i <= n; i++) { const y = Ya(i); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    for (let i = 0; i <= n; i++) { const y = Y(CONTROL[i].h); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
+    // predicted trajectory from here, holding the current extension: eases into its apogee at the right edge
+    const c = CONTROL[n], xs = X(n);
+    g.strokeStyle = 'rgba(242,239,233,.75)'; g.lineWidth = 1.5; g.setLineDash([5, 4]); g.beginPath();
+    for (let j = 0; j <= 40; j++) { const s = j / 40, y = Y(c.h + (c.P - c.h) * (1 - (1 - s) * (1 - s))); j ? g.lineTo(xs + (x1 - xs) * s, y) : g.moveTo(xs, y); }
+    g.stroke(); g.setLineDash([]);
+    g.strokeStyle = '#f2efe9'; g.lineWidth = 1.5; g.beginPath(); g.arc(x1, Y(c.P), 4, 0, 7); g.stroke();
     // extension
     g.fillStyle = 'rgba(242,239,233,.9)'; g.fillText('Airbrake extension', x0, mid + 36);
     g.strokeStyle = 'rgba(242,239,233,.15)'; g.beginPath(); g.moveTo(x0, bot); g.lineTo(x1, bot); g.stroke();
     g.strokeStyle = '#8fb4ff'; g.lineWidth = 2; g.beginPath();
     for (let i = 0; i <= n; i++) { const y = Ye(CONTROL[i].e); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); } g.stroke();
-    if (n > 0) { const c = CONTROL[n]; g.fillStyle = '#f2efe9'; g.beginPath(); g.arc(X(n), Ya(n), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(X(n), Ye(c.e), 3.5, 0, 7); g.fill(); }
+    g.fillStyle = '#f2efe9'; g.beginPath(); g.arc(xs, Y(c.h), 3.5, 0, 7); g.fill(); g.fillStyle = '#8fb4ff'; g.beginPath(); g.arc(xs, Ye(c.e), 3.5, 0, 7); g.fill();
     g.globalAlpha = 1;
   }
   _sizeFlow(w, h) {
@@ -484,7 +502,7 @@ class ASAirbrakes extends HTMLElement {
         const J = journeyAt(this._jp); this._target = this._ext = J.ext; this._J = J;
         if (J.exit !== this._exit) { this.r.setRise(J.exit); this._exit = J.exit; this._dirty = true; }
         const rf = smooth((J.zoom - 0.15) / 0.6); if (rf !== this._rf) { this.r.setShellFade(rf); this._rf = rf; this._dirty = true; }
-        this._flow.speed = 1.8 * (1 - 0.82 * Math.pow(J.q, 1.2));   // fast, then slowing as the rocket nears apogee
+        this._flow.speed = 1.8 * (1 - 0.25 * J.q);   // still fast at the end: the loop settles seconds before apogee
         if (J.cam !== this._mix || J.zoom !== this._zoom) { this.r.setCamMix(J.cam, J.zoom); this._mix = J.cam; this._zoom = J.zoom; this._dirty = true; }
       }
       else if (this._progress !== null && !this._reduced.matches) { const k = 1 - Math.exp(-dt * 10); this._ext += (this._target - this._ext) * k; if (Math.abs(this._target - this._ext) > 1e-4) moving = true; else this._ext = this._target; }

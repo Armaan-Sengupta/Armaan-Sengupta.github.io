@@ -15,7 +15,17 @@ createServer(async (req, res) => {
   const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^([/\\])+/, '');
   for (const p of [path, path + '.html', join(path, 'index.html')]) {
     const f = join(ROOT, p);
-    if (f.startsWith(ROOT) && await isFile(f)) { res.writeHead(200, { 'content-type': TYPES[extname(f)] || 'application/octet-stream' }); return res.end(await readFile(f)); }
+    if (f.startsWith(ROOT) && await isFile(f)) {
+      const body = await readFile(f), type = TYPES[extname(f)] || 'application/octet-stream';
+      // byte ranges, as Pages serves them: without them Chrome cannot seek a video, so the scroll-scrubbed ones stall
+      const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+      if (m) {
+        const start = m[1] ? +m[1] : body.length - +m[2], end = m[1] && m[2] ? Math.min(+m[2], body.length - 1) : body.length - 1;
+        res.writeHead(206, { 'content-type': type, 'accept-ranges': 'bytes', 'content-range': `bytes ${start}-${end}/${body.length}`, 'content-length': end - start + 1 });
+        return res.end(body.subarray(start, end + 1));
+      }
+      res.writeHead(200, { 'content-type': type, 'accept-ranges': 'bytes', 'content-length': body.length }); return res.end(body);
+    }
   }
   res.writeHead(404, { 'content-type': TYPES['.html'] }); res.end(await readFile(join(ROOT, '404.html')));
 }).listen(PORT, () => console.log(`http://localhost:${PORT}`));
