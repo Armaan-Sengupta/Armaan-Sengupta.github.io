@@ -63,12 +63,16 @@ export function makeVideo(src, { controls = false, loop = true } = {}) {
 export let VH = innerHeight;
 export const chapterState = [];
 
+// scroll length of each view in viewport heights: twice the len in data.js, so every chapter scrolls at half speed,
+// except the airbrakes, whose lengths are already tuned
+const viewLens = (ch) => ch.views.map((v) => (v.len ?? 0.5) * (ch.id === 'airbrakes' ? 1 : 2));
+
 export function buildChapter(ch) {
   const sec = document.createElement('section');
   sec.className = 'chapter' + (ch.hero ? ' hero' : '') + (ch.mono ? ' mono-ch' : '');
   sec.id = `ch-${ch.id}`; sec.dataset.ch = ch.id;
   sec.setAttribute('aria-label', ch.title);
-  const lens = ch.views.map((v) => v.len ?? 0.5);
+  const lens = viewLens(ch);
   const total = lens.reduce((a, b) => a + b, 0);
   const starts = lens.map((_, i) => lens.slice(0, i).reduce((a, b) => a + b, 0) / total);
   sec.innerHTML = `
@@ -135,7 +139,7 @@ export function buildHead(ch) {
 export function buildBeat(ch) {
   const sec = document.createElement('div');
   sec.className = 'chapter beat'; sec.dataset.ch = ch.id;
-  const lens = ch.views.map((v) => v.len ?? 0.5);
+  const lens = viewLens(ch);
   const total = lens.reduce((a, b) => a + b, 0);
   const starts = lens.map((_, i) => lens.slice(0, i).reduce((a, b) => a + b, 0) / total);
   sec.innerHTML = `<div class="pin"><div class="ch-stage"><div class="frame"><div class="layers"></div><span class="hint mono"></span><p class="cap"></p></div></div></div>`;
