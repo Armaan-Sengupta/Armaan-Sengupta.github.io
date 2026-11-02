@@ -107,7 +107,8 @@ export function createPlatformRenderer(host, options = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: !!options.preserveDrawingBuffer, powerPreference: 'high-performance' });
   const bg = new THREE.Color(options.background ?? 0x08080a);
   renderer.debug.checkShaderErrors = false; renderer.setClearColor(bg, 1); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
-  let pixelRatio = options.pixelRatio ?? Math.min(devicePixelRatio || 1, 2);
+  // capped at 1.5: a Retina screen at 2x renders 4x the pixels of a 1x screen, enough to stutter a full-screen scene on a laptop
+  let pixelRatio = options.pixelRatio ?? Math.min(devicePixelRatio || 1, 1.5);
   renderer.setPixelRatio(pixelRatio);
   const scene = new THREE.Scene(); scene.background = bg;
   const envRT = makeEnvironment(renderer); scene.environment = envRT.texture; scene.environmentIntensity = 0.55;

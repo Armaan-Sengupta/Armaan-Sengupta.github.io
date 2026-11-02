@@ -56,7 +56,7 @@ class PlatformSequence extends HTMLElement {
   }
   async _initialize() {
     try {
-      if(!this._view){this._view=createPlatformRenderer(this._canvas,{});this._view.setCamera('hero-end');this._ro=new ResizeObserver(([e])=>{const r=e.contentRect;this._view.resize(r.width,r.height,Math.min(devicePixelRatio||1,2));this.seek(this._time);});this._ro.observe(this._canvas.parentElement);}
+      if(!this._view){this._view=createPlatformRenderer(this._canvas,{});this._view.setCamera('hero-end');this._ro=new ResizeObserver(([e])=>{const r=e.contentRect;this._view.resize(r.width,r.height,Math.min(devicePixelRatio||1,1.5));this.seek(this._time);});this._ro.observe(this._canvas.parentElement);}
       if(this._view.ready)await this._view.ready;
       if(this._disposed)return this;
       this.seek(this.hasAttribute('time')?(Number(this.getAttribute('time'))||0):this._time);

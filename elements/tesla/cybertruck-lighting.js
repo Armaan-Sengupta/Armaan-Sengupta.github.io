@@ -397,7 +397,7 @@ class CybertruckLighting extends HTMLElement {
     this._camPos = new THREE.Vector3(); this._camTgt = new THREE.Vector3(); this._snap = true;
   }
   _resize() {
-    const w = Math.max(1, this.clientWidth), h = Math.max(1, this.clientHeight), d = Math.min(2, devicePixelRatio || 1);
+    const w = Math.max(1, this.clientWidth), h = Math.max(1, this.clientHeight), d = Math.min(1.5, devicePixelRatio || 1);
     this._w = w; this._h = h; this._dpr = d; this._r.setPixelRatio(d); this._r.setSize(w, h, false);
     this._hud.width = Math.round(w * d); this._hud.height = Math.round(h * d); this._cam.aspect = w / h; this._cam.updateProjectionMatrix(); this._kick();
   }

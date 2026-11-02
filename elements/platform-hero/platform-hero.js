@@ -52,7 +52,7 @@ class ASPlatformHero extends HTMLElement {
     if (this._demoTarget) this._ensureTrack();
     this._view.ready.then(() => { this._dirty = true; this._frame(performance.now()); this.dispatchEvent(new CustomEvent('platform-ready', { bubbles: true, composed: true })); })
       .catch((e) => this.dispatchEvent(new CustomEvent('platform-error', { detail: String(e?.message || e), bubbles: true, composed: true })));
-    this._ro = new ResizeObserver(([e]) => { const r = e.contentRect; this._view.resize(r.width, r.height, Math.min(devicePixelRatio || 1, 2)); this._dirty = true; this._frame(performance.now()); });
+    this._ro = new ResizeObserver(([e]) => { const r = e.contentRect; this._view.resize(r.width, r.height, Math.min(devicePixelRatio || 1, 1.5)); this._dirty = true; this._frame(performance.now()); });
     this._ro.observe(this);
     this._io = new IntersectionObserver(([e]) => { this._visible = e.isIntersecting; this._last = 0; }); this._io.observe(this);
     let down = null;

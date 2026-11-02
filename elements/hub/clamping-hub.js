@@ -277,7 +277,7 @@ class ASClampingHub extends HTMLElement {
   }
   _resize() {
     if (!this._r) return; const b = this.getBoundingClientRect(); const w = Math.max(1, b.width), h = Math.max(1, b.height);
-    this._r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); this._r.setSize(w, h, false);
+    this._r.setPixelRatio(Math.min(1.5, devicePixelRatio || 1)); this._r.setSize(w, h, false);
     this._hud.classList.toggle('sm', w < 380); this._cam.aspect = w / h; this._cam.updateProjectionMatrix(); this._fitDist = 6.9 * Math.max(1, 1.25 / (w / h)); this._dirty = true; this._render();
   }
   _tick(now) {

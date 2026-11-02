@@ -396,7 +396,7 @@ class FyelabsSystem extends HTMLElement {
     if (init) { const a = V[k + 3]; D[j] += V[k] * a * (1 - Math.min(.5, a * .04)); D[j + 1] += V[k + 1] * a * .8; D[j + 2] += V[k + 2] * a; }
   }
   _resize() {
-    const w = Math.max(1, this.clientWidth), h = Math.max(1, this.clientHeight), d = Math.min(2, devicePixelRatio || 1);
+    const w = Math.max(1, this.clientWidth), h = Math.max(1, this.clientHeight), d = Math.min(1.5, devicePixelRatio || 1);
     this._w = w; this._h = h; this._dpr = d; this._renderer.setPixelRatio(d); this._renderer.setSize(w, h, false);
     this._hud.width = Math.round(w * d); this._hud.height = Math.round(h * d); this._cam.aspect = w / h; this._cam.updateProjectionMatrix();
     this._pts.material.uniforms.uPx.value = h * d / 600; this._kick();

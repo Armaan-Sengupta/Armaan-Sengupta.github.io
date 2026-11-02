@@ -57,7 +57,7 @@ export class ASParallelManipulator extends HTMLElement {
     });
     this._ready.catch((e) => this._fail(e));
     if (this._isCompare) this._loadTrack();
-    this._ro = new ResizeObserver(([e]) => { const r = e.contentRect; this._view.resize(r.width, r.height, Math.min(devicePixelRatio || 1, 2)); this._draw(); });
+    this._ro = new ResizeObserver(([e]) => { const r = e.contentRect; this._view.resize(r.width, r.height, Math.min(devicePixelRatio || 1, 1.5)); this._draw(); });
     this._ro.observe(vp);
     this._io = new IntersectionObserver(([e]) => { this._visible = e.isIntersecting; this._last = 0; if (this._visible) this._maybeAutoDrop(); }); this._io.observe(this);
     this._onVis = () => { this._last = 0; }; document.addEventListener('visibilitychange', this._onVis);
