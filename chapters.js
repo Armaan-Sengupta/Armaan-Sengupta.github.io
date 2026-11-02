@@ -209,13 +209,22 @@ function buildCompare(layer, src) {
   handle.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') set(x - 0.05); if (e.key === 'ArrowRight') set(x + 0.05); });
 }
 
-function chapterProgress(st) {
-  const top = st.sec.getBoundingClientRect().top;
-  return clamp(-top / (st.total * VH));
+// A plain mouse wheel on a Mac (and anywhere smooth scrolling is off) moves the page in ~100 px steps, which made the
+// scrubbed animations jump. The progress shown eases toward the scroll position instead, so those steps glide; trackpad
+// scrolling is already fine-grained and barely changes. Off-screen chapters, long jumps and reduced motion snap.
+const EASE = 0.09;   // time constant, s
+function chapterProgress(st, snap) {
+  const target = clamp(-st.sec.getBoundingClientRect().top / (st.total * VH)), now = performance.now();
+  if (snap || reduce || !st.visible || st.p == null || Math.abs(target - st.p) * st.total > 1.5) st.p = target;
+  else st.p += (target - st.p) * (1 - Math.exp(-(st.raf ? Math.min(0.1, (now - st.t) / 1000) : 1 / 60) / EASE));   // at rest, start from one frame
+  st.t = now;
+  if (Math.abs(target - st.p) * st.total * VH < 0.5) st.p = target;
+  else if (!st.raf) st.raf = requestAnimationFrame(() => { st.raf = 0; updateChapter(st); });
+  return st.p;
 }
 
 export function updateChapter(st, force) {
-  const p = chapterProgress(st), { starts, ch } = st;
+  const p = chapterProgress(st, force), { starts, ch } = st;
   let i = starts.length - 1; while (i > 0 && p < starts[i]) i--;
   const end = i + 1 < starts.length ? starts[i + 1] : 1;
   const local = clamp((p - starts[i]) / (end - starts[i] || 1));
