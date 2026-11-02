@@ -119,7 +119,7 @@ export const chapters = [
     title: 'FYELABS', role: 'Robotics & Embedded Intern',
     points: ['Built back-up safety sensing for garbage trucks', 'Designed a LiDAR dust filter that still detects people', 'Designed the 100+ part enclosure and cut its cost by 56%'],
     views: [
-      { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view' },
+      { id: 'case', label: 'Enclosure', el: withAttrs(EL.fyelabs, { view: 'case' }), progress: 'view', len: 1 },
       { id: 'built', label: 'As built', caption: 'The built enclosure on the test rig', img: 'media/fyelabs/case-photo.webp' },
       { id: 'lidar', label: 'LiDAR array', el: withAttrs(EL.fyelabs, { view: 'lidar' }) },
       { id: 'dust', label: 'Dust filter', el: withAttrs(EL.fyelabs, { view: 'dust' }) },
