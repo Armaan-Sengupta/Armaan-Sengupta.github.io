@@ -23,7 +23,7 @@ const flowTop = () => $('#work').offsetTop;
 
 /* ═════════════ personal / professional flows ═════════════ */
 const flowSwitch = $('#flow-switch'), veil = $('#flow-veil');
-const flowState = { current: 'personal', seen: { personal: true, professional: false }, offsets: { personal: 0, professional: 0 } };
+const flowState = { current: 'personal', seen: { personal: true, professional: false }, offsets: { personal: 0, professional: 0 }, auto: false, hold: null };
 function layout() { layoutChapters(); VH = innerHeight; }
 function showFlow(name, { restore = true } = {}) {
   if (name === flowState.current) return;
@@ -41,17 +41,20 @@ function showFlow(name, { restore = true } = {}) {
 // the other flow then rises in as the fade lifts
 function swapWithVeil(name, opts) {
   if (name === flowState.current) return;
+  const quick = !!opts?.quick, fade = reduce ? 0 : quick ? 350 : 1000;
+  veil.classList.toggle('quick', quick); flowSwitch.classList.toggle('quick', quick);
   $$('button', flowSwitch).forEach((b) => b.setAttribute('aria-checked', b.dataset.flow === name));
   flowSwitch.dataset.flow = name;
   flowSwitch.classList.add('swapping');
   veil.querySelector('span').textContent = '';
   veil.classList.add('on');
   setTimeout(() => {
+    flowState.hold = null;
     showFlow(name, opts);
     const f = flows[name]; f.classList.remove('flow-enter'); void f.offsetWidth; f.classList.add('flow-enter');
-    setTimeout(() => veil.classList.remove('on'), reduce ? 0 : 250);
-    setTimeout(() => flowSwitch.classList.remove('swapping'), reduce ? 0 : 900);
-  }, reduce ? 0 : 1000);
+    setTimeout(() => veil.classList.remove('on'), reduce ? 0 : quick ? 80 : 250);
+    setTimeout(() => { flowSwitch.classList.remove('swapping', 'quick'); veil.classList.remove('quick'); }, reduce ? 0 : quick ? 500 : 900);
+  }, fade);
 }
 flowSwitch.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) swapWithVeil(b.dataset.flow); });
 $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {
@@ -60,7 +63,7 @@ $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {
 }));
 
 /* ═════════════ scroll loop ═════════════ */
-let ticking = false;
+let ticking = false, lastY = scrollY;
 /* ═════════════ where-you-are rail ═════════════
    A stack of short lines on the left, one per section, the current one brighter; hovering opens the names,
    clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. While open, a small
@@ -115,7 +118,15 @@ function onScroll() {
   chapterState.forEach((st) => { if (st.visible) updateChapter(st); });
   // the switch floats only while the chapters are on screen
   flowSwitch.classList.toggle('on', y > top - VH * 0.6 && y < top + h - VH * 0.9);
+  // finished personal without ever looking at professional: continue there, just before the last chapter lets go, so
+  // the next section never comes into view. Only when the reader scrolled there, not when they jumped past (nav links).
+  const end = top + h - VH, at = end - VH * 0.12;
+  if (flowState.hold != null && y > flowState.hold) scrollTo(0, flowState.hold);   // momentum waits at the chapter's end during the fade
+  if (flowState.current === 'personal' && !flowState.seen.professional && !flowState.auto && lastY > end - VH * 1.5 && lastY < at && y >= at && y < end + VH) {
+    flowState.auto = true; flowState.hold = end; swapWithVeil('professional', { quick: true });
+  }
   $('#nav').classList.toggle('scrolled', y > 40);
+  lastY = y;
   cardScrub();
 }
 addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
