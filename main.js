@@ -23,7 +23,7 @@ const flowTop = () => $('#work').offsetTop;
 
 /* ═════════════ personal / professional flows ═════════════ */
 const flowSwitch = $('#flow-switch'), veil = $('#flow-veil');
-const flowState = { current: 'personal', seen: { personal: true, professional: false }, offsets: { personal: 0, professional: 0 }, auto: false };
+const flowState = { current: 'personal', seen: { personal: true, professional: false }, offsets: { personal: 0, professional: 0 } };
 function layout() { layoutChapters(); VH = innerHeight; }
 function showFlow(name, { restore = true } = {}) {
   if (name === flowState.current) return;
@@ -60,7 +60,7 @@ $$('[data-flow-link]').forEach((a) => a.addEventListener('click', (e) => {
 }));
 
 /* ═════════════ scroll loop ═════════════ */
-let ticking = false, lastY = scrollY;
+let ticking = false;
 /* ═════════════ where-you-are rail ═════════════
    A stack of short lines on the left, one per section, the current one brighter; hovering opens the names,
    clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. While open, a small
@@ -98,12 +98,13 @@ rail.addEventListener('mouseenter', () => {
   rail.style.top = rail.getBoundingClientRect().top + 'px'; rail.style.transform = 'none'; rail.classList.add('open');
 });
 rail.addEventListener('mouseleave', () => {
-  railClose = setTimeout(() => { rail.classList.remove('open'); rail.style.top = rail.style.transform = ''; if (railFlow !== flowState.current) buildRail(); }, 350);
+  railClose = setTimeout(() => { rail.classList.remove('open'); rail.style.top = rail.style.transform = ''; if (railFlow !== flowState.current) buildRail(); else updateRail(); }, 350);
 });
 function updateRail() {
   let cur = -1;
   railItems.forEach((it, i) => { if (it.flow && it.flow !== flowState.current) return; const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });
-  rail.classList.toggle('on', cur >= 0);
+  // shown from the work section down; not tied to cur, which has no match while the list previews the other flow
+  rail.classList.toggle('on', rail.classList.contains('open') || flowTop() - scrollY < VH * 0.45);
   $$('button[data-i]', rail).forEach((b, i) => b.classList.toggle('cur', i === cur));
 }
 
@@ -114,14 +115,7 @@ function onScroll() {
   chapterState.forEach((st) => { if (st.visible) updateChapter(st); });
   // the switch floats only while the chapters are on screen
   flowSwitch.classList.toggle('on', y > top - VH * 0.6 && y < top + h - VH * 0.9);
-  // finished personal without ever looking at professional: continue there
-  // only when the reader scrolled through the end, not when they jumped past it (nav links)
-  const end = top + h - VH;
-  if (flowState.current === 'personal' && !flowState.seen.professional && !flowState.auto && lastY > end - VH * 1.5 && lastY <= end + 4 && y > end + 4 && y < end + VH) {
-    flowState.auto = true; swapWithVeil('professional');
-  }
   $('#nav').classList.toggle('scrolled', y > 40);
-  lastY = y;
   cardScrub();
 }
 addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
