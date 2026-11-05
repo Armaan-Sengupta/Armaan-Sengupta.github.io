@@ -10,7 +10,8 @@ const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application
 const OUT = fileURLToPath(new URL('../media/posters/', import.meta.url)), ONLY = process.argv[2];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // where in a view to take the still (0..1 through the view); the rest use the middle
-const AT = { 'platform-assemble': 0.8, 'airbrakes-mechanism': 0.2 };
+// Neuralink is one long camera move, so its stills are where each view begins: where a reader arrives, and what the live scene shows there
+const AT = { 'platform-assemble': 0.8, 'airbrakes-mechanism': 0.2, 'neuralink-implant': 0.01, 'neuralink-threads': 0.01, 'neuralink-signals': 0.01, 'neuralink-perception': 0.01 };
 
 const dir = mkdtempSync(join(tmpdir(), 'posters-'));
 const proc = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${dir}`, '--no-first-run', '--enable-gpu', '--ignore-gpu-blocklist', '--use-angle=d3d11', '--autoplay-policy=no-user-gesture-required', 'about:blank'], { stdio: 'ignore' });

@@ -41,13 +41,15 @@ export async function makeLottie(box, view, loop) {
   }
   if (view.scrub) {
     const v = document.createElement('video');
-    Object.assign(v, { muted: true, playsInline: true, preload: 'auto', src: view.scrub, poster: view.scrub.replace(/.mp4$/, '.jpg') });
+    Object.assign(v, { muted: true, playsInline: true, preload: 'metadata', src: view.scrub, poster: view.scrub.replace(/.mp4$/, '.jpg') });
     v.className = 'fit'; box.append(v);
     let want = 0, busy = false;
     const go = () => { if (!v.duration) return; busy = true; v.currentTime = want * (v.duration - 0.05); };
     v.addEventListener('seeked', () => { busy = false; if (Math.abs(v.currentTime - want * (v.duration - 0.05)) > 0.04) go(); });
     v.addEventListener('loadedmetadata', go);
-    return { seek: (p) => { want = p; if (!busy) go(); }, play() {}, pause() {} };
+    // the whole file only downloads once it is on screen, so a chapter mounted ahead of time costs next to nothing
+    const onScreen = () => { const r = box.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+    return { seek: (p) => { want = p; if (v.preload !== 'auto' && onScreen()) v.preload = 'auto'; if (!busy) go(); }, play() {}, pause() {} };
   }
   return { seek() {}, play() {}, pause() {} };
 }
@@ -148,7 +150,8 @@ const posterOf = (ch, v) => v.poster || v.img || v.swap?.[0] || ((v.video || v.s
 function syncPoster(st) {
   const ph = $('.ph', st.sec), v = st.ch.views[st.active]; if (!ph || !v) return;
   const show = !st.ready[st.active], src = posterOf(st.ch, v);
-  if (show && ph.getAttribute('src') !== src) ph.src = src;
+  // only sections near the viewport fetch theirs here; the rest wait their turn in pumpStills
+  if (show && st.visible && ph.getAttribute('src') !== src) { if (distance(st) === 0) ph.fetchPriority = 'high'; ph.src = src; }
   ph.classList.toggle('on', show);
 }
 function markReady(st, i) { st.ready[i] = true; if (i === st.active) syncPoster(st); }
@@ -163,34 +166,52 @@ const within = (p, ms) => Promise.race([p, new Promise((r) => setTimeout(r, ms))
 export const warmEl = (n) => within(Promise.resolve(n.ready).then(() => n.warm?.()).catch(() => {}), 8000).then(() => within(nextPaint(), 400));
 
 /* ── load order ──
-   Nothing heavy until the reader scrolls half a screen, unless it is already on screen. Then every still is requested,
-   and chapters mount one at a time when the page is free, nearest first, so a scroll rarely pays for two scenes at once.
-   Small or low-memory devices only mount what is near the viewport. */
-const lowEnd = innerWidth <= 860 || (navigator.deviceMemory || 8) < 4;
-const heavyJobs = [];
-let loadStarted = false, loaderBusy = false;
+   1. Whatever is on screen: its still at high priority, then its live version, straight away.
+   2. From half a screen of scrolling: the stills of the current flow, nearest first, a few at a time.
+   3. Then the 3D library and the chapters not yet on screen, one at a time, nearest first; then the other flow's stills.
+   Small or low-memory devices and slow connections skip the third step and load only what the reader gets close to. */
+const net = navigator.connection;
+const lowEnd = innerWidth <= 860 || (navigator.deviceMemory || 8) < 4 || !!net?.saveData || /(^|-)[23]g$/.test(net?.effectiveType || '');
+const heavyJobs = [], stillsAsked = new Set();
+let loadStarted = false, loaderBusy = false, stillsLoading = 0, libPreloaded = false;
 export const loadWhenFree = (job) => { heavyJobs.push(job); pumpLoader(); };
+const distance = (st) => { const r = st.sec.getBoundingClientRect(); return r.top >= innerHeight ? r.top - innerHeight + 1 : r.bottom < 0 ? -r.bottom * 2 : 0; };
+const unmounted = () => chapterState.filter((st) => !st.mounted && !st.sec.closest('.flow')?.hidden);
+const needStill = (st) => st.ch.views.map((v) => posterOf(st.ch, v)).filter((src) => !stillsAsked.has(src));
+function nextStill() {
+  const shown = chapterState.filter((st) => st.sec.offsetHeight && (!lowEnd || distance(st) < innerHeight * 3)).sort((a, b) => distance(a) - distance(b));
+  const rest = lowEnd || unmounted().length ? [] : chapterState.filter((st) => !st.sec.offsetHeight);
+  for (const st of [...shown, ...rest]) { const src = needStill(st)[0]; if (src) return src; }
+  return null;
+}
+function pumpStills() {
+  if (!loadStarted) return;
+  for (let src; stillsLoading < 3 && (src = nextStill()); ) {
+    stillsAsked.add(src); stillsLoading++;
+    const im = new Image(), done = () => { stillsLoading--; pumpStills(); if (!stillsLoading) pumpLoader(); };
+    im.fetchPriority = 'low'; im.onload = im.onerror = done; im.src = src;
+  }
+}
+function preloadLibrary() {
+  if (libPreloaded) return; libPreloaded = true;
+  for (const f of ['three.module.min.js', 'three.core.min.js']) { const l = document.createElement('link'); l.rel = 'modulepreload'; l.href = `elements/shared/vendor/${f}`; document.head.append(l); }
+}
 function startLoading() {
   if (loadStarted) return; loadStarted = true;
   removeEventListener('scroll', onFirstScroll);
-  for (const f of ['three.module.min.js', 'three.core.min.js']) { const l = document.createElement('link'); l.rel = 'modulepreload'; l.href = `elements/shared/vendor/${f}`; document.head.append(l); }
-  const seen = new Set();
-  chapterState.forEach((st) => st.ch.views.forEach((v) => {
-    const src = posterOf(st.ch, v); if (seen.has(src)) return; seen.add(src);
-    const im = new Image(); im.fetchPriority = 'low'; im.src = src;
-  }));
   pumpLoader();
 }
 function onFirstScroll() { if (scrollY > innerHeight * 0.5) startLoading(); }
 addEventListener('scroll', onFirstScroll, { passive: true });
-const distance = (st) => { const r = st.sec.getBoundingClientRect(); return r.top >= innerHeight ? r.top - innerHeight + 1 : r.bottom < 0 ? -r.bottom * 2 : 0; };
-const unmounted = () => chapterState.filter((st) => !st.mounted && !st.sec.closest('.flow')?.hidden);
 export async function pumpLoader() {
   // on screen now: starts straight away, even if something further down is still loading
   unmounted().filter((st) => st.sec.offsetHeight && distance(st) === 0).forEach((st) => { settled.then(() => { if (distance(st) === 0) mountChapter(st); }); });
+  pumpStills();
   if (loaderBusy || !loadStarted) return;
   const nearest = () => unmounted().filter((st) => !lowEnd || st.visible).sort((a, b) => distance(a) - distance(b))[0];
   if (!nearest() && !heavyJobs.length) return;
+  if (stillsLoading && !nearest()?.visible) return;   // the stills finish first; the last one calls back here
+  if (!lowEnd) preloadLibrary();
   loaderBusy = true;
   await settled;
   await new Promise((r) => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 1200 }) : setTimeout(r, 120)));
@@ -199,6 +220,27 @@ export async function pumpLoader() {
   loaderBusy = false;
   pumpLoader();
 }
+
+/* ── loading indicator ──
+   A small chip in the corner while the section on screen is still showing its still, or while chapters are loading in
+   the background. index.html carries it from the first paint; it delays its own appearance so a fast load never shows it. */
+const chip = $('#load-chip') || Object.assign(document.body.appendChild(document.createElement('div')), { id: 'load-chip', className: 'load-chip', innerHTML: '<i></i><span>Loading</span>' });
+chip.setAttribute('role', 'status');
+const isReady = (st, k) => !!(st.ready[k] || st.failed?.[k]);
+let chipDone = -1, chipMoved = performance.now();
+function tickChip() {
+  const all = chapterState.filter((st) => st.sec.offsetHeight); if (!all.length) return;
+  const done = all.filter((st) => st.ch.views.every((_, k) => isReady(st, k))).length, H = innerHeight;
+  if (done !== chipDone) { chipDone = done; chipMoved = performance.now(); }
+  const here = all.find((st) => { const r = st.sec.getBoundingClientRect(); return r.top <= H / 2 && r.bottom >= H / 2; });
+  const waiting = here && here.active >= 0 && !isReady(here, here.active), background = loadStarted && !lowEnd && done < all.length;
+  const stalled = performance.now() - chipMoved > 45000;   // never leave it spinning on something that will not arrive
+  const on = (waiting || background) && !stalled;
+  const text = waiting ? 'Loading this section' : `Loading ${done + 1} of ${all.length}`;
+  if (on && chip.lastChild.textContent !== text) chip.lastChild.textContent = text;
+  chip.classList.toggle('on', on); chip.classList.add('live');
+}
+setInterval(tickChip, 400);
 
 export async function mountChapter(st) {
   if (st.mounted) return; st.mounted = true;
@@ -215,7 +257,7 @@ export async function mountChapter(st) {
           el.append(n); entry.node = n; updateChapter(st, true);
           entry.warmed = warmEl(n).then(done);
           return n;
-        }).catch((e) => console.warn('element failed', v.el.tag, e));   // the still stays up
+        }).catch((e) => { console.warn('element failed', v.el.tag, e); st.failed ||= []; st.ch.views.forEach((u, k) => { if (u.el?.tag === v.el.tag) st.failed[k] = true; }); });   // the still stays up
         waits.push(entry.ready.then(() => entry.warmed));
       }
     }
@@ -360,12 +402,9 @@ function setView(st, i) {
   if (prev !== i) $('.frame', st.sec).classList.toggle('compare-on', !!v.compare);
 }
 
-// Heavy elements (Three.js scenes, videos) wait until the page has loaded and the main thread is idle, so the
-// first paint is never held up; they are ready before the reader scrolls to them.
-const settled = new Promise((res) => {
-  const idle = () => (window.requestIdleCallback ? requestIdleCallback(res, { timeout: 2000 }) : setTimeout(res, 200));
-  document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true });
-});
+// Live elements wait for the first paint and a free moment, not for the load event: images further down can hold that
+// event up for many seconds on a slow connection, and the section on screen should not wait for them.
+const settled = new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(() => (window.requestIdleCallback ? requestIdleCallback(res, { timeout: 600 }) : setTimeout(res, 100)))));
 const chapterIO = new IntersectionObserver((es) => es.forEach((e) => {
   const st = chapterState.find((s) => s.sec === e.target); if (!st) return;
   st.visible = e.isIntersecting;

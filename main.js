@@ -12,8 +12,8 @@ const allProjects = new Map([...cards, ...chapters].map((p) => [p.id, p]));   //
 /* ── content.json: galleries and extra facts scraped from the original site ── */
 let content = new Map();
 let story = {};
-const storyReady = fetch('story.json').then((r) => (r.ok ? r.json() : {})).then((j) => { story = j; }).catch(() => {});
-const contentReady = fetch('content.json').then((r) => (r.ok ? r.json() : { projects: [] }))
+const storyReady = fetch('story.json', { priority: 'low' }).then((r) => (r.ok ? r.json() : {})).then((j) => { story = j; }).catch(() => {});
+const contentReady = fetch('content.json', { priority: 'low' }).then((r) => (r.ok ? r.json() : { projects: [] }))
   .then((j) => { content = new Map((j.projects || []).map((p) => [p.id, p])); }).catch(() => {});
 
 /* ── chapters live in chapters.js (shared with the project pages) ── */

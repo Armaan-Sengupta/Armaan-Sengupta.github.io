@@ -125,7 +125,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 @media(min-width:861px){.chapter.hero[data-view="demo"] .ch-copy{opacity:0;pointer-events:none}}
 
 /* black-and-white chapters */
-.mono-ch .frame img,.mono-ch .frame video{filter:grayscale(1)}
+.mono-ch .frame img:not(.ph),.mono-ch .frame video{filter:grayscale(1)}
 .mono-ch .frame .layer.color img,.mono-ch .frame .layer.color video{filter:none}
 .layer.media{background:var(--bg-2)}
 .layer .swap-b{position:absolute;inset:0;opacity:0}
@@ -411,3 +411,16 @@ html.rm .fall-rocket{display:none}
 .rail .rail-flow button:not(.on):hover{color:var(--fg)}
 .rail-flow::after{content:'';position:absolute;left:0;right:0;top:100%;height:8px}
 footer a{color:inherit;text-decoration:none}footer a:hover{color:var(--fg)}
+
+/* room for the chapters before they are built, so lazy images further down do not count as near the screen and load first */
+.flow:empty{min-height:1500vh}
+
+/* loading indicator: before the script takes over it shows itself after a moment, so a fast load never sees it */
+.load-chip{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));z-index:38;display:flex;align-items:center;gap:8px;padding:6px 11px 6px 9px;border:1px solid var(--line);border-radius:99px;background:rgba(8,8,10,.88);color:var(--mute);font:500 11px/1 var(--mono);letter-spacing:.02em;pointer-events:none;visibility:hidden;opacity:0;transition:opacity .3s,visibility 0s .3s;animation:chip-in .3s 1s forwards}
+.load-chip.live{animation:none}
+.load-chip.on{visibility:visible;opacity:1;transition:opacity .3s}
+.load-chip i{width:10px;height:10px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:chip-spin .9s linear infinite}
+.load-chip:not(.on).live i{animation:none}
+@keyframes chip-in{to{visibility:visible;opacity:1}}
+@keyframes chip-spin{to{transform:rotate(360deg)}}
+@media (max-width:860px){.load-chip{bottom:calc(max(18px,env(safe-area-inset-bottom)) + 54px)}}
