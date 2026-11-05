@@ -34,7 +34,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 /* ───────── nav ───────── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:50;height:var(--nav);display:flex;align-items:center;justify-content:space-between;
   padding:0 var(--gutter);transition:background .4s var(--ease),border-color .4s;border-bottom:1px solid transparent}
-.nav.scrolled{background:rgba(8,8,10,.72);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.nav.scrolled{background:rgba(8,8,10,.92);border-color:var(--line)}
 .brand{display:flex;align-items:center;gap:12px;font:600 14px var(--display);letter-spacing:-.01em}
 .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--fg);box-shadow:0 0 12px rgba(255,248,235,.8);animation:pulse 5s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.7;box-shadow:0 0 6px rgba(255,248,235,.45)}}
@@ -76,6 +76,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .layers,.layer{position:absolute;inset:0}
 .layer{opacity:0;visibility:hidden;transition:opacity .55s var(--ease),visibility 0s linear .55s}
 .layer.on{opacity:1;visibility:visible;transition:opacity .55s var(--ease),visibility 0s}
+/* a scene whose layer is off stops rendering: its own observer reports it off screen */
+.el-layer:not(.on){content-visibility:hidden;transition:opacity .55s var(--ease),visibility 0s linear .55s,content-visibility 0s linear .55s;transition-behavior:allow-discrete}
+/* the still that stands in for a view until its real media is up, then fades away */
+.ph{position:absolute;inset:0;z-index:3;width:100%;height:100%;object-fit:contain;pointer-events:none;opacity:0;transition:opacity .6s var(--ease)}
+.ph.on{opacity:1;transition-duration:.2s}
+.card .thumb > .ph{object-fit:cover}
 .layer > *{width:100%;height:100%}
 .layer.lottie{background:#000}
 .card .thumb.lottie{background:#000}
@@ -114,7 +120,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .chapter.hero[data-view="demo"] .frame{border-color:var(--line)}
 .chapter.hero .hint{top:auto;right:auto;left:50%;bottom:clamp(10px,3vh,28px);transform:translateX(-50%);white-space:nowrap}
 .hero-more{position:absolute;left:50%;bottom:clamp(12px,3vh,28px);z-index:4;transform:translate(-50%,10px);opacity:0;pointer-events:none;
-  background:rgba(8,8,10,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .4s,transform .4s}
+  background:rgba(8,8,10,.9);transition:opacity .4s,transform .4s}
 .chapter.hero.demo-done .hero-more{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 @media(min-width:861px){.chapter.hero[data-view="demo"] .ch-copy{opacity:0;pointer-events:none}}
 
@@ -127,7 +133,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 
 /* flow switch */
 .flow-switch{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));z-index:40;display:flex;padding:4px;border:1px solid var(--line-2);border-radius:999px;
-  background:rgba(14,14,17,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:opacity .4s,transform .5s var(--ease)}
+  background:rgba(14,14,17,.94);transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:opacity .4s,transform .5s var(--ease)}
 .flow-switch.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .flow-switch button{position:relative;z-index:1;padding:8px 18px;font-size:13px;color:var(--mute);border-radius:999px;transition:color .3s;min-width:118px;text-align:center}
 .flow-switch button[aria-checked="true"]{color:var(--bg)}
@@ -188,7 +194,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 
 /* ───────── popup card ───────── */
 .pop{position:fixed;inset:0;z-index:60;pointer-events:none}
-.pop .scrim{position:absolute;inset:0;background:rgba(4,4,6,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .35s;cursor:zoom-out}
+.pop .scrim{position:absolute;inset:0;background:rgba(4,4,6,.78);opacity:0;transition:opacity .35s;cursor:zoom-out}
 .card-pop{position:absolute;top:4vh;bottom:4vh;left:max(3vw,calc((100vw - 1280px) / 2));right:max(3vw,calc((100vw - 1280px) / 2));
   background:var(--bg-2);border:1px solid var(--line-2);border-radius:20px;overflow:auto;overscroll-behavior:contain;
   opacity:0;transform:translateY(24px) scale(.975);transition:opacity .35s var(--ease),transform .5s var(--ease);padding:clamp(20px,3vw,44px)}
@@ -369,9 +375,10 @@ html:not(.rocket-fell) .crash{display:none}
 .rail i{display:block;width:14px;height:2px;border-radius:2px;background:rgba(242,239,233,.28);transition:width .3s var(--ease),background .3s}
 .rail span{opacity:0;transform:translateX(-4px);transition:opacity .25s,transform .25s}
 .rail button.cur i{width:22px;background:var(--fg)}
-.rail:hover{background:rgba(8,8,10,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.rail:hover span{opacity:1;transform:none}
-.rail:hover button.cur{color:var(--fg)}
+.rail.open{background:rgba(8,8,10,.92)}
+.rail.open span{opacity:1;transform:none}
+.rail.open button.cur{color:var(--fg)}
+.rail-list{display:contents}
 .rail button:hover{color:var(--fg)}
 .rail button:hover i{background:rgba(242,239,233,.7)}
 /* the current flow's sections sit indented on a thin guide; the shared sections below follow a small gap */
@@ -383,7 +390,7 @@ html:not(.rocket-fell) .crash{display:none}
 /* reduce-motion toggle */
 /* small fixed pause/play in the corner: reduce motion */
 .motion-toggle{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:39;width:30px;height:30px;display:grid;place-items:center;
-  border-radius:50%;border:1px solid var(--line-2);background:rgba(14,14,17,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--mute);opacity:.6;transition:opacity .25s,color .25s}
+  border-radius:50%;border:1px solid var(--line-2);background:rgba(14,14,17,.85);color:var(--mute);opacity:.6;transition:opacity .25s,color .25s}
 .motion-toggle svg{width:12px;height:12px}
 .motion-toggle:hover,.motion-toggle:focus-visible{opacity:1;color:var(--fg)}
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.001s!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001s!important;scroll-behavior:auto!important}
@@ -397,8 +404,8 @@ html.rm .fall-rocket{display:none}
 .pop-story .points{margin:6px 0 12px}
 /* rail: which flow's list it shows, only while open */
 .rail-flow{position:absolute;left:0;bottom:calc(100% + 6px);display:flex;gap:2px;padding:3px;border-radius:999px;border:1px solid var(--line-2);
-  background:rgba(8,8,10,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .25s,transform .25s}
-.rail:hover .rail-flow{opacity:1;transform:none;pointer-events:auto}
+  background:rgba(8,8,10,.92);opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .25s,transform .25s}
+.rail.open .rail-flow{opacity:1;transform:none;pointer-events:auto}
 .rail .rail-flow button{height:auto;padding:4px 10px;border-radius:999px;font-size:11.5px;color:var(--mute);transition:background .2s,color .2s}
 .rail .rail-flow button.on{background:var(--fg);color:var(--bg)}
 .rail .rail-flow button:not(.on):hover{color:var(--fg)}

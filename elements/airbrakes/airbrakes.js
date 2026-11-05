@@ -185,6 +185,7 @@ function makeEnvironment(renderer) {
 export class AirbrakeRenderer {
   constructor(canvas) {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    this.renderer.debug.checkShaderErrors = false;
     this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -487,11 +488,16 @@ class ASAirbrakes extends HTMLElement {
   pause() { this._playing = false; if (this._btn) this._btn.textContent = 'PLAY'; }
   seek(t) { this.time = clamp(+t || 0, 0, this.duration); this._progress = null; this._target = this._ext = airbrakeStateAt(this.time).extension; this._dirty = true; this._kick(); return this.time; }
   renderAt(t) { return this.seek(t); }
+  // compiles the shaders off the main thread (KHR_parallel_shader_compile) and holds the first frame until they are ready
+  warm() {
+    if (!this.r?.renderer || this._warming) return Promise.resolve(); this._warming = true;
+    return this.r?.renderer.compileAsync(this.r.scene, this.r.camera).catch(() => {}).finally(() => { this._warming = false; this._kick(); });
+  }
   _kick() { if (!this._raf && this._connected && this.r) { this._last = performance.now(); this._raf = requestAnimationFrame(n => this._tick(n)); } }
   _tick(now) {
     this._raf = 0; if (!this.r) return;
     const dt = Math.min(0.05, (now - this._last) / 1000); this._last = now;
-    const active = this._visible && !document.hidden;
+    const active = this._visible && !document.hidden && !this._warming;
     let moving = false;
     if (active) {
       const auto = this._playing && this._progress === null && !this._reduced.matches;

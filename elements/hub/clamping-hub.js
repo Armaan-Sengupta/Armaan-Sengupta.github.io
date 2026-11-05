@@ -260,6 +260,11 @@ class ASClampingHub extends HTMLElement {
   disconnectedCallback() { this._ro?.disconnect(); this._io?.disconnect(); document.removeEventListener('visibilitychange', this._onVis); cancelAnimationFrame(this._raf); this._raf = 0; }
   play() { this._playing = true; this._kick(); }
   pause() { this._playing = false; }
+  // compiles the shaders off the main thread (KHR_parallel_shader_compile) and holds the first frame until they are ready
+  warm() {
+    if (!this._r || this._warming) return Promise.resolve(); this._warming = true;
+    return this._r.compileAsync(this._scene, this._cam).catch(() => {}).finally(() => { this._warming = false; this._kick(); });
+  }
   _kick() { if (this._visible && !document.hidden && !this._raf) { this._last = 0; this._raf = requestAnimationFrame(this._tick); } }
   _setup() {
     try {
@@ -282,7 +287,7 @@ class ASClampingHub extends HTMLElement {
   }
   _tick(now) {
     this._raf = 0;
-    if (!this._visible || document.hidden) return;
+    if (!this._visible || document.hidden || this._warming) return;
     const dt = this._last ? Math.min(0.05, (now - this._last) / 1000) : 0; this._last = now;
     const live = this._playing && !this._reduced;
     if (live) { this._t += dt; this._dirty = true; }

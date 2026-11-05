@@ -336,6 +336,11 @@ class FyelabsSystem extends HTMLElement {
     this._scene?.traverse(o => { o.geometry?.dispose(); if (o.material) [].concat(o.material).forEach(m => m.dispose()); });
     this._env?.dispose(); this._renderer?.dispose(); this._renderer = null;
   }
+  // compiles the shaders off the main thread (KHR_parallel_shader_compile) and holds the first frame until they are ready
+  warm() {
+    if (!this._renderer || this._warming) return Promise.resolve(); this._warming = true;
+    return this._renderer.compileAsync(this._scene, this._cam).catch(() => {}).finally(() => { this._warming = false; this._kick(); });
+  }
   _kick() { if (!this._renderer || this._raf) return; this._raf = requestAnimationFrame(t => this._frame(t)); }
 
   _init() {
@@ -482,7 +487,7 @@ class FyelabsSystem extends HTMLElement {
   }
 
   _frame(now) {
-    this._raf = 0; if (!this._renderer) return;
+    this._raf = 0; if (!this._renderer || this._warming) return;
     const dt = this._last ? Math.min(.05, (now - this._last) / 1000) : 0; this._last = now;
     const running = !this._reduced && !this.hasAttribute('paused');
     if (running) this._clock += dt;

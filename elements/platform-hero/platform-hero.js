@@ -74,6 +74,11 @@ class ASPlatformHero extends HTMLElement {
     const loop = (now) => { this._raf = requestAnimationFrame(loop); this._frame(now); };
     this._raf = requestAnimationFrame(loop);
   }
+  // compiles the shaders off the main thread once the parts have loaded, and holds the first frame until they are ready
+  warm() {
+    if (!this._view || this._warming) return Promise.resolve(); this._warming = true;
+    return this._view.ready.then(() => this._view.compile()).catch(() => {}).finally(() => { this._warming = false; this._dirty = true; });
+  }
   disconnectedCallback() { cancelAnimationFrame(this._raf); this._ro?.disconnect(); this._io?.disconnect(); this._view?.dispose(); this._view = null; }
   attributeChangedCallback(name, _o, v) {
     if (name === 'progress') this.progress = v;
@@ -120,7 +125,7 @@ class ASPlatformHero extends HTMLElement {
     return { ...s, explode };
   }
   _frame(now) {
-    if (!this._view || !this._visible || document.hidden) { this._last = 0; return; }
+    if (!this._view || !this._visible || document.hidden || this._warming) { this._last = 0; return; }
     const dt = this._last ? Math.min((now - this._last) / 1000, 0.05) : 0; this._last = now;
     // demo camera blend
     if (this._demoScroll != null) { if (this._demoMix !== this._demoScroll) { this._demoMix = this._demoScroll; this._dirty = true; } }

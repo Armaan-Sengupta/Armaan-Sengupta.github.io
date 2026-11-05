@@ -1,6 +1,6 @@
 import { initHero } from './hero.js';
 import { chapters, cards, details, uses, skills, pagePath } from './data.js';
-import { VH as _VH, chapterState, updateChapter, makeEl, makeLottie, makeVideo, buildProject, layoutChapters, observeChapters } from './chapters.js';
+import { VH as _VH, chapterState, updateChapter, makeEl, makeLottie, makeVideo, buildProject, layoutChapters, observeChapters, loadWhenFree, pumpLoader, warmEl, attachPoster } from './chapters.js';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
@@ -31,7 +31,7 @@ function showFlow(name, { restore = true } = {}) {
   flowState.offsets[flowState.current] = clamp(scrollY - top, 0, flows[flowState.current].offsetHeight);
   const first = !flowState.seen[name];
   flows[flowState.current].hidden = true; flows[name].hidden = false;
-  flowState.current = name; flowState.seen[name] = true; buildRail();
+  flowState.current = name; flowState.seen[name] = true; buildRail(); pumpLoader();
   $$('button', flowSwitch).forEach((b) => b.setAttribute('aria-checked', b.dataset.flow === name));
   flowSwitch.dataset.flow = name;
   scrollTo({ top: top + (first || !restore ? 0 : flowState.offsets[name]), behavior: 'auto' });
@@ -66,16 +66,20 @@ let ticking = false, lastY = scrollY;
    clicking jumps there. Follows the current flow, then Projects, Skills and Volunteering. While open, a small
    Personal / Professional toggle changes which list it shows; the page only switches once an item is clicked. */
 const rail = document.createElement('nav'); rail.className = 'rail'; rail.setAttribute('aria-label', 'Sections');
+rail.innerHTML = `<div class="rail-flow">${['personal', 'professional'].map((f) => `<button data-f="${f}">${f === 'personal' ? 'Personal' : 'Professional'}</button>`).join('')}</div><div class="rail-list"></div>`;
 document.body.append(rail);
-let railItems = [], railFlow = null;
+const railToggle = $('.rail-flow', rail), railList = $('.rail-list', rail);
+let railItems = [], railFlow = null, railClose = 0;
 function buildRail(show = flowState.current) {
   railFlow = show;
   railItems = [
     ...chapters.filter((c) => c.flow === show).map((c) => ({ label: c.title, flow: c.flow, el: () => $(`[data-ch="${c.id}"]`, flows[c.flow]) })),
     { label: 'Projects', el: () => $('#projects') }, { label: 'Skills', el: () => $('#skills') }, { label: 'Volunteering', el: () => $('#volunteering') }
   ];
-  rail.innerHTML = `<div class="rail-flow">${['personal', 'professional'].map((f) => `<button data-f="${f}" class="${f === show ? 'on' : ''}">${f === 'personal' ? 'Personal' : 'Professional'}</button>`).join('')}</div>`
-    + railItems.map((it, i) => `<button data-i="${i}"${it.flow ? ' class="sub"' : ''}><i></i><span>${esc(it.label)}</span></button>`).join('');
+  // the toggle stays in place and only the list is replaced: swapping out the button under the cursor dropped the
+  // rail's hover, which closed it
+  $$('button', railToggle).forEach((b) => b.classList.toggle('on', b.dataset.f === show));
+  railList.innerHTML = railItems.map((it, i) => `<button data-i="${i}"${it.flow ? ' class="sub"' : ''}><i></i><span>${esc(it.label)}</span></button>`).join('');
   updateRail();
 }
 rail.addEventListener('click', (e) => {
@@ -87,8 +91,15 @@ rail.addEventListener('click', (e) => {
 });
 // The rail is centred on the viewport, so a list of a different length would move it out from under the cursor
 // (and close it). While hovered, pin its top edge where it is so swapping the list only grows or shrinks the bottom.
-rail.addEventListener('mouseenter', () => { rail.style.top = rail.getBoundingClientRect().top + 'px'; rail.style.transform = 'none'; });
-rail.addEventListener('mouseleave', () => { rail.style.top = rail.style.transform = ''; if (railFlow !== flowState.current) buildRail(); });
+// Open is a class with a short grace period rather than :hover, so crossing the gap up to the toggle never closes it.
+rail.addEventListener('mouseenter', () => {
+  clearTimeout(railClose);
+  if (rail.classList.contains('open')) return;
+  rail.style.top = rail.getBoundingClientRect().top + 'px'; rail.style.transform = 'none'; rail.classList.add('open');
+});
+rail.addEventListener('mouseleave', () => {
+  railClose = setTimeout(() => { rail.classList.remove('open'); rail.style.top = rail.style.transform = ''; if (railFlow !== flowState.current) buildRail(); }, 350);
+});
 function updateRail() {
   let cur = -1;
   railItems.forEach((it, i) => { if (it.flow && it.flow !== flowState.current) return; const el = it.el(); if (el && el.getBoundingClientRect().top < VH * 0.45) cur = i; });
@@ -100,7 +111,7 @@ function onScroll() {
   ticking = false;
   updateRail();
   const y = scrollY, top = flowTop(), h = flows[flowState.current].offsetHeight;
-  chapterState.forEach((st) => { if (!st.sec.closest('.flow').hidden) updateChapter(st); });
+  chapterState.forEach((st) => { if (st.visible) updateChapter(st); });
   // the switch floats only while the chapters are on screen
   flowSwitch.classList.toggle('on', y > top - VH * 0.6 && y < top + h - VH * 0.9);
   // finished personal without ever looking at professional: continue there
@@ -131,12 +142,19 @@ grid.innerHTML = cards.map((c) => `
 const cardIO = new IntersectionObserver((es) => es.forEach(async (e) => {
   if (!e.isIntersecting) return; cardIO.unobserve(e.target);
   const c = cards.find((x) => x.id === e.target.dataset.open), box = $('.thumb', e.target), m = c.media;
-  if (m.el) { const n = await makeEl(m.el).catch(() => null); if (n) { box.append(n); if (m.progress) scrubbers.push({ card: e.target, seek: (p) => { n.progress = p; } }); } }
+  if (m.el) {
+    const clear = attachPoster(box, `media/posters/card-${c.id}.webp`);
+    loadWhenFree(async () => {
+      const n = await makeEl(m.el).catch(() => null); if (!n) return clear();
+      box.append(n); if (m.progress) scrubbers.push({ card: e.target, seek: (p) => { n.progress = p; } });
+      cardScrub(); await warmEl(n); clear();
+    });
+  }
   else if (m.lottie || m.scrub) { box.classList.add('lottie'); const pl = await makeLottie(box, m, false); scrubbers.push({ card: e.target, seek: pl.seek }); }
   else if (m.video) { const v = makeVideo(m.video); box.append(v); vidIO.observe(v); }
   else if (m.img) { const im = new Image(); im.src = m.img; im.alt = ''; im.className = 'fit'; box.append(im); }
   cardScrub();
-}), { rootMargin: '300px 0px' });
+}), { rootMargin: '100% 0px' });
 $$('.card', grid).forEach((c) => cardIO.observe(c));
 const vidIO = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause())), { threshold: 0.2 });
 function cardScrub() {

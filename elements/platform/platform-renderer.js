@@ -377,5 +377,6 @@ export function createPlatformRenderer(host, options = {}) {
     dispose() { renderer.dispose(); envRT.dispose(); geoms.forEach((g) => g.dispose()); Object.values(M).forEach((m) => m.dispose()); tex.map.dispose(); tex.metal.dispose(); },
   };
   setLed('white'); resize(width, height); setStateStatic(state);
+  api.compile = () => renderer.compileAsync(scene, camera);
   return api;
 }

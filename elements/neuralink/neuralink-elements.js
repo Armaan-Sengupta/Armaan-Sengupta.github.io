@@ -122,7 +122,7 @@ class ASNeuralJourney extends HTMLElement{
  attributeChangedCallback(name,old,v){if(name==='progress')this.progress=v;else if(name==='view'){if(v in NJ_VIEWS){this._from=this._shownP();this._target=NJ_VIEWS[v];this._tween=0;if(old==null&&this._progress==null&&!this.isConnected)this._tween=1}}else if(name==='portrait-src'&&this.isConnected)this.ready=this._load()}
  connectedCallback(){this._ro.observe(this);this._io.observe(this);this.ready=this._load();this.resize();this._raf=requestAnimationFrame(this._frame)}
  disconnectedCallback(){this._ro.disconnect();this._io.disconnect();cancelAnimationFrame(this._raf)}
- resize(){const b=this.getBoundingClientRect();this._w=Math.max(1,b.width);this._h=Math.max(1,b.height);this._dpr=Math.min(2,devicePixelRatio||1);this._canvas.width=Math.round(this._w*this._dpr);this._canvas.height=Math.round(this._h*this._dpr);this.render()}
+ resize(){const b=this.getBoundingClientRect();this._w=Math.max(1,b.width);this._h=Math.max(1,b.height);this._dpr=Math.min(1.5,devicePixelRatio||1);this._canvas.width=Math.round(this._w*this._dpr);this._canvas.height=Math.round(this._h*this._dpr);this.render()}
  /** Autoplay clock seek (seconds). */
  seek(t){this._clock=Math.max(0,Number(t)||0);this.render();return this}
  /** Deterministic draw: journey progress p (0..1) and ambient time (s) for pulses/flicker. */
