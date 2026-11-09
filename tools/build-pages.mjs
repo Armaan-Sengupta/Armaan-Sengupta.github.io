@@ -144,6 +144,12 @@ function page(it, i) {
 }
 items.forEach(page);
 
+// The home page's chapters and cards are built by script, so its HTML alone linked to none of these pages. The grid
+// starts out holding a plain link to each one, which main.js replaces with the real cards as soon as it runs.
+const GRID = '<div class="grid" id="grid"></div>', home = readFileSync('index.html', 'utf8');
+if (!home.includes(GRID)) throw new Error('index.html no longer has the empty grid to fill');
+writeFileSync('index.html', home.replace(GRID, () => `<div class="grid" id="grid">${items.map((it) => `<a class="card" href="${pagePath(it.id)}"><div class="body"><h3>${esc(it.title)}</h3><p>${esc(clip(it.summary))}</p></div></a>`).join('')}</div>`));
+
 /* ── redirects ──
    Every old address that is not a page itself: the old Wix site's pages (and the section anchors the résumé
    links into), and the earlier /work/<id>/ pages. Each gets a tiny page that redirects at once and names its
