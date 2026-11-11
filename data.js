@@ -33,7 +33,7 @@ export const chapters = [
   {
     id: 'platform', flow: 'personal', hero: true,
     org: '3RRS parallel manipulator', dates: 'Dec 2025',
-    title: 'Stewart Platform', role: 'Finding a 200× heavier ball by feel',
+    title: 'Stewart Platform', role: 'Finding a 200× heavier ball by its moment',
     points: ['Redesigned the platform around a 538 g steel ball so a force-torque sensor could find it', 'Topology-optimized the plate: 14% lighter and 12% stiffer than a standard cutout design', 'Designed a ball-joint-free spherical parallel manipulator with pin joints only'],
     views: [
       { id: 'assemble', label: 'Assembly', el: EL.platform, progress: 'view', len: 1.3 },
@@ -131,7 +131,7 @@ export const chapters = [
 
 // grid cards. media: one of {el}, {lottie} (scrubbed by scroll position), {video}, {img}
 export const cards = [
-  { id: 'platform', date: 'Dec 2025', title: 'Stewart Platform', kicker: 'MTE 380 · Team of five', blurb: 'Led the mechanical, electrical and software design of a ball balancer that finds a 538 g steel ball by feel, with a force-torque sensor under the plate.', media: { video: 'media/stewart-demo.mp4' } },
+  { id: 'platform', date: 'Dec 2025', title: 'Stewart Platform', kicker: 'MTE 380 · Team of five', blurb: 'Led the mechanical, electrical, software and firmware design of a ball balancer that finds a 538 g steel ball from the moment it produces on a force-torque sensor.', media: { video: 'media/stewart-demo.mp4' } },
   { id: 'airbrakes', date: 'Dec 2024', title: 'Rocket Airbrakes', kicker: 'Waterloo Rocketry', blurb: 'Designed the cam mechanism that drives three panels from one servo, and co-wrote the firmware that steers Borealis to its target apogee.', media: { video: 'media/airbrakes/irl/actuation-1.mp4' } },
   { id: 'measurement', date: 'Dec 2023', title: 'Automated Measurement System', kicker: 'Team project', blurb: 'Led the firmware for a station that measures parts to 0.3 mm, including a custom 2-wire protocol to the VEX brain.', media: { scrub: 'media/lottie/measurement-device.mp4' } },
   { id: 'trashminator', date: '2022', title: 'The Trashminator', kicker: 'Grade 12 · Design', blurb: 'Designed and built an autonomous surface robot that collects floating trash, meant to work in swarms.', media: { scrub: 'media/lottie/trashminator.mp4' } },
@@ -174,8 +174,8 @@ export const details = {
       { type: 'image', src: 'media/img/stewart_platform_prototype.webp', caption: 'Prototype' },
       { type: 'image', src: 'media/img/stewart_platform_sim_sensor.webp', caption: 'Kinematics, Simulink and sensor collage' }
     ],
-    body: ["A ball-balancing platform: a 3-RRS parallel manipulator, where three legs, each a revolute–revolute–spherical joint chain, tilt and lift the plate with three degrees of freedom to hold a ball still. The usual version, from our course, balances a 2.7 g ping-pong ball under an overhead camera. I had never seen anyone find the ball by feel instead, so our team of five tried it for the novelty: a force-torque sensor under the plate reads the forces and moments, and the ball's position follows from them.",
-      "A ping-pong ball barely registers on a load cell, so we switched to a 538 g steel ball, about 200 times heavier, and that broke almost every part of the platform. I led the mechanical, electrical and software design: a topology-optimized plate 14% lighter and 12% stiffer than a standard cutout design, stronger links, a protection circuit for the large back EMF from servos the heavy ball drove backwards, and the forward and inverse kinematics, the ball position estimate from the force sensor, and the controller.",
+    body: ["A ball-balancing platform: a 3-RRS parallel manipulator, where three legs, each a revolute–revolute–spherical joint chain, tilt and lift the plate with three degrees of freedom to hold a ball still. The usual version, from our course, balances a 2.7 g ping-pong ball under an overhead camera. I had never seen anyone find the ball from the moment it produces instead, so our team of five tried it for the novelty: a force-torque sensor under the plate reads the moments the ball's weight creates, and its position follows from them.",
+      "A ping-pong ball barely registers on a load cell, so we switched to a 538 g steel ball, about 200 times heavier, and that broke almost every part of the platform. I led the mechanical, electrical, software and firmware design: a topology-optimized plate 14% lighter and 12% stiffer than a standard cutout design, stronger links, a protection circuit for the large back EMF from servos the heavy ball drove backwards, the forward and inverse kinematics, the ball position estimate from the force sensor, the controller, and the servo control firmware.",
       "The play left in the ball joints led to a second design: a spherical parallel manipulator with pin joints only. Its 3D-printed prototype moves smoothly with no bearings at all and balances an egg."],
     chips: ['SolidWorks', 'Topology optimization · FEA', 'Laser cutting · 3D printing', 'Kinematics', 'Python', 'Simulink', 'PID · feedforward']
   },
