@@ -220,8 +220,9 @@ export const details = {
       { type: 'image', src: 'media/airbrakes/slide-drag-surface.webp', caption: 'Drag against velocity, altitude and extension' },
       { type: 'image', src: 'media/airbrakes/slide-drag-tables.webp', caption: 'Drag tables' }
     ],
-    body: ['Airbrakes for Borealis, Canada\'s first liquid-fuelled student rocket. A modified cam-slot spiral drives three panels in perfect sync, with extension linear in servo angle.',
-      'Ansys CFD gave C<sub>D</sub> against extension and checked the centre-of-pressure margin. STM32 / FreeRTOS firmware estimates state with a Madgwick filter, predicts apogee with RK4 and closes the loop with a PI controller. The 4-layer KiCad flight computer raised power efficiency from 66% to 95%.'],
+    body: ['Borealis is Waterloo Rocketry\'s rocket, Canada\'s first liquid-fuelled student rocket. At competition each team declares a target apogee before launch and is scored on how close it gets. Without active control, the team\'s 2023 rocket came within 1,500 ft of its 30,000 ft target. For 2024 we added airbrakes: three panels that extend out of the airframe in flight, adding drag to bleed off extra altitude and steer the rocket onto its target.',
+      'I designed the mechanism: one servo turns a plate cut with three modified cam-slot spirals, so all three panels move in perfect sync and extension is linear in servo angle. With a teammate I ran Ansys CFD to map drag coefficient against extension and check the centre of pressure stays safely behind the centre of gravity. With the subteam I wrote the STM32 / FreeRTOS firmware, which estimates the rocket\'s state with a Madgwick filter, predicts apogee with RK4 and closes the loop with a PI controller.',
+      'At launch the propellant was underfilled by more than the airbrakes could correct for, so they correctly stayed retracted. For the next rocket I designed the 4-layer KiCad flight computer for its roll-control canards, raising power efficiency from 66% to 95%.'],
     chips: ['C · FreeRTOS', 'STM32', 'DMA · interrupts', 'KiCad', 'Ansys CFD', 'SolidWorks'], links: [['Borealis', 'https://www.waterloorocketry.com/rockets/borealis']]
   },
   measurement: { gallery: [
