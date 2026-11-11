@@ -182,7 +182,7 @@
   [
    "Sensing and control",
    [
-    "As a team, we estimate the ball's position from a quasi-static model of the sensor's force and moments, filtered and aligned to the plate, and benchmark it against an OpenCV Hough-circle tracker reworked for the mirror-like steel ball. Control is decoupled X–Y PID with velocity feedforward and extra derivative action to catch the heavy ball's momentum; trajectory planning was compared on a Simulink plant model."
+    "As a team, we estimate the ball's position from a quasi-static model of the sensor's force and moments, filtered and aligned to the plate, and benchmark it against an OpenCV Hough-circle tracker reworked for the mirror-like steel ball. Control is decoupled X–Y PID, tuned to catch the heavy ball's momentum; trajectory planning was compared on a Simulink plant model."
    ]
   ]
  ],

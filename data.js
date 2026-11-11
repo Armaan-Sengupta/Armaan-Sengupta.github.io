@@ -177,7 +177,7 @@ export const details = {
     body: ["A ball-balancing platform: a 3-RRS parallel manipulator, where three legs, each a revolute–revolute–spherical joint chain, tilt and lift the plate with three degrees of freedom to hold a ball still. The usual version, from our course, balances a 2.7 g ping-pong ball under an overhead camera. I had never seen anyone find the ball from the moment it produces instead, so our team of five tried it for the novelty: a force-torque sensor under the plate reads the moments the ball's weight creates, and its position follows from them.",
       "A ping-pong ball barely registers on a load cell, so we switched to a 538 g steel ball, about 200 times heavier, and that broke almost every part of the platform. I led the mechanical, electrical, software and firmware design: a topology-optimized plate 14% lighter and 12% stiffer than a standard cutout design, stronger links, a protection circuit for the large back EMF from servos the heavy ball drove backwards, the forward and inverse kinematics, the ball position estimate from the force sensor, the controller, and the servo control firmware.",
       "The play left in the ball joints led to a second design: a spherical parallel manipulator with pin joints only. Its 3D-printed prototype moves smoothly with no bearings at all and balances an egg."],
-    chips: ['SolidWorks', 'Topology optimization · FEA', 'Laser cutting · 3D printing', 'Kinematics', 'Python', 'Simulink', 'PID · feedforward']
+    chips: ['SolidWorks', 'Topology optimization · FEA', 'Laser cutting · 3D printing', 'Kinematics', 'Python', 'Simulink', 'PID']
   },
   airbrakes: { hero: 'SJO39WQ7Uv0', gallery: [
       { type: 'youtube', src: 'Z126ZESX3uA', caption: 'Borealis launch, Launch Canada 2024' },

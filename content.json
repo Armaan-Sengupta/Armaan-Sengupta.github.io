@@ -12,7 +12,7 @@
    "bullets": [
     "3-DOF 3RRS parallel manipulator: forward and inverse kinematics for the servo legs",
     "Plant modelled in Simulink/Simscape; physical plant characterized and controller tuned against it",
-    "Trajectory planning for feedforward control of the ball path",
+    "Decoupled X–Y PID control of the ball position",
     "\"Remote\" ball position sensing from a 3-DOF ForceN force/torque sensor",
     "Code on GitHub (Redstone-ray/3YDP); full MTE 380 report"
    ],
