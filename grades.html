@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Grades · Armaan Sengupta</title>
-<meta name="description" content="University of Waterloo Mechatronics Engineering grade history and prerequisite skill tree for Armaan Sengupta.">
+<meta name="description" content="University of Waterloo Mechatronics Engineering grades for Armaan Sengupta.">
 <link rel="canonical" href="https://www.armaansengupta.ca/grades">
 <meta name="author" content="Armaan Sengupta">
 <meta name="theme-color" content="#08080a">
@@ -25,85 +25,54 @@
 <header class="top">
   <a class="brand" href="/"><span class="dot" aria-hidden="true"></span>Armaan Sengupta</a>
   <nav aria-label="Page navigation">
-    <a href="/">← Back to portfolio</a>
+    <a href="/">← Portfolio</a>
   </nav>
 </header>
 
-<main class="page">
-  <section class="hero wrap">
-    <div class="hero-copy">
-      <p class="eyebrow mono">University of Waterloo · Mechatronics Engineering · BASc (Co-op)</p>
-      <h1>Academic Skill Tree</h1>
-      <p class="lede">Course progression across eight engineering and complementary branches from Fall 2022 (1A) through Fall 2026 (4A). Hover, focus, or select any node to trace prerequisite chains and inspect exact grades.</p>
-      <p class="source-note mono">All academic terms Excellent Standing · Source: Quest ("View My Grades", Nov 17 2026)</p>
+<main class="page wrap">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow mono">Mechatronics Engineering · University of Waterloo</p>
+      <div class="title-row">
+        <h1>Grades</h1>
+        <span class="avg-pill mono" id="summary"></span>
+      </div>
     </div>
 
-    <div class="summary" id="summary" aria-label="Transcript summary"></div>
-  </section>
-
-  <section class="controls wrap" aria-label="View and branch filters">
-    <div class="controls-row">
-      <div class="seg" role="tablist" aria-label="Display mode">
-        <button type="button" class="seg-btn is-on" role="tab" aria-selected="true" data-view="tree">Skill Tree</button>
-        <button type="button" class="seg-btn" role="tab" aria-selected="false" data-view="table">Transcript Table</button>
-      </div>
-
-      <div class="legend" aria-label="Grade and edge legend">
-        <span class="legend-item"><i class="swatch tier-peak"></i>95–100</span>
+    <div class="controls">
+      <div class="legend" id="legend" aria-label="Grade legend">
+        <span class="legend-item"><i class="swatch tier-peak"></i>95+</span>
         <span class="legend-item"><i class="swatch tier-high"></i>90–94</span>
         <span class="legend-item"><i class="swatch tier-mid"></i>85–89</span>
-        <span class="legend-item"><i class="swatch tier-base"></i>75–84</span>
-        <span class="legend-item"><i class="swatch tier-ip"></i>4A In Progress</span>
-        <span class="legend-sep" aria-hidden="true"></span>
-        <span class="legend-item"><i class="edge-swatch is-prereq"></i>Prerequisite</span>
-        <span class="legend-item"><i class="edge-swatch is-concept"></i>Cross-topic</span>
+        <span class="legend-item"><i class="swatch tier-base"></i>80–84</span>
+      </div>
+
+      <div class="seg" role="tablist" aria-label="View">
+        <button type="button" class="seg-btn is-on" role="tab" aria-selected="true" data-view="tree">Graph</button>
+        <button type="button" class="seg-btn" role="tab" aria-selected="false" data-view="table">Table</button>
       </div>
     </div>
+  </header>
 
-    <div class="branch-bar" id="branch-bar" role="group" aria-label="Filter by skill branch"></div>
-  </section>
-
-  <!-- Primary Interactive Skill Tree -->
-  <section class="tree-section wrap" id="tree-view" aria-label="Mechatronics curriculum skill tree">
-    <div class="inspector" id="inspector" aria-live="polite"></div>
-
-    <div class="tree-frame" id="tree-frame">
-      <div class="tree-scroll" id="tree-scroll">
+  <section class="tree-section" id="tree-view" aria-label="Course graph">
+    <div class="tree-frame">
+      <div class="tree-scroll">
         <div class="tree-canvas" id="tree-canvas">
           <svg class="tree-edges" id="tree-edges" aria-hidden="true"></svg>
           <div class="tree-grid" id="tree-grid"></div>
-          <div class="edge-tip" id="edge-tip" hidden role="status"></div>
         </div>
       </div>
     </div>
-
-    <!-- Mobile / narrow vertical branch flow -->
-    <div class="mobile-flow" id="mobile-flow" aria-label="Skill branches by progression"></div>
   </section>
 
-  <!-- Secondary Compact Transcript Table -->
-  <section class="table-section wrap" id="table-view" hidden aria-label="Transcript table by term">
+  <section class="table-section" id="table-view" hidden aria-label="Grades by term">
     <div class="table-wrap" id="table-wrap"></div>
-  </section>
-
-  <!-- Subtle footnote for CR, PD, seminars, and work-term reports -->
-  <section class="footnote wrap" aria-label="Co-op terms, seminars, and work-term reports">
-    <details class="quiet-box" open>
-      <summary class="mono">Non-graded milestones, seminars &amp; work-term reports</summary>
-      <div class="quiet-grid" id="quiet-grid"></div>
-    </details>
   </section>
 </main>
 
-<!-- Touch / keyboard detail sheet for mobile or quick inspection -->
-<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-  <div class="sheet-scrim" id="sheet-scrim"></div>
-  <div class="sheet-panel" id="sheet-panel"></div>
-</div>
-
 <footer class="foot wrap">
   <a href="/">armaansengupta.ca</a>
-  <span class="mono">Unlisted academic record · Noindex</span>
+  <span class="mono">© 2026 Armaan Sengupta</span>
 </footer>
 
 </body>
