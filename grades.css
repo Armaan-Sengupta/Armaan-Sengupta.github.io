@@ -130,6 +130,21 @@ button {
   color: var(--tier-peak);
   font-size: 12px;
 }
+.gpa-calc-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--mute);
+}
+.gpa-calc-note a {
+  text-decoration: underline;
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 3px;
+  transition: color .18s, text-decoration-color .18s;
+}
+.gpa-calc-note a:hover {
+  color: var(--fg);
+  text-decoration-color: var(--fg);
+}
 
 .controls {
   display: flex;

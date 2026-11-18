@@ -536,7 +536,7 @@ const branchHeadEls = new Map();
 function renderSummary() {
   const stats = weightedAverage(COURSES);
   if (stats && summaryEl) {
-    summaryEl.textContent = `${stats.avg.toFixed(1)}% avg`;
+    summaryEl.textContent = `${stats.avg.toFixed(1)}% avg · 3.93 cGPA`;
   }
 }
 
