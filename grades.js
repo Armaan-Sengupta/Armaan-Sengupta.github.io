@@ -320,10 +320,10 @@ function drawEdges() {
         <path d="M0,1 L7,4 L0,7 Z" fill="rgba(242,239,233,0.18)"></path>
       </marker>
       <marker id="arr-prereq" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M0,1 L7,4 L0,7 Z" fill="#f0dfba"></path>
+        <path d="M0,1 L7,4 L0,7 Z" fill="#4ade80"></path>
       </marker>
       <marker id="arr-unlock" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M0,1 L7,4 L0,7 Z" fill="#7dd3b0"></path>
+        <path d="M0,1 L7,4 L0,7 Z" fill="#68b898"></path>
       </marker>
     </defs>
   `;

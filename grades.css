@@ -16,10 +16,10 @@
   --max: 1440px;
   --ease: cubic-bezier(.2, .7, .1, 1);
 
-  --tier-peak: #f0dfba;
-  --tier-peak-bg: rgba(240, 223, 186, .11);
-  --tier-high: #7dd3b0;
-  --tier-high-bg: rgba(125, 211, 176, .09);
+  --tier-peak: #4ade80;
+  --tier-peak-bg: rgba(74, 222, 128, .12);
+  --tier-high: #68b898;
+  --tier-high-bg: rgba(104, 184, 152, .10);
   --tier-mid: #7aa8e8;
   --tier-mid-bg: rgba(122, 168, 232, .09);
   --tier-base: #c99c6b;
@@ -350,8 +350,8 @@ button {
   background: #191920;
   border-color: rgba(242, 239, 233, .45);
 }
-.node.tier-peak { border-color: rgba(240, 223, 186, .3); }
-.node.tier-high { border-color: rgba(125, 211, 176, .24); }
+.node.tier-peak { border-color: rgba(74, 222, 128, .34); }
+.node.tier-high { border-color: rgba(104, 184, 152, .25); }
 .node.tier-mid  { border-color: rgba(122, 168, 232, .22); }
 .node.tier-base { border-color: rgba(201, 156, 107, .24); }
 .node.tier-ip {
