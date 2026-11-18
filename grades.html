@@ -70,6 +70,40 @@
   </section>
 </main>
 
+<aside class="side-panel" id="course-panel" aria-label="Course details" aria-hidden="true">
+  <div class="sp-head">
+    <div class="sp-head-top">
+      <div class="sp-badges">
+        <span class="sp-code mono" id="sp-code"></span>
+        <span class="sp-grade mono" id="sp-grade"></span>
+      </div>
+      <button type="button" class="sp-close" id="sp-close" aria-label="Close course details">✕</button>
+    </div>
+    <h2 class="sp-title" id="sp-title"></h2>
+    <div class="sp-meta-row">
+      <span class="sp-meta mono" id="sp-meta"></span>
+      <a class="sp-flow mono" id="sp-flow" href="https://uwflow.com" target="_blank" rel="noopener">UW Flow ↗</a>
+    </div>
+  </div>
+
+  <div class="sp-body">
+    <div class="sp-section">
+      <h3 class="sp-label mono">Description</h3>
+      <p class="sp-desc" id="sp-desc"></p>
+    </div>
+
+    <div class="sp-section">
+      <h3 class="sp-label mono"><span class="sp-dot is-prereq"></span>Fed by</h3>
+      <div class="sp-links" id="sp-prereqs"></div>
+    </div>
+
+    <div class="sp-section">
+      <h3 class="sp-label mono"><span class="sp-dot is-unlock"></span>Feeds into</h3>
+      <div class="sp-links" id="sp-unlocks"></div>
+    </div>
+  </div>
+</aside>
+
 <footer class="foot wrap">
   <a href="/">armaansengupta.ca</a>
   <span class="mono">© 2026 Armaan Sengupta</span>
