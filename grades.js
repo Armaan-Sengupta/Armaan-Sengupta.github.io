@@ -388,8 +388,12 @@ const COURSES = [
 const EDGES = [
   ['MATH 116', 'MATH 118'],
   ['MATH 118', 'MTE 203'],
-  ['MATH 115', 'MTE 202'],
   ['MATH 115', 'MTE 204'],
+  ['MATH 115', 'MTE 351'],
+  ['MATH 115', 'MTE 360'],
+  ['MATH 115', 'MTE 484'],
+  ['MATH 115', 'MTE 544'],
+  ['MATH 115', 'ME 597'],
   ['MATH 116', 'SYDE 182'],
   ['MATH 118', 'MTE 201'],
   ['MATH 118', 'MTE 202'],
